@@ -1,40 +1,112 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, Alert, Linking, Pressable, StyleSheet, Text, View } from 'react-native';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { BackHandler, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import * as Notifications from 'expo-notifications';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
-import { openArticle } from './src/components/NewsCard';
-import { COLORS } from './src/config';
+import { openUrl } from './src/components/ui';
 import { FavoritesProvider } from './src/favorites';
-import { disableNewsNotifications, enableNewsNotifications } from './src/notifications';
 import NewsScreen from './src/screens/NewsScreen';
+import RizeScreen from './src/screens/RizeScreen';
 import SavedScreen from './src/screens/SavedScreen';
+import SettingsScreen from './src/screens/SettingsScreen';
+import TeaScreen from './src/screens/TeaScreen';
 import WeatherScreen from './src/screens/WeatherScreen';
-import { loadNotificationsEnabled } from './src/storage';
+import { ThemeProvider, useTheme } from './src/theme';
 
-type Tab = 'news' | 'saved' | 'weather';
+// Bildirim yanıtı yalnızca telefonda vardır; web önizlemesinde boş döner.
+const useNotificationResponse =
+  Platform.OS === 'web' ? () => null : Notifications.useLastNotificationResponse;
+
+type Tab = 'news' | 'tea' | 'weather' | 'rize' | 'settings';
 
 const TABS: { id: Tab; label: string; icon: string; title: string }[] = [
   { id: 'news', label: 'Haberler', icon: '📰', title: 'Rize Haber' },
-  { id: 'saved', label: 'Kaydedilenler', icon: '⭐', title: 'Kaydedilenler' },
-  { id: 'weather', label: 'Hava Durumu', icon: '🌦️', title: 'Rize Hava Durumu' },
+  { id: 'tea', label: 'Çay', icon: '🍃', title: 'Çay Fiyatları' },
+  { id: 'weather', label: 'Hava', icon: '🌦️', title: 'Hava Durumu' },
+  { id: 'rize', label: 'Rize', icon: '🏞️', title: 'Rize’yi Tanı' },
+  { id: 'settings', label: 'Ayarlar', icon: '⚙️', title: 'Ayarlar' },
 ];
 
 export default function App() {
   return (
     <SafeAreaProvider>
-      <FavoritesProvider>
-        <Main />
-      </FavoritesProvider>
+      <ThemeProvider>
+        <FavoritesProvider>
+          <Main />
+        </FavoritesProvider>
+      </ThemeProvider>
     </SafeAreaProvider>
   );
 }
 
 function Main() {
+  const { colors, fs } = useTheme();
   const [tab, setTab] = useState<Tab>('news');
+  const [showSaved, setShowSaved] = useState(false);
   const activeTab = TABS.find((t) => t.id === tab)!;
-  useOpenNotifications(setTab);
+  useOpenNotifications(setTab, () => setShowSaved(false));
+
+  // Android geri tuşu: önce Kaydedilenler'i kapat, sonra Haberler sekmesine dön.
+  useEffect(() => {
+    const sub = BackHandler.addEventListener('hardwareBackPress', () => {
+      if (showSaved) {
+        setShowSaved(false);
+        return true;
+      }
+      if (tab !== 'news') {
+        setTab('news');
+        return true;
+      }
+      return false;
+    });
+    return () => sub.remove();
+  }, [showSaved, tab]);
+
+  const styles = useMemo(
+    () =>
+      StyleSheet.create({
+        root: { flex: 1, backgroundColor: colors.header },
+        header: {
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: 12,
+          backgroundColor: colors.header,
+          paddingHorizontal: 16,
+          paddingVertical: 14,
+        },
+        headerTitle: { flexShrink: 1, color: '#FFFFFF', fontSize: fs(22), fontWeight: '800' },
+        headerButton: {
+          minHeight: 36,
+          justifyContent: 'center',
+          paddingHorizontal: 12,
+          borderRadius: 999,
+          backgroundColor: 'rgba(255,255,255,0.16)',
+        },
+        headerButtonActive: { backgroundColor: 'rgba(255,255,255,0.32)' },
+        headerButtonText: { color: '#FFFFFF', fontSize: fs(14), fontWeight: '700' },
+        body: { flex: 1, backgroundColor: colors.background },
+        screen: { flex: 1 },
+        hidden: { display: 'none' },
+        tabBar: {
+          flexDirection: 'row',
+          backgroundColor: colors.card,
+          borderTopWidth: StyleSheet.hairlineWidth,
+          borderTopColor: colors.border,
+        },
+        tabButton: { flex: 1, alignItems: 'center', paddingTop: 8, paddingBottom: 6, gap: 2 },
+        tabIndicator: { position: 'absolute', top: 0, height: 3, width: 28, borderRadius: 2 },
+        tabIndicatorActive: { backgroundColor: colors.primary },
+        tabIcon: { fontSize: 22 },
+        tabInactive: { opacity: 0.45 },
+        tabLabel: { fontSize: fs(11), fontWeight: '600', color: colors.textMuted },
+        tabLabelActive: { color: colors.primary },
+      }),
+    [colors, fs],
+  );
+
+  const title = tab === 'news' && showSaved ? 'Kaydedilenler' : activeTab.title;
 
   return (
     <>
@@ -42,21 +114,41 @@ function Main() {
       <SafeAreaView style={styles.root} edges={['top', 'left', 'right']}>
         <View style={styles.header}>
           <Text style={styles.headerTitle} numberOfLines={1}>
-            {activeTab.title}
+            {title}
           </Text>
-          {tab === 'news' ? <NotificationToggle /> : null}
+          {tab === 'news' ? (
+            <Pressable
+              onPress={() => setShowSaved((v) => !v)}
+              style={[styles.headerButton, showSaved && styles.headerButtonActive]}
+              accessibilityRole="button"
+              accessibilityState={{ selected: showSaved }}
+              accessibilityLabel={showSaved ? 'Haberlere dön' : 'Kaydedilen haberler'}
+              hitSlop={8}
+            >
+              <Text style={styles.headerButtonText}>{showSaved ? '← Haberler' : '★ Kaydedilenler'}</Text>
+            </Pressable>
+          ) : null}
         </View>
 
         {/* Ekranlar bağlı kalır; sekme değişince yüklenen veri ve kaydırma konumu korunur. */}
         <View style={styles.body}>
-          <View style={[styles.screen, tab !== 'news' && styles.hidden]}>
+          <View style={[styles.screen, (tab !== 'news' || showSaved) && styles.hidden]}>
             <NewsScreen />
           </View>
-          <View style={[styles.screen, tab !== 'saved' && styles.hidden]}>
+          <View style={[styles.screen, (tab !== 'news' || !showSaved) && styles.hidden]}>
             <SavedScreen />
+          </View>
+          <View style={[styles.screen, tab !== 'tea' && styles.hidden]}>
+            <TeaScreen />
           </View>
           <View style={[styles.screen, tab !== 'weather' && styles.hidden]}>
             <WeatherScreen />
+          </View>
+          <View style={[styles.screen, tab !== 'rize' && styles.hidden]}>
+            <RizeScreen />
+          </View>
+          <View style={[styles.screen, tab !== 'settings' && styles.hidden]}>
+            <SettingsScreen />
           </View>
         </View>
 
@@ -72,8 +164,11 @@ function Main() {
                 accessibilityState={{ selected: active }}
                 accessibilityLabel={t.label}
               >
+                <View style={[styles.tabIndicator, active && styles.tabIndicatorActive]} />
                 <Text style={[styles.tabIcon, !active && styles.tabInactive]}>{t.icon}</Text>
-                <Text style={[styles.tabLabel, active && styles.tabLabelActive]}>{t.label}</Text>
+                <Text style={[styles.tabLabel, active && styles.tabLabelActive]} numberOfLines={1}>
+                  {t.label}
+                </Text>
               </Pressable>
             );
           })}
@@ -84,8 +179,9 @@ function Main() {
 }
 
 /** Bildirime dokunulunca: tek haberse onu açar, özet bildirimse Haberler sekmesine geçer. */
-function useOpenNotifications(setTab: (tab: Tab) => void) {
-  const response = Notifications.useLastNotificationResponse();
+function useOpenNotifications(setTab: (tab: Tab) => void, closeSaved: () => void) {
+  const { colors } = useTheme();
+  const response = useNotificationResponse();
   const handled = useRef<string | null>(null);
 
   useEffect(() => {
@@ -95,116 +191,8 @@ function useOpenNotifications(setTab: (tab: Tab) => void) {
     handled.current = id;
 
     setTab('news');
+    closeSaved();
     const url = response.notification.request.content.data?.url;
-    if (typeof url === 'string') openArticle(url);
-  }, [response, setTab]);
+    if (typeof url === 'string') openUrl(url, colors);
+  }, [response, setTab, closeSaved, colors]);
 }
-
-function NotificationToggle() {
-  const [enabled, setEnabled] = useState<boolean | null>(null);
-  const [busy, setBusy] = useState(false);
-
-  useEffect(() => {
-    loadNotificationsEnabled().then(setEnabled);
-  }, []);
-
-  const toggle = useCallback(async () => {
-    if (busy) return;
-    setBusy(true);
-    try {
-      if (enabled) {
-        await disableNewsNotifications();
-        setEnabled(false);
-        Alert.alert('Bildirimler kapatıldı', 'Yeni haberler için artık bildirim gönderilmeyecek.');
-        return;
-      }
-      const result = await enableNewsNotifications();
-      if (result === 'enabled') {
-        setEnabled(true);
-        Alert.alert(
-          'Bildirimler açıldı 🔔',
-          'Rize ile ilgili yeni bir haber yayımlandığında bildirim alacaksınız.\n\n' +
-            'Kontrol yaklaşık 30 dakikada bir yapılır; kesin zamanı telefonunuz belirler. ' +
-            'Pil tasarrufu modu açıksa bildirimler gecikebilir.',
-        );
-      } else if (result === 'permission-denied') {
-        Alert.alert(
-          'Bildirim izni gerekli',
-          'Bildirim almak için telefon ayarlarından Rize Haber uygulamasına bildirim izni verin.',
-          [
-            { text: 'Vazgeç', style: 'cancel' },
-            { text: 'Ayarları aç', onPress: () => Linking.openSettings() },
-          ],
-        );
-      } else {
-        Alert.alert(
-          'Arka plan kısıtlı',
-          'Telefonunuz bu uygulamanın arka planda çalışmasına izin vermiyor. ' +
-            'Ayarlar → Uygulamalar → Rize Haber → Pil bölümünden kısıtlamayı kaldırabilirsiniz.',
-        );
-      }
-    } catch {
-      Alert.alert('Bir sorun oluştu', 'Bildirim ayarı değiştirilemedi. Lütfen tekrar deneyin.');
-    } finally {
-      setBusy(false);
-    }
-  }, [busy, enabled]);
-
-  if (enabled === null) return null;
-
-  return (
-    <Pressable
-      onPress={toggle}
-      style={({ pressed }) => [styles.bell, pressed && styles.bellPressed]}
-      accessibilityRole="switch"
-      accessibilityState={{ checked: enabled, busy }}
-      accessibilityLabel="Yeni haber bildirimleri"
-      hitSlop={8}
-    >
-      {busy ? (
-        <ActivityIndicator color="#FFFFFF" />
-      ) : (
-        <Text style={styles.bellText}>{enabled ? '🔔 Açık' : '🔕 Bildirim'}</Text>
-      )}
-    </Pressable>
-  );
-}
-
-const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: COLORS.primary },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: 12,
-    backgroundColor: COLORS.primary,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-  },
-  headerTitle: { flexShrink: 1, color: '#FFFFFF', fontSize: 22, fontWeight: '800' },
-  bell: {
-    minHeight: 36,
-    minWidth: 44,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 12,
-    borderRadius: 999,
-    backgroundColor: 'rgba(255,255,255,0.16)',
-  },
-  bellPressed: { backgroundColor: 'rgba(255,255,255,0.3)' },
-  bellText: { color: '#FFFFFF', fontSize: 14, fontWeight: '700' },
-  body: { flex: 1, backgroundColor: COLORS.background },
-  screen: { flex: 1 },
-  hidden: { display: 'none' },
-  tabBar: {
-    flexDirection: 'row',
-    backgroundColor: COLORS.card,
-    borderTopWidth: 1,
-    borderTopColor: COLORS.border,
-  },
-  tabButton: { flex: 1, alignItems: 'center', paddingVertical: 8, gap: 2 },
-  tabIcon: { fontSize: 22 },
-  tabInactive: { opacity: 0.45 },
-  tabLabel: { fontSize: 12, fontWeight: '600', color: COLORS.textMuted },
-  tabLabelActive: { color: COLORS.primary },
-});

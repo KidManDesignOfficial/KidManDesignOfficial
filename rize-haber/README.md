@@ -4,15 +4,28 @@ Rize'deki günlük haberleri ve hava durumunu gösteren Android uygulaması (Rea
 
 ## Özellikler
 
-| Ekran | İçerik |
+| Sekme | İçerik |
 |---|---|
-| **Haberler** | Google Haberler üzerinden son 7 günün Rize haberleri · kategoriler (Tümü, Gündem, Spor, Ekonomi, Asayiş, İlçeler) · arama · aşağı çekerek yenileme · habere dokununca uygulama içi tarayıcıda kaynağında açılır · **Kaydet** ve **Paylaş** düğmeleri |
-| **Kaydedilenler** | Kaydedilen haberler telefonda saklanır, internet yokken de listelenir |
-| **Hava Durumu** | Anlık durum · **24 saatlik tahmin** · 7 günlük tahmin · Rize Merkez, Çayeli, Pazar, Ardeşen, Fındıklı, Güneysu, İkizdere, Çamlıhemşin, Ayder |
-| **Bildirimler** | Haberler ekranındaki 🔕/🔔 düğmesiyle açılır. Uygulama arka planda ~30 dakikada bir yeni haber kontrol eder (kesin zamanı Android belirler; pil tasarrufu modunda gecikebilir). Bildirime dokununca haber açılır. |
+| **Haberler** | Google Haberler üzerinden son 7 günün Rize haberleri · kategoriler · arama · Kaydet / Paylaş · başlıktaki **★ Kaydedilenler** |
+| **Çay** | Güncel yaş çay alım fiyatı (resmî kaynak + ilan tarihi) · önceki yıla göre değişim · **tutar hesaplayıcı** · yıllara göre fiyat grafiği · çay gündemi haberleri · kaynak bağlantıları |
+| **Hava** | Anlık durum · 24 saatlik ve 7 günlük tahmin · 9 konum |
+| **Rize** | Bir bakışta Rize · 12 ilçe · adın kökeni · tarihçe zaman çizelgesi · Rize’de çayın hikâyesi · resmî kaynaklar |
+| **Ayarlar** | Tema (Sistem/Açık/Koyu) · 5 renk · yazı boyutu (Normal/Büyük/Çok büyük) · varsayılan hava konumu · bildirimler · kaydedilenleri temizle · hakkında ve veri kaynakları |
 
-Haber metinleri kopyalanmaz; yalnızca başlık, kaynak ve bağlantı gösterilir (telif açısından güvenli yaklaşım).
-Hava durumu verisi: [Open-Meteo](https://open-meteo.com) (ücretsiz, API anahtarı gerektirmez).
+Haber metinleri kopyalanmaz; yalnızca başlık, kaynak ve bağlantı gösterilir.
+
+## Çay fiyatını güncelleme (APK gerekmez)
+
+Yaş çay alım fiyatı yılda bir kez (genellikle Mayıs’ta) açıklanır. Yeni fiyat açıklandığında:
+
+1. `rize-haber/data/cay.json` dosyasında `current`, `history`, `updatedAt`, `notes` ve `links` alanlarını güncelleyin.
+   Kaynak (`sourceUrl`) mutlaka resmî bir duyuru olmalı (Tarım ve Orman Bakanlığı / ÇAYKUR).
+2. `npm test` çalıştırın (dosyanın biçimi test edilir).
+3. Değişikliği deponun **varsayılan dalına** birleştirin.
+
+Uygulama açılışta bu dosyayı `raw.githubusercontent.com/.../HEAD/rize-haber/data/cay.json` adresinden okur ve
+doğrular; dosyaya ulaşamazsa son indirdiği ya da APK’ya gömülü kopyayı gösterir. Biçimi bozuk bir dosya asla
+gösterilmez.
 
 ## APK'yı indirme
 
@@ -38,7 +51,12 @@ npx expo start      # telefonda Expo Go ile anlık önizleme
 
 ```
 App.tsx                     Ana yerleşim: başlık + alt sekme çubuğu
-src/config.ts               Renkler, haber kategorileri (arama sorguları), ilçe koordinatları
+src/config.ts               Haber kategorileri (arama sorguları), ilçe koordinatları
+src/colors.ts, src/theme.tsx Renk paletleri, tema ve kullanıcı ayarları
+src/tea.ts, src/teaData.ts  Çay fiyatı verisi: doğrulama, hesaplama, uzaktan güncelleme
+data/cay.json               Güncel çay fiyatı (uygulama buradan okur)
+src/data/rize.ts            Rize tarihçesi ve çayın hikâyesi (kaynaklarıyla)
+src/components/ui.tsx       Ortak arayüz parçaları
 src/rss.ts                  RSS okuyucu (Google Haberler + genel RSS beslemeleri)
 src/notifications.ts        Arka plan haber kontrolü ve bildirimler
 src/newsDiff.ts             "Hangi haberler yeni?" hesabı
@@ -46,6 +64,9 @@ src/storage.ts              Telefonda kalıcı veri (favoriler, ayarlar)
 src/favorites.tsx           Favori durumu
 src/components/NewsCard.tsx Haber kartı (kaydet / paylaş)
 src/screens/SavedScreen.tsx Kaydedilenler
+src/screens/TeaScreen.tsx   Çay fiyatları
+src/screens/RizeScreen.tsx  Rize’yi tanı
+src/screens/SettingsScreen.tsx Ayarlar
 src/weather.ts              Open-Meteo istemcisi, hava kodu → Türkçe açıklama
 src/time.ts                 "5 dk önce", gün adları vb.
 src/screens/NewsScreen.tsx  Haber listesi

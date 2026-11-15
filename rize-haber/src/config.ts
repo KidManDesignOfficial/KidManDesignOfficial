@@ -1,19 +1,8 @@
 /**
- * Uygulama genelindeki sabitler: renkler, haber kategorileri, hava durumu konumları.
+ * Uygulama genelindeki sabitler: haber kategorileri, hava durumu konumları.
+ * Renkler `colors.ts` içindedir.
  * Yeni kategori veya ilçe eklemek için yalnızca bu dosyayı düzenlemek yeterlidir.
  */
-
-export const COLORS = {
-  primary: '#1B6B3A', // Rize çay yeşili
-  primaryDark: '#124D29',
-  primaryLight: '#E3F1E8',
-  background: '#F4F6F5',
-  card: '#FFFFFF',
-  text: '#16201A',
-  textMuted: '#5E6B63',
-  border: '#DCE3DE',
-  error: '#B3261E',
-} as const;
 
 export type NewsCategory = {
   id: string;

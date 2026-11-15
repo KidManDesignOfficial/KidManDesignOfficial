@@ -1,18 +1,11 @@
-import { memo } from 'react';
+import { memo, useMemo } from 'react';
 import { Image, Pressable, Share, StyleSheet, Text, View } from 'react-native';
-import * as WebBrowser from 'expo-web-browser';
 
-import { COLORS } from '../config';
 import { useFavorites } from '../favorites';
 import type { NewsItem } from '../rss';
+import { useTheme } from '../theme';
 import { timeAgo } from '../time';
-
-export function openArticle(url: string) {
-  WebBrowser.openBrowserAsync(url, {
-    toolbarColor: COLORS.primary,
-    controlsColor: COLORS.primary,
-  }).catch(() => {});
-}
+import { openUrl } from './ui';
 
 function shareArticle(item: NewsItem) {
   Share.share({
@@ -23,12 +16,41 @@ function shareArticle(item: NewsItem) {
 
 function NewsCardBase({ item }: { item: NewsItem }) {
   const { isFavorite, toggleFavorite } = useFavorites();
+  const { colors, fs } = useTheme();
+  const styles = useMemo(
+    () =>
+      StyleSheet.create({
+        card: {
+          backgroundColor: colors.card,
+          borderRadius: 14,
+          borderWidth: 1,
+          borderColor: colors.border,
+          overflow: 'hidden',
+        },
+        main: { flexDirection: 'row', gap: 12, padding: 14, paddingBottom: 10 },
+        pressed: { backgroundColor: colors.primarySoft },
+        body: { flex: 1, gap: 6 },
+        title: { fontSize: fs(16), fontWeight: '700', color: colors.text, lineHeight: fs(22) },
+        summary: { fontSize: fs(14), color: colors.textMuted, lineHeight: fs(20) },
+        meta: { fontSize: fs(12), color: colors.primary, fontWeight: '600' },
+        image: { width: 84, height: 84, borderRadius: 10, backgroundColor: colors.border },
+        actions: {
+          flexDirection: 'row',
+          borderTopWidth: StyleSheet.hairlineWidth,
+          borderTopColor: colors.border,
+        },
+        action: { flex: 1, alignItems: 'center', paddingVertical: 10 },
+        actionText: { fontSize: fs(14), fontWeight: '600', color: colors.textMuted },
+        actionActive: { color: colors.primary },
+      }),
+    [colors, fs],
+  );
   const saved = isFavorite(item.id);
 
   return (
     <View style={styles.card}>
       <Pressable
-        onPress={() => openArticle(item.link)}
+        onPress={() => openUrl(item.link, colors)}
         style={({ pressed }) => [styles.main, pressed && styles.pressed]}
         accessibilityRole="link"
         accessibilityLabel={`${item.title}, ${item.source}`}
@@ -77,28 +99,3 @@ function NewsCardBase({ item }: { item: NewsItem }) {
 }
 
 export const NewsCard = memo(NewsCardBase);
-
-const styles = StyleSheet.create({
-  card: {
-    backgroundColor: COLORS.card,
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-    overflow: 'hidden',
-  },
-  main: { flexDirection: 'row', gap: 12, padding: 14, paddingBottom: 10 },
-  pressed: { backgroundColor: COLORS.primaryLight },
-  body: { flex: 1, gap: 6 },
-  title: { fontSize: 16, fontWeight: '700', color: COLORS.text, lineHeight: 22 },
-  summary: { fontSize: 14, color: COLORS.textMuted, lineHeight: 20 },
-  meta: { fontSize: 12, color: COLORS.primary, fontWeight: '600' },
-  image: { width: 84, height: 84, borderRadius: 10, backgroundColor: COLORS.border },
-  actions: {
-    flexDirection: 'row',
-    borderTopWidth: 1,
-    borderTopColor: COLORS.border,
-  },
-  action: { flex: 1, alignItems: 'center', paddingVertical: 10 },
-  actionText: { fontSize: 14, fontWeight: '600', color: COLORS.textMuted },
-  actionActive: { color: COLORS.primary },
-});

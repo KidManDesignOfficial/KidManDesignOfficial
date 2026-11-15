@@ -9,6 +9,7 @@ type FavoritesValue = {
   favorites: NewsItem[];
   isFavorite: (id: string) => boolean;
   toggleFavorite: (item: NewsItem) => void;
+  clearFavorites: () => void;
 };
 
 const FavoritesContext = createContext<FavoritesValue | null>(null);
@@ -43,9 +44,14 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
     );
   }, []);
 
+  const clearFavorites = useCallback(() => {
+    loaded.current = true;
+    setFavorites([]);
+  }, []);
+
   const value = useMemo(
-    () => ({ favorites, isFavorite: (id: string) => ids.has(id), toggleFavorite }),
-    [favorites, ids, toggleFavorite],
+    () => ({ favorites, isFavorite: (id: string) => ids.has(id), toggleFavorite, clearFavorites }),
+    [favorites, ids, toggleFavorite, clearFavorites],
   );
 
   return <FavoritesContext.Provider value={value}>{children}</FavoritesContext.Provider>;

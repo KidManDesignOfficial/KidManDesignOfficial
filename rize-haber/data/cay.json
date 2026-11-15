@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "updatedAt": "2026-05-21",
+  "current": {
+    "year": 2026,
+    "pricePerKg": 35,
+    "announcedAt": "2026-05-12",
+    "announcedBy": "T.C. Tarım ve Orman Bakanlığı",
+    "sourceUrl": "https://www.tarimorman.gov.tr/Haber/7069/Yas-Cay-Alim-Fiyati-Kilogram-Basina-35-Lira-Olarak-Belirlendi"
+  },
+  "history": [
+    { "year": 2026, "pricePerKg": 35 },
+    { "year": 2025, "pricePerKg": 25.44 },
+    { "year": 2024, "pricePerKg": 19 }
+  ],
+  "notes": [
+    "ÇAYKUR'un 2026 yaş çay alım kampanyası 20 Mayıs 2026'da başladı.",
+    "Alım fiyatı her yıl hasat öncesinde bir kez belirlenir ve sezon boyunca geçerlidir."
+  ],
+  "links": [
+    {
+      "label": "Tarım ve Orman Bakanlığı – 2026 fiyat duyurusu",
+      "url": "https://www.tarimorman.gov.tr/Haber/7069/Yas-Cay-Alim-Fiyati-Kilogram-Basina-35-Lira-Olarak-Belirlendi"
+    },
+    {
+      "label": "Tarım ve Orman Bakanlığı – 2025 fiyat duyurusu",
+      "url": "https://www.tarimorman.gov.tr/Haber/6600/Yas-Cay-Alim-Fiyati-Kilogram-Basina-2544-Lira-Olarak-Belirlendi"
+    },
+    { "label": "ÇAYKUR resmî internet sitesi (ürün ve fiyatlar)", "url": "https://www.caykur.gov.tr" }
+  ]
+}

@@ -5,11 +5,14 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import type { NewsItem } from './rss';
+import type { Settings } from './theme';
 
 const KEYS = {
   favorites: 'rizehaber:favorites:v1',
   notificationsEnabled: 'rizehaber:notificationsEnabled:v1',
   seenIds: 'rizehaber:seenIds:v1',
+  settings: 'rizehaber:settings:v1',
+  teaData: 'rizehaber:teaData:v1',
 } as const;
 
 type StoredNewsItem = Omit<NewsItem, 'publishedAt'> & { publishedAt: string | null };
@@ -70,4 +73,21 @@ export async function clearSeenIds(): Promise<void> {
   } catch {
     // yok say
   }
+}
+
+export function loadSettings(): Promise<Partial<Settings>> {
+  return readJson<Partial<Settings>>(KEYS.settings, {});
+}
+
+export function saveSettings(settings: Settings): Promise<void> {
+  return writeJson(KEYS.settings, settings);
+}
+
+/** Son başarılı indirilen çay verisi (çevrimdışı açılışlar için). */
+export function loadCachedTeaData(): Promise<unknown> {
+  return readJson<unknown>(KEYS.teaData, null);
+}
+
+export function saveCachedTeaData(data: unknown): Promise<void> {
+  return writeJson(KEYS.teaData, data);
 }

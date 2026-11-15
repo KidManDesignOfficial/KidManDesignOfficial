@@ -1,18 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import {
-  ActivityIndicator,
-  FlatList,
-  Pressable,
-  RefreshControl,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from 'react-native';
+import { ActivityIndicator, FlatList, RefreshControl, StyleSheet, Text, TextInput, View } from 'react-native';
+
 import { NewsCard } from '../components/NewsCard';
-import { COLORS, NEWS_CATEGORIES, googleNewsRssUrl } from '../config';
+import { Chip, ChipRow, PrimaryButton } from '../components/ui';
+import { NEWS_CATEGORIES, googleNewsRssUrl } from '../config';
 import { fetchRss, type NewsItem } from '../rss';
+import { useTheme } from '../theme';
 
 type CategoryState = {
   items: NewsItem[];
@@ -33,6 +26,30 @@ export default function NewsScreen() {
   const controllers = useRef<Record<string, AbortController>>({});
 
   const state = byCategory[categoryId] ?? EMPTY;
+  const { colors, fs } = useTheme();
+  const styles = useMemo(
+    () =>
+      StyleSheet.create({
+        container: { flex: 1, backgroundColor: colors.background },
+        searchBox: { paddingHorizontal: 16, paddingTop: 12 },
+        searchInput: {
+          backgroundColor: colors.card,
+          borderRadius: 12,
+          borderWidth: 1,
+          borderColor: colors.border,
+          paddingHorizontal: 14,
+          paddingVertical: 10,
+          fontSize: fs(16),
+          color: colors.text,
+        },
+        list: { paddingHorizontal: 16, paddingBottom: 24, gap: 10, flexGrow: 1 },
+        center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32, gap: 12 },
+        muted: { color: colors.textMuted, fontSize: fs(15), textAlign: 'center' },
+        errorText: { color: colors.error, fontSize: fs(15), textAlign: 'center' },
+        inlineError: { color: colors.error, fontSize: fs(13), marginBottom: 4 },
+      }),
+    [colors, fs],
+  );
 
   const load = useCallback(async (id: string) => {
     const category = NEWS_CATEGORIES.find((c) => c.id === id);
@@ -101,7 +118,7 @@ export default function NewsScreen() {
           value={search}
           onChangeText={setSearch}
           placeholder="Haberlerde ara…"
-          placeholderTextColor={COLORS.textMuted}
+          placeholderTextColor={colors.textMuted}
           style={styles.searchInput}
           returnKeyType="search"
           clearButtonMode="while-editing"
@@ -109,31 +126,15 @@ export default function NewsScreen() {
         />
       </View>
 
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        style={styles.chipsScroll}
-        contentContainerStyle={styles.chips}
-      >
-        {NEWS_CATEGORIES.map((c) => {
-          const active = c.id === categoryId;
-          return (
-            <Pressable
-              key={c.id}
-              onPress={() => setCategoryId(c.id)}
-              style={[styles.chip, active && styles.chipActive]}
-              accessibilityRole="tab"
-              accessibilityState={{ selected: active }}
-            >
-              <Text style={[styles.chipText, active && styles.chipTextActive]}>{c.label}</Text>
-            </Pressable>
-          );
-        })}
-      </ScrollView>
+      <ChipRow>
+        {NEWS_CATEGORIES.map((c) => (
+          <Chip key={c.id} label={c.label} selected={c.id === categoryId} onPress={() => setCategoryId(c.id)} />
+        ))}
+      </ChipRow>
 
       {showFullScreenLoader ? (
         <View style={styles.center}>
-          <ActivityIndicator size="large" color={COLORS.primary} />
+          <ActivityIndicator size="large" color={colors.primary} />
           <Text style={styles.muted}>Haberler yükleniyor…</Text>
         </View>
       ) : (
@@ -142,12 +143,14 @@ export default function NewsScreen() {
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => <NewsCard item={item} />}
           contentContainerStyle={styles.list}
+          keyboardShouldPersistTaps="handled"
           refreshControl={
             <RefreshControl
               refreshing={refreshing}
               onRefresh={onRefresh}
-              colors={[COLORS.primary]}
-              tintColor={COLORS.primary}
+              colors={[colors.primary]}
+              tintColor={colors.primary}
+              progressBackgroundColor={colors.card}
             />
           }
           ListHeaderComponent={
@@ -160,9 +163,7 @@ export default function NewsScreen() {
               {state.error ? (
                 <>
                   <Text style={styles.errorText}>{state.error}</Text>
-                  <Pressable onPress={() => load(categoryId)} style={styles.retryButton}>
-                    <Text style={styles.retryText}>Tekrar dene</Text>
-                  </Pressable>
+                  <PrimaryButton label="Tekrar dene" onPress={() => load(categoryId)} />
                 </>
               ) : (
                 <Text style={styles.muted}>
@@ -176,47 +177,3 @@ export default function NewsScreen() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: COLORS.background },
-  searchBox: { paddingHorizontal: 16, paddingTop: 12 },
-  searchInput: {
-    backgroundColor: COLORS.card,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    fontSize: 16,
-    color: COLORS.text,
-  },
-  // ScrollView varsayılan olarak flexShrink: 1 gelir; liste ekranı doldururken şerit ezilmesin.
-  chipsScroll: { flexGrow: 0, flexShrink: 0 },
-  chips: { paddingHorizontal: 16, paddingVertical: 12, gap: 8, alignItems: 'center' },
-  chip: {
-    flexShrink: 0,
-    minHeight: 38,
-    justifyContent: 'center',
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 999,
-    backgroundColor: COLORS.card,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-  },
-  chipActive: { backgroundColor: COLORS.primary, borderColor: COLORS.primary },
-  chipText: { fontSize: 14, fontWeight: '600', color: COLORS.text },
-  chipTextActive: { color: '#FFFFFF' },
-  list: { paddingHorizontal: 16, paddingBottom: 24, gap: 10, flexGrow: 1 },
-  center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32, gap: 12 },
-  muted: { color: COLORS.textMuted, fontSize: 15, textAlign: 'center' },
-  errorText: { color: COLORS.error, fontSize: 15, textAlign: 'center' },
-  inlineError: { color: COLORS.error, fontSize: 13, marginBottom: 4 },
-  retryButton: {
-    backgroundColor: COLORS.primary,
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 10,
-  },
-  retryText: { color: '#FFFFFF', fontWeight: '700' },
-});
