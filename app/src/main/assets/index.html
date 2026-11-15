@@ -211,6 +211,37 @@ button:focus-visible{outline:3px solid var(--bone);outline-offset:3px}
 }
 @media (max-height:520px){.btn.big{font-size:28px;padding:11px 30px 12px}.mstats div{padding:6px}.mstats b{font-size:20px}.mgrid .btn,.mside>.btn.ghost{padding:8px 4px 9px;font-size:14px}.mside{gap:7px}.tabs button{font-size:14px;padding:7px 10px 8px}.card b{font-size:16px}#help{gap:6px}}
 #confirm{background:rgba(13,10,17,.93);z-index:6}
+/* ---------- eğitici işaretler ---------- */
+#marks{position:fixed;inset:0;pointer-events:none}
+.mk{position:absolute;left:0;top:0;width:0;height:0;--c:#ffb53d}
+.mk i{position:absolute;left:-26px;top:-26px;width:52px;height:52px;border-radius:50%;border:3px solid var(--c);box-shadow:0 0 14px var(--c);animation:mkp 1s ease-out infinite}
+.mk b{position:absolute;left:50%;top:-58px;transform:translateX(-50%);white-space:nowrap;font:800 italic 15px/1 var(--ui);letter-spacing:.06em;color:#100c14;background:var(--c);padding:6px 10px 7px;clip-path:polygon(6px 0,100% 0,calc(100% - 6px) 100%,0 100%)}
+@keyframes mkp{0%{transform:scale(.55);opacity:1}100%{transform:scale(1.25);opacity:0}}
+.shint{margin:0;width:100%;font:600 14px/1.3 var(--ui);color:var(--bone);opacity:.8;text-align:left}
+.mgrid .btn.new{color:var(--ink);background:var(--amber);border-color:var(--amber)}
+/* ---------- açılış ---------- */
+.intro{z-index:7;background:transparent;padding:0;gap:0;cursor:pointer}
+.intro .lb{position:absolute;left:0;right:0;height:11vh;background:#000;transition:height 1s ease}
+.intro .lb.top{top:0}.intro .lb.bot{bottom:0}
+.intro.s0{background:#000}
+.intro .studio{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--amber);background:#000;transition:opacity .9s ease}
+.intro .studio svg{width:clamp(70px,16vh,120px);height:auto;animation:stIn 1.6s cubic-bezier(.2,.9,.2,1) both}
+.intro .studio b{font:400 clamp(26px,7vh,44px)/1 var(--disp);letter-spacing:.12em;color:var(--bone);animation:stTx 1.6s .35s both}
+.intro .studio span{font:700 13px/1 var(--ui);letter-spacing:.5em;animation:stTx 1.6s .7s both}
+@keyframes stIn{0%{opacity:0;transform:scale(1.6) rotate(-12deg);filter:blur(6px)}60%{opacity:1;filter:blur(0)}100%{transform:none}}
+@keyframes stTx{0%{opacity:0;letter-spacing:.6em}100%{opacity:1}}
+.intro.s1 .studio{opacity:0;pointer-events:none}
+.incap{position:absolute;left:0;right:0;bottom:calc(11vh + 18px);text-align:center;font:800 italic clamp(20px,5vh,32px)/1 var(--ui);letter-spacing:.12em;color:var(--bone);text-shadow:0 2px 6px #000;opacity:0;padding:0 16px}
+.incap.show{animation:cap 3.2s ease both}
+@keyframes cap{0%{opacity:0;transform:translateY(10px)}15%{opacity:1;transform:none}80%{opacity:1}100%{opacity:0}}
+.intitle{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;opacity:0;pointer-events:none}
+.intitle h1{margin:0;font:400 clamp(70px,22vh,180px)/.82 var(--disp);color:var(--bone);text-shadow:0 6px 0 rgba(0,0,0,.6),0 0 80px rgba(255,140,40,.5)}
+.intitle h1 em{font-style:normal;color:var(--amber)}
+.intro.s2 .intitle{animation:ttl 4s cubic-bezier(.2,.9,.2,1) both}
+.intro.s2 .lb{height:0}
+@keyframes ttl{0%{opacity:0;transform:scale(2.4)}12%{opacity:1;transform:scale(.96)}20%{transform:scale(1)}100%{opacity:1;transform:scale(1.04)}}
+#inSkip{position:absolute;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(env(safe-area-inset-bottom,0px) + 14px);font-size:15px;padding:9px 18px 10px;z-index:2}
+.intro.s0 #inSkip{opacity:0}
 #confirm h2{color:var(--blood)}
 #playBtn small{display:block;font:700 normal 14px/1 var(--ui);letter-spacing:.16em;margin-top:5px;opacity:.75}
 #rot{background:rgba(16,12,20,.94);z-index:5}
@@ -269,6 +300,17 @@ button:focus-visible{outline:3px solid var(--bone);outline-offset:3px}
 </div>
 <div id="xhair" hidden><i></i><i></i><i></i><i></i><u></u><div id="hm"></div><div id="thp"><i id="thpi"></i></div></div>
 <div id="pops"></div>
+<div id="marks"><div class="mk" hidden><i></i><b></b></div><div class="mk" hidden><i></i><b></b></div><div class="mk" hidden><i></i><b></b></div></div>
+<div id="intro" class="ov intro s0" hidden>
+  <div class="lb top"></div><div class="lb bot"></div>
+  <div class="studio">
+    <svg viewBox="0 0 120 120" aria-hidden="true"><path d="M60 6 108 33v54L60 114 12 87V33z" fill="none" stroke="currentColor" stroke-width="5"/><path d="M38 38v44M38 60l22-22M38 60l22 22M66 82V38l14 22 14-22v44" fill="none" stroke="currentColor" stroke-width="7" stroke-linejoin="bevel"/></svg>
+    <b>KIDMAN DESIGN</b><span>SUNAR</span>
+  </div>
+  <div class="incap" id="inCap"></div>
+  <div class="intitle"><span class="kick">KARANTİNA BÖLGESİ · SON İNSAN</span><h1>SON <em>KAT</em></h1></div>
+  <button id="inSkip" class="btn ghost" type="button">ATLA ›</button>
+</div>
 
 <div id="menu" class="ov menu">
   <div class="mhead">
@@ -312,6 +354,7 @@ button:focus-visible{outline:3px solid var(--bone);outline-offset:3px}
     <span class="goldbig" id="shopGold">0 ALTIN</span>
     <button id="shopClose" class="btn sm" type="button">KAPAT</button>
   </div>
+  <p class="shint" id="shopHint"></p>
   <div class="scroll" id="shopList"></div>
 </div>
 <div id="help" class="ov" hidden>
@@ -2149,7 +2192,7 @@ function resetProps() {
   BARRELS.forEach((b, i) => { b.act = true; b.x = BARPOS[i][0]; b.z = BARPOS[i][1]; b.y = 0; b.hp = 1; b.fuse = false; b.on = false; b.sr = 12; });
 }
 function blowObj(o, chain) {
-  if (o.isBarrel) { if (!o.act) return; o.act = false; if (G.mode === 'play') quest('barrels', 1); explode(o.x, 0.6, o.z, 7, 70 * G.hpMul, { src: o }); if (G.mode === 'play') G.score += 50; return; }
+  if (o.isBarrel) { if (!o.act) return; o.act = false; if (G.mode === 'play') { quest('barrels', 1); if (!chain) G.tips.barN = (G.tips.barN || 0) + 1; } explode(o.x, 0.6, o.z, 7, 70 * G.hpMul, { src: o }); if (G.mode === 'play') G.score += 50; return; }
   if (o.st === 2) return; o.st = 2; o.t = 0; o.sp = 0;
   explode(o.x, 1, o.z, 9.5, 12 * G.hpMul, { src: o });
   for (let i = 0; i < 4; i++) { const a = rnd(TAU); debris(o.x, 1, o.z, Math.cos(a) * rnd(5, 12), rnd(8, 15), Math.sin(a) * rnd(5, 12), 0.7, 0.26, 0.7, [0.02, 0.02, 0.02], 3); }
@@ -2209,14 +2252,16 @@ const JET = { act: false, x: 0, y: 24, z: 0 };
 function airstrike() {
   if (!G.sup.air || G.ulti < 1 || G.mode !== 'play' || G.paused) return;
   G.ulti = 0; quest('ulti', 1); AU.radio(); UI.callout('HAVA SALDIRISI!'); vib(40);
-  later(0.35, () => {
+  later(0.35, () => doStrike(G.level >= 7 ? 12 : 8));
+}
+function doStrike(n) {
+  {
     AU.jet(); JET.act = true; JET.z = 75; JET.x = rnd(-2, 2);
-    const n = G.level >= 7 ? 12 : 8;
     for (let i = 0; i < n; i++) {
       const bz = -23 - i * (118 / n), bx = (i % 2 ? 1 : -1) * rnd(2.5, 7), tHit = (75 - bz) / 150 + 0.3;
       later(tHit - 0.32, () => BOMBS.push({ x: bx, z: bz, sx: JET.x, sz: bz + 16, t: 0, d: 0.32 }));
     }
-  });
+  }
 }
 /* nadir an: UFO şehre iner, uzaylı indirir */
 const UFO = { act: false, t: 0, x: 0, y: 60, z: -70, hx: 0, hz: -60, dropT: 0, left: 0, sx: 0 };
@@ -2641,7 +2686,7 @@ function drawScene() {
     const d0 = Math.hypot(x0 - cam.x, y0 - cam.y, z0 - cam.z), d1 = Math.hypot(x1 - cam.x, y1 - cam.y, z1 - cam.z), a = q.t > q.dur ? 1 - (q.t - q.dur) / (q.dur * 0.4) : 1;
     fxA.beam(x0, y0, z0, x1, y1, z1, 0.0042 * d0 * q.w, 0.0042 * d1 * q.w, q.r, q.g, q.b, 0.9 * a, cam.x, cam.y, cam.z);
   }
-  drawGun();
+  if (G.mode === 'intro') drawIntro(t); else drawGun();
 }
 
 /* =====================================================================
@@ -2753,7 +2798,7 @@ function dropCrate(x, z) { if (CRATES.length >= 4) return; CRATES.push({ x: clam
 function tapCrate(px, py) {
   for (let i = 0; i < CRATES.length; i++) {
     const c = CRATES[i]; project(c.x, 1, c.z, _pr); if (!_pr.on || Math.hypot(_pr.sx - px, _pr.sy - py) > 52) continue;
-    CRATES.splice(i, 1); const T = CRT[c.type];
+    CRATES.splice(i, 1); const T = CRT[c.type]; G.tips.crateN = (G.tips.crateN || 0) + 1;
     if (c.type === 'x2') G.bDmg = 10; else if (c.type === 'ammo') { G.bAmmo = 10; G.ammo[G.w] = WPN[G.w].mag; G.reload = 0; } else if (c.type === 'slow') G.bSlow = 7; else G.hp = Math.min(G.maxHp, G.hp + 30);
     UI.callout(T.n, 'tox'); AU.unlock(); vib(30); quest('crates', 1); addLight(c.x, 2, c.z, 16, T.c[0] * 5, T.c[1] * 5, T.c[2] * 5, 0.4);
     for (let k = 0; k < 14; k++) pA.spawn(c.x, 1, c.z, rnd(-5, 5), rnd(2, 9), rnd(-5, 5), 0.5, 0, T.c[0], T.c[1], T.c[2], 1, rnd(0.4, 0.9), 12, 1); UI.weapon(); return true;
@@ -2808,10 +2853,97 @@ function makeThumbs() {
   }
   gl.enable(gl.CULL_FACE); canvas.width = pw; canvas.height = ph; resize();
 }
+
+/* =====================================================================
+   AÇILIŞ: stüdyo logosu + sinematik savaş sahnesi
+   ===================================================================== */
+const IN = { t: 0, ft: 0, spawnT: 0, cap: -1, done: false, mgYaw: 0, spin: 0, fired: {} };
+const IN_CAPS = [[3.4, 'ŞEHİR DÜŞTÜ'], [7.0, 'ORDU GERİ ÇEKİLDİ'], [10.0, 'AMA DESTEK HÂLÂ GELİYOR'], [13.6, '']];
+function startIntro() {
+  clearEntities(); G.mode = 'intro'; G.level = 1; G.hpMul = 1; G.t = 0; IN.t = 0; IN.ft = 0; IN.spawnT = 0; IN.cap = -1; IN.done = false; IN.fired = {};
+  resetProps(); E.menu.hidden = true; E.hud.hidden = true; E.xhair.hidden = true; E.intro.hidden = false; E.intro.className = 'ov intro s0';
+  try { AU.init(); AU.ambience(true); } catch (e) { }
+  for (let i = 0; i < 34; i++) { const z = spawnZombie(pick(['runner', 'walker', 'runner', 'cop', 'brute']), rnd(-10.5, 10.5), rnd(-150, -55)); if (z) z.tx = rnd(-7, 7); }
+}
+function endIntro() {
+  if (IN.done) return; IN.done = true; E.intro.hidden = true; JET.act = false; HELI.act = false; BOMBS.length = 0; LATER.length = 0;
+  toMenu(); if (!G.tips.help) UI.help(true);
+}
+const L3 = (a, b, k) => [lerp(a[0], b[0], k), lerp(a[1], b[1], k), lerp(a[2], b[2], k)];
+function introCam() {
+  const t = IN.t; let p, yaw, pitch, k;
+  if (t < 7.0) { k = smooth(2.6, 7.0, t); p = L3([6, 27, -18], [2.2, 7.5, -15], k); yaw = lerp(0.18, 0.05, k); pitch = lerp(-0.6, -0.17, k); }
+  else if (t < 10.0) { k = smooth(7.0, 10.0, t); p = L3([4.4, 2.7, -9.4], [3.6, 2.5, -10.6], k); yaw = lerp(0.2, 0.12, k); pitch = -0.035; }
+  else if (t < 13.6) { k = smooth(10.0, 13.6, t); p = L3([-12, 15, -24], [-9.5, 12, -33], k); yaw = lerp(-0.3, -0.24, k); pitch = lerp(-0.34, -0.28, k); }
+  else { k = smooth(13.6, 17.5, t); p = L3([0, 3.6, -4], [0, 2.4, -9.5], k); yaw = Math.sin(t * 0.4) * 0.02; pitch = lerp(-0.06, -0.02, k); }
+  cam.x = p[0]; cam.y = p[1]; cam.z = p[2]; cam.yaw = yaw; cam.pitch = pitch;
+  const s = G.shake * G.shake; cam.sp = rnd(-1, 1) * s * 0.03; cam.sy = rnd(-1, 1) * s * 0.03; cam.sr = rnd(-1, 1) * s * 0.015; cam.punch = 0;
+}
+const MG = M4.create(), MG1 = M4.create();
+function introMinigunMat() { M4.trs(MG, 1.7, 1.25, -13.4, 0.04, IN.mgYaw, 0, 2.6, 2.6, 2.6); return MG; }
+function introTick(dt) {
+  if (IN.done) return; const t = IN.t += dt;
+  /* sahne geçişleri ve altyazılar */
+  if (t > 2.6 && E.intro.classList.contains('s0')) E.intro.className = 'ov intro s1';
+  for (let i = IN_CAPS.length - 1; i >= 0; i--) if (t >= IN_CAPS[i][0]) { if (IN.cap !== i) { IN.cap = i; E.inCap.textContent = IN_CAPS[i][1]; replay(E.inCap, 'show'); } break; }
+  if (t > 14.2 && !IN.fired.title) { IN.fired.title = 1; E.intro.className = 'ov intro s1 s2'; AU.boom(0.9); G.shake = 0.7; ENV.flash = 0.5; }
+  if (t > 18.2) { endIntro(); return; }
+  /* sürü */
+  IN.spawnT -= dt; if (IN.spawnT <= 0) { IN.spawnT = 0.09; let n = 0; for (const z of Z) if (z.act && z.st !== 2) n++; if (n < 46) { const z = spawnZombie(pick(['runner', 'runner', 'walker', 'cop', 'brute', 'bomber']), rnd(-10.5, 10.5), rnd(-155, -130)); if (z) z.tx = rnd(-7, 7); } }
+  /* sabit minigun */
+  IN.spin += dt * (t > 7.3 ? 40 : 0);
+  if (t > 7.3) {
+    IN.ft -= dt;
+    while (IN.ft <= 0) {
+      IN.ft += 0.04; let best = null;
+      for (let k = 0; k < 8; k++) { const z = Z[(Math.random() * ZMAX) | 0]; if (z.act && z.st !== 2 && z.z > -95 && (!best || z.z > best.z)) best = z; }
+      if (!best) break;
+      const want = Math.atan2(-(best.x - 1.7), -(best.z + 13.4)); IN.mgYaw += (want - IN.mgYaw) * 0.25;
+      const m = introMinigunMat(), mx = m[8] * -0.64 + m[12], my = m[9] * -0.64 + m[13], mz = m[10] * -0.64 + m[14];
+      tracer(mx, my, mz, best.x, best.y + 1.4 * best.sc, best.z, 1.2, 1, 0.82, 0.45); hitZombie(best, 7, Math.random() < 0.3, 0.8);
+      pA.spawn(mx, my, mz, 0, 0, 0, 1.3, -6, 1, 0.75, 0.35, 0.9, 0.05, 0, 0); if (Math.random() < 0.3) { AU.shot('mini'); addLight(mx, my, mz - 1, 14, 2.5, 1.6, 0.7, 0.06); }
+      G.shake = Math.min(0.35, G.shake + 0.02);
+    }
+  }
+  /* hava saldırısı, helikopter, varil */
+  if (t > 10.1 && !IN.fired.jet) { IN.fired.jet = 1; AU.radio(); doStrike(10); }
+  if (t > 10.6 && !IN.fired.heli) { IN.fired.heli = 1; HELI.act = true; HELI.t = 0; HELI.dur = 6.5; HELI.x = -60; AU.heli(8.5); }
+  if (t > 15.4 && !IN.fired.bar) { IN.fired.bar = 1; for (const b of BARRELS) if (b.act && b.z > -60) { blowObj(b, true); break; } }
+}
+function drawIntro(t) {
+  if (IN.t < 6.6 || IN.done) return;
+  const m = introMinigunMat(); drawModel(WPN[5].model.g[0], m, boxes, cyls);
+  M4.trs(TM, 0, 0, 0, 0, 0, IN.spin, 1, 1, 1); M4.mul(MG1, m, TM); drawModel(WPN[5].model.g[1], MG1, boxes, cyls);
+  /* ayaklık */
+  dbox(1.7, 0.7, -13.15, 0.12, 1.1, 0.12, [0.06, 0.06, 0.065]); dbox(1.7, 0.2, -13.15, 0.9, 0.08, 0.9, [0.06, 0.06, 0.065]);
+}
+
+/* =====================================================================
+   EĞİTİCİ İPUÇLARI: kutu / varil üstünde "DOKUN" işaretleri
+   ===================================================================== */
+function hintMarks() {
+  let n = 0; const P = E.marks, used = [];
+  const put = (x, y, z, txt, col) => { if (n >= P.length) return false; project(x, y, z, _pr); if (!_pr.on) return false; for (const u of used) if (Math.abs(u[0] - _pr.sx) < 190 && Math.abs(u[1] - _pr.sy) < 46) return false; used.push([_pr.sx, _pr.sy]); const el = P[n++]; el.hidden = false; el.style.transform = 'translate(' + _pr.sx.toFixed(0) + 'px,' + _pr.sy.toFixed(0) + 'px)'; if (el._t !== txt) { el._t = txt; el.lastChild.textContent = txt; } el.style.setProperty('--c', col); return true; };
+  if ((G.tips.crateN || 0) < 4) for (const c of CRATES) { const k = CRT[c.type].c; put(c.x, 1.1, c.z, 'DOKUN · ' + CRT[c.type].n.replace('!', ''), 'rgb(' + (k[0] * 255 | 0) + ',' + (k[1] * 255 | 0) + ',' + (k[2] * 255 | 0) + ')'); }
+  if ((G.tips.barN || 0) < 3) for (const b of BARRELS) {
+    if (!b.act || !b.on) continue; let near = false;
+    for (let i = 0; i < ZMAX; i++) { const z = Z[i]; if (z.act && z.st !== 2 && Math.abs(z.x - b.x) < 5 && Math.abs(z.z - b.z) < 6) { near = true; break; } }
+    if (near && put(b.x, 0.7, b.z, 'VARİLE DOKUN · PATLAT', '#ff5a3a')) break;
+  }
+  for (let i = n; i < P.length; i++) P[i].hidden = true;
+}
+function hintTips() {
+  if (G.inter > 0) return;
+  const tip = (k, txt, d) => { if (!G.tips[k]) { G.tips[k] = 1; UI.tip(txt, d || 3.6); save(); return true; } return false; };
+  if (G.t > 20 && G.unlocked > 1 && tip('swap', 'SİLAH PANELİNE DOKUN · SİLAH DEĞİŞTİR')) return;
+  if (G.hp < G.maxHp * 0.5 && tip('lowhp', 'BARİKAT ZAYIFLADI · YEŞİL KUTU TAMİR EDER')) return;
+  if (G.gold >= 500 && !G.owned[1] && tip('gold', 'ALTIN BİRİKTİ · BÖLÜM SONUNDA MAĞAZADAN YENİ SİLAH AÇ')) return;
+  if (G.gold >= 3000 && !G.sup.air && tip('air', 'MAĞAZADAN HAVA SALDIRISI AÇABİLİRSİN · UÇAK CADDEYİ BOMBALAR')) return;
+}
 /* =====================================================================
    ARAYÜZ, GİRDİ ve ANA DÖNGÜ
    ===================================================================== */
-const E = {}; ['hud', 'confirm', 'cfKick', 'cfTitle', 'cfText', 'cfNo', 'cfYes', 'shopTabs', 'help', 'helpOpen', 'helpClose', 'mLvl', 'mGold', 'mBest', 'rot', 'rotSkip', 'thp', 'thpi', 'hpk', 'gold', 'buff', 'shop', 'shopGold', 'shopList', 'shopClose', 'shopOpen', 'shopOpen2', 'quests', 'questGold', 'questList', 'questClose', 'questOpen', 'lvl', 'prog', 'left', 'score', 'mult', 'hp', 'hpn', 'bossbar', 'bosshp', 'banner', 'unlock', 'callout', 'streak', 'tip', 'wpn', 'wk', 'wname', 'ammo', 'rel',
+const E = {}; ['hud', 'intro', 'inCap', 'inSkip', 'shopHint', 'confirm', 'cfKick', 'cfTitle', 'cfText', 'cfNo', 'cfYes', 'shopTabs', 'help', 'helpOpen', 'helpClose', 'mLvl', 'mGold', 'mBest', 'rot', 'rotSkip', 'thp', 'thpi', 'hpk', 'gold', 'buff', 'shop', 'shopGold', 'shopList', 'shopClose', 'shopOpen', 'shopOpen2', 'quests', 'questGold', 'questList', 'questClose', 'questOpen', 'lvl', 'prog', 'left', 'score', 'mult', 'hp', 'hpn', 'bossbar', 'bosshp', 'banner', 'unlock', 'callout', 'streak', 'tip', 'wpn', 'wk', 'wname', 'ammo', 'rel',
   'ultiBtn', 'heliBtn', 'xhair', 'hm', 'pops', 'menu', 'over', 'pause', 'hurt', 'touch', 'playBtn', 'contBtn', 'muteBtn', 'muteBtn2', 'best', 'oLvl', 'oScore', 'oKills', 'oHeads', 'oBest',
   'retryBtn', 'restartBtn', 'menuBtn', 'menuBtn2', 'resumeBtn', 'pauseBtn'].forEach(k => E[k] = $(k));
 const fmt = n => Math.round(n).toLocaleString('tr-TR');
@@ -2835,11 +2967,12 @@ const UI = {
     this.set(E.wk, 'wk', G.unlocked > 1 ? 'SİLAH · DEĞİŞTİR' : 'SİLAH');
   },
   levelSync() { E.hpk.textContent = G.ride ? 'ZIRH' : 'BARİKAT'; this.set(E.lvl, 'lv', String(G.level)); E.heliBtn.hidden = !G.heliUnlocked; E.ultiBtn.hidden = !G.sup.air; },
-  play() { E.menu.hidden = E.over.hidden = E.pause.hidden = true; E.hud.hidden = false; E.xhair.hidden = false; this.boss(-1); },
+  play() { for (const m of E.marks) m.hidden = true; E.menu.hidden = E.over.hidden = E.pause.hidden = true; E.hud.hidden = false; E.xhair.hidden = false; this.boss(-1); },
   menu() {
     E.menu.hidden = false; E.over.hidden = E.pause.hidden = true; E.hud.hidden = true; E.xhair.hidden = true;
     E.contBtn.hidden = G.maxLevel < 2; E.playBtn.innerHTML = G.maxLevel > 1 ? 'DEVAM ET<small>BÖLÜM ' + G.maxLevel + '</small>' : 'OYNA';
     E.mLvl.textContent = G.maxLevel; E.mGold.textContent = fmt(G.gold); E.mBest.textContent = fmt(G.best); this.mute();
+    E.shopOpen.classList.toggle('new', canAfford()); E.shopOpen.textContent = canAfford() ? 'MAĞAZA · YENİ' : 'MAĞAZA';
     const d = G.daily; E.questOpen.textContent = 'GÖREVLER' + (d && !d.claimed ? ' •' : '');
   },
   over() {
@@ -2852,6 +2985,7 @@ const UI = {
   help(on) { E.help.hidden = !on; if (!on && !G.tips.help) { G.tips.help = 1; save(); } },
   tab: 'w',
   shopDraw() {
+    E.shopHint.textContent = { w: 'Altınla yeni silah satın al. Sahip olduğun silahı KUŞAN ile seç; oyunda silah paneline dokunarak değiştirirsin.', s: 'Destek alınca oyunda tuşu çıkar. Halka dolunca bas: uçak caddeyi bombalar, helikopter makineliyle tarar.', u: 'Yükseltmeler kalıcıdır ve her oyunda geçerlidir. Her seviye bir öncekinden pahalıdır.' }[this.tab];
     E.shopGold.textContent = fmt(G.gold) + ' ALTIN'; for (const b of E.shopTabs.children) b.classList.toggle('on', b.dataset.t === this.tab);
     const btn = (k, c) => '<button class="btn sm" type="button" data-k="' + k + '"' + (G.gold < c ? ' disabled' : '') + '>' + fmt(c) + ' ALTIN</button>';
     if (this.tab === 'w') {
@@ -2912,6 +3046,8 @@ let rotSkip = false; function rotCheck() { let coarse = false; try { coarse = ma
 tap(E.rotSkip, () => { rotSkip = true; rotCheck(); }); window.addEventListener('resize', rotCheck); window.addEventListener('orientationchange', () => setTimeout(rotCheck, 200));
 let cfAct = null;
 function ask(title, text, yes, act) { E.cfTitle.textContent = title; E.cfText.textContent = text; E.cfYes.textContent = yes; cfAct = act; E.confirm.hidden = false; AU.ui(); }
+tap(E.intro, () => { AU.init(); if (IN.t > 1.2) endIntro(); }); tap(E.inSkip, () => { AU.init(); endIntro(); });
+E.marks = [...document.querySelectorAll('.mk')];
 tap(E.cfNo, () => { E.confirm.hidden = true; cfAct = null; AU.ui(); }); tap(E.cfYes, () => { E.confirm.hidden = true; const f = cfAct; cfAct = null; if (f) f(); });
 tap(E.playBtn, () => { AU.ui(); goLandscape(); startGame(G.maxLevel); });
 tap(E.contBtn, () => ask('BAŞTAN BAŞLA', 'Bölüm 1\'e dönersin ve kaldığın bölüm (' + G.maxLevel + ') sıfırlanır. Altının, silahların ve yükseltmelerin kalır.', 'BAŞTAN BAŞLA', () => { G.maxLevel = 1; save(); goLandscape(); startGame(1); }));
@@ -2938,6 +3074,7 @@ function frame(now) {
   if (G.slowT > 0 && !G.paused) { G.slowT -= rdt; dt *= 0.35; }
   if (!G.paused) qualityTick(rdt);
   /* kamera: pencereden aşağı bakış, nişana doğru hafif dönüş, sarsıntı */
+  if (G.mode === 'intro') { introTick(rdt); introCam(); updateCamera(); projectAll(); step(IN.done ? 0 : rdt, rdt); drawScene(); renderFrame(); return; }
   let wantYaw = 0, wantP = 0;
   if (G.mode === 'menu') { wantYaw = Math.sin(now * 0.00018) * 0.1; wantP = 0.1 + Math.sin(now * 0.00011) * 0.03; }
   else if (G.aim && G.aim.act && G.aim.st !== 2) { wantYaw = clamp(-Math.atan2(G.aim.x, cam.z - G.aim.z + 2) * 0.55, -0.42, 0.42); }
@@ -2961,6 +3098,7 @@ function frame(now) {
     E.xhair.style.transform = 'translate(' + G.cx.toFixed(1) + 'px,' + G.cy.toFixed(1) + 'px)';
     E.xhair.style.setProperty('--g', (lock ? 5 : 11) + G.recoil * 9 + 'px');
     const ta = G.aim && G.aim.act && G.aim.st !== 2 ? G.aim : null; E.thp.hidden = !ta; if (ta) E.thpi.style.transform = 'scaleX(' + clamp(ta.hp / ta.mhp, 0, 1) + ')';
+    hintMarks(); if (((G.t * 2) | 0) % 2 === 0) hintTips();
     UI.frame();
   } else { G.gx *= 0.9; G.gy *= 0.9; }
   drawScene(); renderFrame();
@@ -2968,7 +3106,7 @@ function frame(now) {
 function boot() {
   load(); applyUp(); dailyInit(); resize(); initShadow(2048); buildAtlas(); buildWorld();
   cam.pitch = cam.basePitch; G.cx = VW / 2; G.cy = VH * 0.42;
-  makeThumbs(); resetProps(); toMenu(); rotCheck(); if (!G.tips.help) UI.help(true); requestAnimationFrame(frame);
+  makeThumbs(); rotCheck(); startIntro(); requestAnimationFrame(frame);
 }
 boot();
 </script>
