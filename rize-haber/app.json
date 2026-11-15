@@ -2,7 +2,7 @@
   "expo": {
     "name": "Rize Haber",
     "slug": "rize-haber",
-    "version": "1.1.0",
+    "version": "1.1.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -19,7 +19,7 @@
       },
       "predictiveBackGestureEnabled": false,
       "package": "com.kidmandesign.rizehaber",
-      "versionCode": 2,
+      "versionCode": 3,
       "blockedPermissions": [
         "android.permission.READ_EXTERNAL_STORAGE",
         "android.permission.WRITE_EXTERNAL_STORAGE",
@@ -37,6 +37,14 @@
         {
           "color": "#1B6B3A",
           "defaultChannel": "yeni-haberler"
+        }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "extraProguardRules": "# WorkManager (expo-background-task) Room veritabanini yansima ile olusturur;\n# R8 kurucuyu silerse uygulama acilista coker (NoSuchMethodException WorkDatabase_Impl.<init>).\n-keep class * extends androidx.room.RoomDatabase { <init>(); }\n-keep class androidx.work.impl.** { *; }\n-keep class * extends androidx.work.ListenableWorker { <init>(...); }"
+          }
         }
       ]
     ]
