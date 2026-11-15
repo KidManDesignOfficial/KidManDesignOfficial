@@ -22,7 +22,10 @@ export class PlayerController {
     addEventListener('keyup', (e) => { this.keys.delete(e.code); });
     addEventListener('blur', () => this.keys.clear());
     document.addEventListener('mousemove', (e) => {
-      if (document.pointerLockElement !== this.dom || !this.enabled) return;
+      if (!this.enabled) return;
+      // İmleç kilitlenemezse (gömülü sayfa vb.) sol tuşu basılı tutarak sürükle-bak
+      const dragging = e.target === this.dom && (e.buttons & 1);
+      if (document.pointerLockElement !== this.dom && !dragging) return;
       this.yaw -= e.movementX * this.sensitivity;
       this.pitch -= e.movementY * this.sensitivity;
       this.pitch = THREE.MathUtils.clamp(this.pitch, -1.45, 1.45);

@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Mahalle PlayStation Salonu — MVP Prototip</title>
+<title>Mahalle PlayStation Salonu</title>
 <style>
   :root {
     --bg: rgba(28, 20, 14, .78); --fg: #fff6e6; --muted: #d8c3a5;
     --ok: #51cf66; --warn: #fcc419; --bad: #ff6b6b; --accent: #4dabf7; --gold: #ffd43b;
   }
   * { box-sizing: border-box; }
-  html, body { margin: 0; height: 100%; overflow: hidden; background: #1a1410; color: var(--fg);
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #1a1410; color: var(--fg); color-scheme: dark;
     font-family: "Trebuchet MS", "Segoe UI", system-ui, sans-serif; }
   #app canvas { display: block; }
   kbd { display: inline-block; min-width: 1.6em; padding: 1px 6px; border-radius: 6px; background: var(--fg); color: #2b2118;
@@ -105,6 +105,7 @@
       <li><kbd>1</kbd>–<kbd>4</kbd> tezgahta diyalog seçimi · <kbd>Esc</kbd> duraklat</li>
     </ul>
     <p><b>Döngü:</b> Müşteriyi tezgahta karşıla → temiz ve boş masaya yönlendir → istediği oyunu raftan alıp o masanın konsoluna tak → oyun bitince ücreti al → masadaki çöpleri toplayıp kovaya at.</p>
+    <p class="sub">Bilgisayarda klavye ve fareyle oynanır. İmleç kilitlenmezse fareyi basılı tutup sürükleyerek bakabilirsin.</p>
     <button id="start-btn">Kepengi kaldır</button>
     <button id="reset-btn" class="ghost">Kaydı sıfırla</button>
   </div>
