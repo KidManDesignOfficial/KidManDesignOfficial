@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mahalle PlayStation Salonu — MVP Prototip</title>
+<style>
+  :root {
+    --bg: rgba(28, 20, 14, .78); --fg: #fff6e6; --muted: #d8c3a5;
+    --ok: #51cf66; --warn: #fcc419; --bad: #ff6b6b; --accent: #4dabf7; --gold: #ffd43b;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #1a1410; color: var(--fg);
+    font-family: "Trebuchet MS", "Segoe UI", system-ui, sans-serif; }
+  #app canvas { display: block; }
+  kbd { display: inline-block; min-width: 1.6em; padding: 1px 6px; border-radius: 6px; background: var(--fg); color: #2b2118;
+    font: bold 13px/1.4 system-ui, sans-serif; text-align: center; box-shadow: 0 2px 0 #9c8466; }
+
+  .panel { position: fixed; background: var(--bg); border-radius: 16px; padding: 10px 14px; backdrop-filter: blur(4px);
+    box-shadow: 0 6px 20px rgba(0,0,0,.35); pointer-events: none; }
+  #hud-top { top: 14px; left: 14px; display: flex; gap: 16px; align-items: center; }
+  #hud-time { font-size: 28px; font-weight: 800; letter-spacing: 1px; }
+  #hud-day { color: var(--muted); font-size: 13px; }
+  #hud-phase { color: var(--muted); font-size: 13px; }
+  #hud-money { font-size: 22px; font-weight: 800; color: var(--gold); }
+  #hud-rep { font-size: 13px; color: var(--muted); }
+  #hud-stations { top: 96px; left: 14px; width: 230px; display: flex; flex-direction: column; gap: 8px; padding: 10px; }
+  .st { background: rgba(255,255,255,.06); border-radius: 10px; padding: 7px 9px; border-left: 4px solid #888; display: grid; gap: 2px; font-size: 13px; }
+  .st b { font-size: 13px; } .st small { color: var(--muted); }
+  .st.good { border-color: var(--ok); } .st.warn { border-color: var(--warn); } .st.idle { border-color: #8a7a66; }
+  .bar { height: 5px; border-radius: 3px; background: rgba(255,255,255,.12); overflow: hidden; }
+  .bar i { display: block; height: 100%; }
+
+  #crosshair { position: fixed; left: 50%; top: 50%; width: 8px; height: 8px; margin: -4px; border-radius: 50%;
+    background: rgba(255,255,255,.7); box-shadow: 0 0 0 2px rgba(0,0,0,.35); transition: transform .12s, background .12s; pointer-events: none; }
+  #crosshair.on { transform: scale(1.7); background: var(--gold); }
+  #prompt { position: fixed; left: 50%; top: calc(50% + 30px); transform: translateX(-50%); font-size: 16px; font-weight: 700;
+    text-shadow: 0 2px 4px rgba(0,0,0,.8); pointer-events: none; white-space: nowrap; }
+  #prompt.dim { opacity: .65; font-weight: 500; }
+  #held { position: fixed; right: 16px; bottom: 16px; font-size: 15px; text-shadow: 0 2px 4px rgba(0,0,0,.8); pointer-events: none; }
+  #toasts { position: fixed; right: 14px; top: 14px; display: flex; flex-direction: column; gap: 6px; align-items: flex-end; pointer-events: none; }
+  .toast { background: var(--bg); padding: 8px 12px; border-radius: 10px; font-size: 14px; border-left: 4px solid var(--accent);
+    animation: slide .25s ease-out; transition: opacity .5s; max-width: 340px; }
+  .toast.good { border-color: var(--ok); } .toast.bad { border-color: var(--bad); } .toast.warn { border-color: var(--warn); }
+  .toast.out { opacity: 0; }
+  @keyframes slide { from { transform: translateX(30px); opacity: 0; } }
+
+  #dialog { position: fixed; left: 50%; bottom: 26px; transform: translate(-50%, 20px); width: min(560px, calc(100vw - 32px));
+    background: #fffaf0; color: #2b2118; border-radius: 18px; padding: 14px 18px; box-shadow: 0 10px 30px rgba(0,0,0,.45);
+    opacity: 0; pointer-events: none; transition: .18s; }
+  #dialog.open { opacity: 1; transform: translate(-50%, 0); }
+  #dialog .who { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #8a6b4a; }
+  #dialog .quote { font-size: 18px; font-weight: 700; margin: 4px 0 10px; }
+  #dialog ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+  #dialog li { font-size: 15px; } #dialog li.off { opacity: .4; text-decoration: line-through; }
+  #dialog kbd { background: #2b2118; color: #fffaf0; box-shadow: none; margin-right: 6px; }
+  #dialog .hint { margin-top: 8px; font-size: 12px; color: #8a6b4a; }
+
+  .overlay { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; padding: 16px;
+    background: radial-gradient(ellipse at center, rgba(40,25,15,.75), rgba(10,6,4,.92)); z-index: 10; }
+  .overlay.open { display: flex; }
+  .card { background: #fffaf0; color: #2b2118; border-radius: 22px; padding: 26px 30px; width: min(560px, 100%);
+    box-shadow: 0 20px 60px rgba(0,0,0,.5); max-height: calc(100vh - 32px); overflow: auto; }
+  .card h1 { margin: 0 0 4px; font-size: 30px; } .card h2 { margin: 0 0 14px; }
+  .card .sub { margin: 0 0 16px; color: #8a6b4a; }
+  .card ul { padding-left: 18px; line-height: 1.7; margin: 0 0 18px; }
+  .card kbd { background: #2b2118; color: #fffaf0; box-shadow: none; }
+  .card button { font: inherit; font-weight: 800; font-size: 18px; border: 0; border-radius: 14px; padding: 12px 22px;
+    background: #e8590c; color: #fff; cursor: pointer; box-shadow: 0 4px 0 #a33f06; }
+  .card button.ghost { background: transparent; color: #8a6b4a; box-shadow: none; font-size: 14px; }
+  .card table { width: 100%; border-collapse: collapse; margin-bottom: 14px; }
+  .card td { padding: 6px 0; border-bottom: 1px solid #eadbc4; } .card td:last-child { text-align: right; font-weight: 700; }
+  .card tr.neg td:last-child { color: #c92a2a; } .card tr.pos td:last-child { color: #2b8a3e; }
+  .card tr.total td { font-size: 18px; border-bottom: 2px solid #2b2118; }
+  .card .next { font-size: 14px; background: #fff3bf; padding: 10px 12px; border-radius: 10px; }
+  .card .next span { color: #8a6b4a; }
+  #pause .card { text-align: center; cursor: pointer; }
+</style>
+<script type="importmap">
+  { "imports": { "three": "./vendor/three.module.js" } }
+</script>
+</head>
+<body>
+<div id="app"></div>
+
+<div id="hud-top" class="panel">
+  <div><div id="hud-day"></div><div id="hud-time">10:00</div></div>
+  <div><div id="hud-phase"></div><div id="hud-money"></div><div id="hud-rep"></div></div>
+</div>
+<div id="hud-stations" class="panel"></div>
+<div id="crosshair"></div>
+<div id="prompt"></div>
+<div id="held"></div>
+<div id="toasts"></div>
+<div id="dialog"></div>
+
+<div id="start" class="overlay open">
+  <div class="card">
+    <h1>Mahalle PlayStation Salonu</h1>
+    <p class="sub">MVP prototip · Seviye 1: Köhne Mahalle Salonu</p>
+    <ul>
+      <li><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> yürü · <kbd>Shift</kbd> koş · fare ile bak</li>
+      <li><kbd>E</kbd> etkileşim (konuş, kutu al, disk tak/çıkar, çöp topla)</li>
+      <li><kbd>Q</kbd> elindeki kutuyu baktığın yere bırak</li>
+      <li><kbd>1</kbd>–<kbd>4</kbd> tezgahta diyalog seçimi · <kbd>Esc</kbd> duraklat</li>
+    </ul>
+    <p><b>Döngü:</b> Müşteriyi tezgahta karşıla → temiz ve boş masaya yönlendir → istediği oyunu raftan alıp o masanın konsoluna tak → oyun bitince ücreti al → masadaki çöpleri toplayıp kovaya at.</p>
+    <button id="start-btn">Kepengi kaldır</button>
+    <button id="reset-btn" class="ghost">Kaydı sıfırla</button>
+  </div>
+</div>
+<div id="pause" class="overlay"><div class="card"><h2>Duraklatıldı</h2><p>Devam etmek için tıkla</p></div></div>
+<div id="summary" class="overlay"></div>
+
+<script type="module" src="./src/main.js"></script>
+</body>
+</html>
