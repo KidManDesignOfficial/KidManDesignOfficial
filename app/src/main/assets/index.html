@@ -210,6 +210,9 @@ button:focus-visible{outline:3px solid var(--bone);outline-offset:3px}
   .mside{width:min(320px,40%)}
 }
 @media (max-height:520px){.btn.big{font-size:28px;padding:11px 30px 12px}.mstats div{padding:6px}.mstats b{font-size:20px}.mgrid .btn,.mside>.btn.ghost{padding:8px 4px 9px;font-size:14px}.mside{gap:7px}.tabs button{font-size:14px;padding:7px 10px 8px}.card b{font-size:16px}#help{gap:6px}}
+#confirm{background:rgba(13,10,17,.93);z-index:6}
+#confirm h2{color:var(--blood)}
+#playBtn small{display:block;font:700 normal 14px/1 var(--ui);letter-spacing:.16em;margin-top:5px;opacity:.75}
 #rot{background:rgba(16,12,20,.94);z-index:5}
 @media (orientation:landscape){
   .list{grid-template-columns:repeat(2,minmax(0,1fr));width:min(760px,100%)}
@@ -276,7 +279,7 @@ button:focus-visible{outline:3px solid var(--bone);outline-offset:3px}
   <div class="mside">
     <div class="mstats"><div><span>BÖLÜM</span><b id="mLvl">1</b></div><div><span>ALTIN</span><b id="mGold">0</b></div><div><span>REKOR</span><b id="mBest">0</b></div></div>
     <button id="playBtn" class="btn big" type="button">OYNA</button>
-    <button id="contBtn" class="btn ghost" type="button" hidden>BÖLÜM 2'DEN DEVAM</button>
+    <button id="contBtn" class="btn ghost" type="button" hidden>BAŞTAN BAŞLA</button>
     <div class="mgrid">
       <button id="shopOpen" class="btn ghost" type="button">MAĞAZA</button>
       <button id="questOpen" class="btn ghost" type="button">GÖREVLER</button>
@@ -334,6 +337,12 @@ button:focus-visible{outline:3px solid var(--bone);outline-offset:3px}
   <h2>TELEFONU YAN ÇEVİR</h2>
   <p class="sub">Oyun yatay ekranda oynanır. Telefonun otomatik döndürmesi kapalıysa aç.</p>
   <button id="rotSkip" class="btn ghost" type="button">DİK OYNA</button>
+</div>
+<div id="confirm" class="ov" hidden>
+  <span class="kick" id="cfKick">EMİN MİSİN?</span>
+  <h2 id="cfTitle">ANA MENÜYE DÖN</h2>
+  <p class="sub" id="cfText">Bu bölümdeki ilerlemen sıfırlanacak.</p>
+  <div class="rowb"><button id="cfNo" class="btn ghost" type="button">VAZGEÇ</button><button id="cfYes" class="btn" type="button">EVET</button></div>
 </div>
 <div id="nogl" hidden>Bu cihaz ya da tarayıcı WebGL2 desteklemiyor. Oyunu güncel Chrome ile aç.</div>
 <script>
@@ -1471,14 +1480,44 @@ const WPN = [
     }
   }
   let m;
-  /* 0 TABANCA */
+  /* 0 TABANCA (Beretta 92 tipi: açık üstlü sürgü, tırtıllı kabza, madalyon) */
   m = new Model();
-  m.box(0.03, 0.022, 0.165, 0, 0.006, -0.05, POLY); m.box(0.031, 0.118, 0.05, 0, -0.058, 0.02, POLY, { rx: -0.22 }); m.box(0.032, 0.012, 0.058, 0, -0.118, 0.034, SD, { rx: -0.22, g: 4 }); m.box(0.022, 0.11, 0.034, 0, -0.06, 0.02, C(0x24262b), { rx: -0.22, g: 4 });
-  m.box(0.012, 0.006, 0.055, 0, -0.03, -0.038, POLY); m.box(0.012, 0.03, 0.006, 0, -0.016, -0.064, POLY); m.cyl(0.0075, 0.03, 0, 0.036, -0.166, SD, { rx: HPI });
-  m.box(0.033, 0.035, 0.2, 0, 0.036, -0.062, ST, { g: 1, a: G_ }); m.box(0.034, 0.012, 0.045, 0, 0.049, -0.05, SV, { g: 1, a: 0.8 });
-  m.box(0.006, 0.008, 0.01, 0, 0.058, -0.152, [0.9, 0.9, 0.85], { g: 1 }); m.box(0.022, 0.008, 0.008, 0, 0.058, 0.03, SD, { g: 1 });
-  arms(m, [0, -0.062, 0.03], [-0.022, -0.085, 0.02]);
-  WPN[0].model = m; WPN[0].muz = [0, 0.036, -0.185]; WPN[0].ej = [0.02, 0.055, -0.05]; WPN[0].g1 = 'slide';
+  {
+    const BK = C(0x1c1d21), BK2 = C(0x2a2c31), DK = C(0x0b0c0e), SV = C(0x8d939b), g = { a: 0.5 };
+    /* gövde: sürgü altı, toz kapağı, ön kısım */
+    m.box(0.028, 0.02, 0.15, 0, 0.004, -0.085, BK, g); m.box(0.026, 0.014, 0.05, 0, -0.008, -0.14, BK2, g);
+    m.box(0.029, 0.03, 0.06, 0, -0.002, 0.012, BK, g);
+    /* tetik korkuluğu (yuvarlak) ve tetik */
+    m.box(0.009, 0.005, 0.05, 0, -0.044, -0.052, BK); m.beam(0, -0.044, -0.077, 0, -0.012, -0.092, 0.009, 0.006, BK); m.beam(0, -0.044, -0.026, 0, -0.01, -0.012, 0.009, 0.006, BK);
+    m.beam(0, -0.012, -0.044, 0, -0.034, -0.054, 0.006, 0.006, DK); m.box(0.004, 0.006, 0.006, 0, -0.036, -0.058, DK);
+    /* kabza: çerçeve + tırtıllı paneller + madalyon + vidalar */
+    m.box(0.028, 0.115, 0.05, 0, -0.06, 0.03, BK, { rx: -0.2, a: 0.45 }); m.box(0.032, 0.014, 0.056, 0, -0.117, 0.042, BK2, { rx: -0.2 });
+    for (const s of [-1, 1]) {
+      m.box(0.004, 0.092, 0.04, s * 0.0155, -0.058, 0.03, DK, { rx: -0.2, a: 0.05 });
+      for (let i = 0; i < 6; i++) m.box(0.0015, 0.0035, 0.038, s * 0.0178, -0.022 - i * 0.014, 0.022 + i * 0.003, BK2, { rx: -0.2 });
+      m.cyl(0.0085, 0.003, s * 0.0185, -0.062, 0.034, BK2, { rz: HPI, a: 0.6 });
+      m.cyl(0.0035, 0.003, s * 0.0185, -0.02, 0.022, SV, { rz: HPI, a: 0.8 }); m.cyl(0.0035, 0.003, s * 0.0185, -0.1, 0.044, SV, { rz: HPI, a: 0.8 });
+    }
+    /* şarjör tabanı (grup 4: şarjör değiştirirken düşer) */
+    m.box(0.022, 0.1, 0.034, 0, -0.06, 0.028, C(0x24262b), { rx: -0.2, g: 4 }); m.box(0.03, 0.01, 0.048, 0, -0.123, 0.044, DK, { rx: -0.2, g: 4 });
+    /* horoz ve kuyruk */
+    m.beam(0, 0.016, 0.044, 0, 0.034, 0.056, 0.01, 0.012, BK2, g); m.box(0.026, 0.008, 0.02, 0, 0.012, 0.048, BK);
+    /* açıkta kalan namlu */
+    m.cyl(0.0082, 0.13, 0, 0.033, -0.11, SV, { rx: HPI, a: 0.7 }); m.cyl(0.006, 0.006, 0, 0.033, -0.178, DK, { rx: HPI });
+    /* sürgü (grup 1: her atışta geri gelir) */
+    m.box(0.03, 0.036, 0.075, 0, 0.034, 0.008, BK, { g: 1, a: 0.55 });
+    for (let i = 0; i < 7; i++) for (const s of [-1, 1]) m.box(0.002, 0.03, 0.003, s * 0.0152, 0.034, 0.03 - i * 0.0055, DK, { g: 1 });
+    for (const s of [-1, 1]) m.box(0.007, 0.012, 0.12, s * 0.0115, 0.04, -0.09, BK, { g: 1, a: 0.55 });
+    m.box(0.03, 0.026, 0.035, 0, 0.032, -0.168, BK, { g: 1, a: 0.55 }); m.box(0.03, 0.008, 0.035, 0, 0.018, -0.168, BK2, { g: 1 });
+    m.box(0.03, 0.012, 0.12, 0, 0.022, -0.09, BK, { g: 1, a: 0.5 });
+    m.box(0.008, 0.006, 0.026, 0, 0.0505, -0.05, BK2, { g: 1 }); m.box(0.004, 0.008, 0.008, 0.016, 0.044, -0.042, DK, { g: 1 });
+    /* emniyet mandalı, nişangâhlar */
+    m.box(0.034, 0.008, 0.01, 0, 0.044, 0.024, BK2, { g: 1 }); m.box(0.006, 0.006, 0.018, 0.019, 0.044, 0.024, BK2, { g: 1, ry: 0.4 });
+    m.box(0.022, 0.009, 0.006, 0, 0.056, 0.036, DK, { g: 1 }); m.box(0.004, 0.005, 0.004, -0.006, 0.058, 0.036, [0.9, 0.9, 0.85], { g: 1, a: 2 }); m.box(0.004, 0.005, 0.004, 0.006, 0.058, 0.036, [0.9, 0.9, 0.85], { g: 1, a: 2 });
+    m.box(0.004, 0.01, 0.01, 0, 0.05, -0.178, DK, { g: 1 }); m.box(0.003, 0.003, 0.004, 0, 0.0565, -0.178, [0.9, 0.9, 0.85], { g: 1, a: 2 });
+  }
+  arms(m, [0, -0.066, 0.034], [-0.022, -0.088, 0.024]);
+  WPN[0].model = m; WPN[0].muz = [0, 0.033, -0.19]; WPN[0].ej = [0.02, 0.05, -0.05]; WPN[0].g1 = 'slide';
   /* 1 ALTIPATLAR (tek hareketli, uzun namlulu) */
   m = new Model();
   {
@@ -2380,7 +2419,7 @@ function gameOver() {
   for (let i = 0; i < 5; i++) later(i * 0.18, () => explode(rnd(-7, 7), 1, -15 + rnd(-1, 1), 5, 0, {}));
   setTimeout(() => UI.over(), 1300);
 }
-function toMenu() { clearEntities(); G.ride = false; AU.engine(false); G.mode = 'menu'; G.paused = false; UI.menu(); AU.ambience(false); }
+function toMenu() { save(); clearEntities(); G.ride = false; AU.engine(false); G.mode = 'menu'; G.paused = false; UI.menu(); AU.ambience(false); }
 function save() { try { localStorage.setItem('sonkat3', JSON.stringify({ best: Math.max(G.best, G.score), maxLevel: G.maxLevel, muted: AU.muted, tips: G.tips, gold: G.gold, up: G.up, daily: G.daily, owned: G.owned, equip: G.equip, sup: G.sup })); } catch (e) { } }
 function load() { try { const d = JSON.parse(localStorage.getItem('sonkat3') || '{}'); G.best = d.best || 0; G.maxLevel = d.maxLevel || 1; AU.muted = !!d.muted; G.tips = d.tips || {}; G.gold = d.gold || 0; if (d.owned) d.owned.forEach((v, i) => { if (i < WPN.length) G.owned[i] = !!v || i === 0; }); else for (let i = 0; i < (d.own || 1); i++) G.owned[i] = true; G.equip = d.equip || 0; if (d.sup) Object.assign(G.sup, d.sup); if (d.up) Object.assign(G.up, d.up); G.daily = d.daily || null; } catch (e) { } }
 
@@ -2772,7 +2811,7 @@ function makeThumbs() {
 /* =====================================================================
    ARAYÜZ, GİRDİ ve ANA DÖNGÜ
    ===================================================================== */
-const E = {}; ['hud', 'shopTabs', 'help', 'helpOpen', 'helpClose', 'mLvl', 'mGold', 'mBest', 'rot', 'rotSkip', 'thp', 'thpi', 'hpk', 'gold', 'buff', 'shop', 'shopGold', 'shopList', 'shopClose', 'shopOpen', 'shopOpen2', 'quests', 'questGold', 'questList', 'questClose', 'questOpen', 'lvl', 'prog', 'left', 'score', 'mult', 'hp', 'hpn', 'bossbar', 'bosshp', 'banner', 'unlock', 'callout', 'streak', 'tip', 'wpn', 'wk', 'wname', 'ammo', 'rel',
+const E = {}; ['hud', 'confirm', 'cfKick', 'cfTitle', 'cfText', 'cfNo', 'cfYes', 'shopTabs', 'help', 'helpOpen', 'helpClose', 'mLvl', 'mGold', 'mBest', 'rot', 'rotSkip', 'thp', 'thpi', 'hpk', 'gold', 'buff', 'shop', 'shopGold', 'shopList', 'shopClose', 'shopOpen', 'shopOpen2', 'quests', 'questGold', 'questList', 'questClose', 'questOpen', 'lvl', 'prog', 'left', 'score', 'mult', 'hp', 'hpn', 'bossbar', 'bosshp', 'banner', 'unlock', 'callout', 'streak', 'tip', 'wpn', 'wk', 'wname', 'ammo', 'rel',
   'ultiBtn', 'heliBtn', 'xhair', 'hm', 'pops', 'menu', 'over', 'pause', 'hurt', 'touch', 'playBtn', 'contBtn', 'muteBtn', 'muteBtn2', 'best', 'oLvl', 'oScore', 'oKills', 'oHeads', 'oBest',
   'retryBtn', 'restartBtn', 'menuBtn', 'menuBtn2', 'resumeBtn', 'pauseBtn'].forEach(k => E[k] = $(k));
 const fmt = n => Math.round(n).toLocaleString('tr-TR');
@@ -2799,7 +2838,7 @@ const UI = {
   play() { E.menu.hidden = E.over.hidden = E.pause.hidden = true; E.hud.hidden = false; E.xhair.hidden = false; this.boss(-1); },
   menu() {
     E.menu.hidden = false; E.over.hidden = E.pause.hidden = true; E.hud.hidden = true; E.xhair.hidden = true;
-    E.contBtn.hidden = G.maxLevel < 2; E.contBtn.textContent = 'BÖLÜM ' + G.maxLevel + "'DEN DEVAM";
+    E.contBtn.hidden = G.maxLevel < 2; E.playBtn.innerHTML = G.maxLevel > 1 ? 'DEVAM ET<small>BÖLÜM ' + G.maxLevel + '</small>' : 'OYNA';
     E.mLvl.textContent = G.maxLevel; E.mGold.textContent = fmt(G.gold); E.mBest.textContent = fmt(G.best); this.mute();
     const d = G.daily; E.questOpen.textContent = 'GÖREVLER' + (d && !d.claimed ? ' •' : '');
   },
@@ -2871,9 +2910,13 @@ tap(E.pauseBtn, () => setPause(true)); tap(E.resumeBtn, () => { setPause(false);
 function goLandscape() { try { const d = document.documentElement, r = d.requestFullscreen || d.webkitRequestFullscreen; if (r) { const p = r.call(d); if (p && p.then) p.then(() => { if (screen.orientation && screen.orientation.lock) screen.orientation.lock('landscape').catch(() => { }); }).catch(() => { }); } } catch (e) { } }
 let rotSkip = false; function rotCheck() { let coarse = false; try { coarse = matchMedia('(pointer: coarse)').matches; } catch (e) { } E.rot.hidden = rotSkip || !coarse || window.innerWidth >= window.innerHeight; }
 tap(E.rotSkip, () => { rotSkip = true; rotCheck(); }); window.addEventListener('resize', rotCheck); window.addEventListener('orientationchange', () => setTimeout(rotCheck, 200));
-tap(E.playBtn, () => { AU.ui(); goLandscape(); startGame(1); }); tap(E.contBtn, () => { AU.ui(); goLandscape(); startGame(G.maxLevel); });
+let cfAct = null;
+function ask(title, text, yes, act) { E.cfTitle.textContent = title; E.cfText.textContent = text; E.cfYes.textContent = yes; cfAct = act; E.confirm.hidden = false; AU.ui(); }
+tap(E.cfNo, () => { E.confirm.hidden = true; cfAct = null; AU.ui(); }); tap(E.cfYes, () => { E.confirm.hidden = true; const f = cfAct; cfAct = null; if (f) f(); });
+tap(E.playBtn, () => { AU.ui(); goLandscape(); startGame(G.maxLevel); });
+tap(E.contBtn, () => ask('BAŞTAN BAŞLA', 'Bölüm 1\'e dönersin ve kaldığın bölüm (' + G.maxLevel + ') sıfırlanır. Altının, silahların ve yükseltmelerin kalır.', 'BAŞTAN BAŞLA', () => { G.maxLevel = 1; save(); goLandscape(); startGame(1); }));
 tap(E.retryBtn, () => { AU.ui(); startGame(G.level); }); tap(E.restartBtn, () => { AU.ui(); startGame(1); });
-tap(E.menuBtn, () => { if (AU.ctx) AU.ctx.resume(); toMenu(); }); tap(E.menuBtn2, toMenu);
+tap(E.menuBtn, () => ask('ANA MENÜYE DÖN', 'Bölüm ' + G.level + ' sıfırlanacak. Bu bölümde öldürdüğün zombiler ve skorun silinir; kazandığın altın kalır.', 'ANA MENÜYE DÖN', () => { if (AU.ctx) AU.ctx.resume(); toMenu(); })); tap(E.menuBtn2, toMenu);
 const tm = () => { AU.setMuted(!AU.muted); UI.mute(); save(); }; tap(E.muteBtn, tm); tap(E.muteBtn2, tm);
 document.addEventListener('visibilitychange', () => { if (document.hidden) setPause(true); });
 window.addEventListener('keydown', e => {
