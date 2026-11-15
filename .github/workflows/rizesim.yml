@@ -1,0 +1,26 @@
+name: RizeSim
+
+on:
+  push:
+    paths: ["RizeSim/**", ".github/workflows/rizesim.yml"]
+  pull_request:
+    paths: ["RizeSim/**", ".github/workflows/rizesim.yml"]
+
+jobs:
+  logic-and-tools:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Bağımlılıklar
+        run: pip install numpy pillow
+      - name: Simülasyon çekirdeği (C++, motordan bağımsız)
+        run: make -C RizeSim/Tests/Logic
+      - name: Simülasyon çekirdeği (clang)
+        run: CXX=clang++ make -C RizeSim/Tests/Logic clean test
+      - name: Veri dosyaları
+        run: python3 RizeSim/Tools/validate_data.py
+      - name: Coğrafya, içe aktarım ve MCP köprüsü testleri
+        run: python3 -m unittest discover -s RizeSim/Tools/tests -v

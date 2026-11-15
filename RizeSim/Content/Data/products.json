@@ -1,0 +1,43 @@
+[
+  { "id": "simit",              "name": "Simit",                         "category": "firin",   "priceKurus": 2000 },
+  { "id": "ekmek",              "name": "Ekmek",                         "category": "firin",   "priceKurus": 1500 },
+  { "id": "misir_ekmegi",       "name": "Mısır Ekmeği",                  "category": "firin",   "priceKurus": 4500 },
+  { "id": "laz_boregi",         "name": "Laz Böreği (dilim)",            "category": "firin",   "priceKurus": 7000 },
+  { "id": "pide_kiymali",       "name": "Kıymalı Pide",                  "category": "firin",   "priceKurus": 18000 },
+
+  { "id": "cay_dokme_1kg",      "name": "Rize Çayı (dökme) 1 kg",        "category": "bakkal",  "priceKurus": 32000 },
+  { "id": "cay_dokme_500g",     "name": "Rize Çayı (dökme) 500 g",       "category": "bakkal",  "priceKurus": 17000 },
+  { "id": "seker_1kg",          "name": "Toz Şeker 1 kg",                "category": "bakkal",  "priceKurus": 4500 },
+  { "id": "sut_1l",             "name": "Süt 1 L",                       "category": "bakkal",  "priceKurus": 4500 },
+  { "id": "yumurta_10",         "name": "Yumurta (10'lu)",               "category": "bakkal",  "priceKurus": 9000 },
+  { "id": "tereyagi_500g",      "name": "Köy Tereyağı 500 g",            "category": "bakkal",  "priceKurus": 30000 },
+  { "id": "kolot_peyniri",      "name": "Kolot Peyniri 500 g",           "category": "bakkal",  "priceKurus": 32000 },
+  { "id": "misir_unu_1kg",      "name": "Mısır Unu 1 kg",                "category": "bakkal",  "priceKurus": 5500 },
+  { "id": "karalahana",         "name": "Karalahana (demet)",            "category": "manav",   "priceKurus": 3500 },
+  { "id": "findik_500g",        "name": "İç Fındık 500 g",               "category": "bakkal",  "priceKurus": 38000 },
+  { "id": "su_05l",             "name": "Su 0,5 L",                      "category": "bakkal",  "priceKurus": 1000 },
+  { "id": "ayran",              "name": "Ayran",                         "category": "bakkal",  "priceKurus": 2000 },
+  { "id": "gazete",             "name": "Yerel Gazete",                  "category": "bakkal",  "priceKurus": 1500 },
+  { "id": "semsiye",            "name": "Şemsiye",                       "category": "bakkal",  "priceKurus": 25000 },
+  { "id": "cakmak",             "name": "Çakmak",                        "category": "bakkal",  "priceKurus": 1500 },
+
+  { "id": "hamsi_1kg",          "name": "Taze Hamsi 1 kg",               "category": "balik",   "priceKurus": 25000 },
+  { "id": "istavrit_1kg",       "name": "İstavrit 1 kg",                 "category": "balik",   "priceKurus": 20000 },
+
+  { "id": "cay_ince_belli",     "name": "Çay (ince belli)",              "category": "icecek",  "priceKurus": 1500,  "bServed": true },
+  { "id": "cay_fincan",         "name": "Fincan Çay",                    "category": "icecek",  "priceKurus": 2500,  "bServed": true },
+  { "id": "oralet",             "name": "Oralet",                        "category": "icecek",  "priceKurus": 1500,  "bServed": true },
+  { "id": "turk_kahvesi",       "name": "Türk Kahvesi",                  "category": "icecek",  "priceKurus": 6000,  "bServed": true },
+  { "id": "ayran_servis",       "name": "Ayran (bardak)",                "category": "icecek",  "priceKurus": 2500,  "bServed": true },
+
+  { "id": "lahana_corbasi",     "name": "Lahana Çorbası",                "category": "yemek",   "priceKurus": 12000, "bServed": true },
+  { "id": "mercimek_corbasi",   "name": "Mercimek Çorbası",              "category": "yemek",   "priceKurus": 10000, "bServed": true },
+  { "id": "kuru_fasulye",       "name": "Kuru Fasulye",                  "category": "yemek",   "priceKurus": 16000, "bServed": true },
+  { "id": "pilav",              "name": "Pilav",                         "category": "yemek",   "priceKurus": 8000,  "bServed": true },
+  { "id": "kavurma",            "name": "Kavurma",                       "category": "yemek",   "priceKurus": 38000, "bServed": true },
+  { "id": "hamsi_tava",         "name": "Hamsi Tava",                    "category": "yemek",   "priceKurus": 30000, "bServed": true },
+  { "id": "kuymak",             "name": "Kuymak",                        "category": "yemek",   "priceKurus": 26000, "bServed": true },
+  { "id": "karalahana_sarma",   "name": "Karalahana Sarması",            "category": "yemek",   "priceKurus": 20000, "bServed": true },
+  { "id": "sutlac",             "name": "Fırın Sütlaç",                  "category": "yemek",   "priceKurus": 9000,  "bServed": true },
+  { "id": "laz_boregi_servis",  "name": "Laz Böreği (tatlı)",            "category": "yemek",   "priceKurus": 9000,  "bServed": true }
+]

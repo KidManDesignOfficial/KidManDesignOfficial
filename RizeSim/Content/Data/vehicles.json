@@ -1,0 +1,8 @@
+[
+  { "id": "kompakt_hb",     "name": "Kompakt Hatchback",          "kind": "binek",        "priceKurus": 95000000,  "serviceKurus": 450000, "vehicleClass": "/Game/Vehicles/BP_Kompakt_HB.BP_Kompakt_HB_C" },
+  { "id": "aile_sedan",     "name": "Aile Sedanı",                "kind": "binek",        "priceKurus": 140000000, "serviceKurus": 600000, "vehicleClass": "/Game/Vehicles/BP_Aile_Sedan.BP_Aile_Sedan_C" },
+  { "id": "arazi_4x4",      "name": "4x4 Arazi Aracı (yayla yolu)", "kind": "binek",      "priceKurus": 210000000, "serviceKurus": 900000, "vehicleClass": "/Game/Vehicles/BP_Arazi_4x4.BP_Arazi_4x4_C" },
+  { "id": "kamyonet",       "name": "Hafif Ticari Kamyonet",      "kind": "hafif_ticari", "priceKurus": 120000000, "serviceKurus": 550000, "vehicleClass": "/Game/Vehicles/BP_Kamyonet.BP_Kamyonet_C" },
+  { "id": "kurye_motor",    "name": "Kurye Motosikleti",          "kind": "motor",        "priceKurus": 9500000,   "serviceKurus": 150000, "vehicleClass": "/Game/Vehicles/BP_Kurye_Motor.BP_Kurye_Motor_C" },
+  { "id": "sari_dolmus",    "name": "Sarı Dolmuş (Minibüs)",      "kind": "dolmus",       "priceKurus": 260000000, "serviceKurus": 1200000, "vehicleClass": "/Game/Vehicles/BP_Sari_Dolmus_Surulebilir.BP_Sari_Dolmus_Surulebilir_C" }
+]

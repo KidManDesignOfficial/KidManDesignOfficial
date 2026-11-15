@@ -1,0 +1,24 @@
+{
+  "region": "ayder",
+  "name": "Ayder Yaylası",
+  "center_lat": 40.953,
+  "center_lon": 41.104,
+  "size_m": 4000.0,
+  "resolution_px": 1009,
+  "meters_per_px": 3.9682539682539684,
+  "min_elevation_m": 991.85,
+  "max_elevation_m": 2430.82,
+  "landscape_scale": {
+    "x": 396.8254,
+    "y": 396.8254,
+    "z": 281.0532
+  },
+  "landscape_location_cm": {
+    "x": -200000.0,
+    "y": -200000.0,
+    "z": 171134.25
+  },
+  "sea_level_world_z_cm": 0.0,
+  "axis_convention": "+X=Doğu, +Y=Güney, +Z=Yukarı (cm)",
+  "source": "AWS Terrain Tiles (terrarium) — SRTM/USGS/ETOPO kökenli"
+}

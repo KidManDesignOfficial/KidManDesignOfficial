@@ -1,0 +1,40 @@
+[
+  { "id": "h_sabah_1",   "speaker": "herkes", "text": "Hayırlı sabahlar.", "phases": ["Safak", "Sabah"] },
+  { "id": "h_sabah_2",   "speaker": "herkes", "text": "Sis daha kalkmadı, öğlene açar inşallah.", "phases": ["Safak", "Sabah"], "weathers": ["Sis"], "weight": 3 },
+  { "id": "h_ogle_1",    "speaker": "herkes", "text": "Çarşı da bugün pek kalabalık.", "phases": ["Ogle"] },
+  { "id": "h_aksam_1",   "speaker": "herkes", "text": "Hayırlı akşamlar. Sahile mi iniyorsun?", "phases": ["Aksam"] },
+  { "id": "h_gece_1",    "speaker": "herkes", "text": "Geç oldu, sen de evine git artık.", "phases": ["Gece"] },
+  { "id": "h_yagmur_1",  "speaker": "herkes", "text": "Bu yağmur da dinmedi ha… Rize'de şemsiyesiz çıkılmaz.", "weathers": ["Cisenti", "Saganak"], "weight": 3 },
+  { "id": "h_yagmur_2",  "speaker": "herkes", "text": "Islanma, gir bir saçağın altına, birazdan geçer.", "weathers": ["Saganak"], "weight": 4 },
+  { "id": "h_gunes_1",   "speaker": "herkes", "text": "Güneşi gördük ya, bayram ettik!", "weathers": ["Acik"], "weight": 2 },
+  { "id": "h_genel_1",   "speaker": "herkes", "text": "Selamünaleyküm, nasılsın?" },
+  { "id": "h_genel_2",   "speaker": "herkes", "text": "Bizim yokuşları çıkan her yeri çıkar." },
+
+  { "id": "c_1",         "speaker": "cayci",  "text": "Taze demledim, tavşan kanı.", "places": ["cay_ocagi", "kiraathane"] },
+  { "id": "c_2",         "speaker": "cayci",  "text": "Hemen geliyor, ince belliden mi olsun?" },
+  { "id": "c_3",         "speaker": "cayci",  "text": "Sabahın ilk çayı benden olsun.", "phases": ["Safak"], "weight": 2 },
+  { "id": "c_4",         "speaker": "cayci",  "text": "Yağmurda çay başka içilir, değil mi?", "weathers": ["Cisenti", "Saganak"], "weight": 3 },
+  { "id": "c_5",         "speaker": "cayci",  "text": "Bu yaprak bu yılın ilk hasadı, kokusundan belli.", "phases": ["Sabah", "Ikindi"] },
+  { "id": "c_6",         "speaker": "cayci",  "text": "Akşam çayı keyiflidir, otur bir soluklan.", "phases": ["Aksam"] },
+
+  { "id": "e_1",         "speaker": "esnaf",  "text": "Hoş geldin, ne lazımdı?", "places": ["bakkal", "market", "firin"] },
+  { "id": "e_2",         "speaker": "esnaf",  "text": "Ekmekler yeni çıktı, sıcak sıcak.", "places": ["firin"], "phases": ["Safak", "Sabah"], "weight": 3 },
+  { "id": "e_3",         "speaker": "esnaf",  "text": "Şemsiyen yok mu? Bende var, iyisinden.", "places": ["bakkal", "market"], "weathers": ["Cisenti", "Saganak"], "weight": 3 },
+  { "id": "e_4",         "speaker": "esnaf",  "text": "Kuru fasulyemiz bugün çok güzel oldu, bir tabak koyayım mı?", "places": ["lokanta"], "weight": 2 },
+  { "id": "e_5",         "speaker": "esnaf",  "text": "Lahana çorbası soğuk havaya birebir.", "places": ["lokanta"], "weathers": ["Bulutlu", "Cisenti", "Saganak", "Sis"], "weight": 2 },
+  { "id": "e_6",         "speaker": "esnaf",  "text": "Hamsi geldi, mevsimi tam!", "places": ["balikci"], "weight": 3 },
+  { "id": "e_7",         "speaker": "esnaf",  "text": "Öğle kalabalığı bu, biraz bekleyeceksin.", "places": ["lokanta"], "phases": ["Ogle"], "weight": 2 },
+
+  { "id": "y_1",         "speaker": "yasli",  "text": "Eskiden bu çarşıda her dükkanın önünde bir semaver kaynardı.", "weight": 2 },
+  { "id": "y_2",         "speaker": "yasli",  "text": "Bu yokuşu gençken koşarak çıkardım, şimdi durup nefesleniyorum.", "places": ["sahil_yuruyus", "carsi_kaldirim"] },
+  { "id": "y_3",         "speaker": "yasli",  "text": "Gel bir el okey atalım, dördüncüyü arıyorduk.", "places": ["kiraathane_masa"], "weight": 3 },
+  { "id": "y_4",         "speaker": "yasli",  "text": "Denize bak, bugün çarşaf gibi.", "places": ["sahil_yuruyus", "sahil_bank"], "weathers": ["Acik"], "weight": 3 },
+  { "id": "y_5",         "speaker": "yasli",  "text": "Sis dağdan indi mi bir hafta kalkmaz, bilirim.", "weathers": ["Sis"], "weight": 3 },
+
+  { "id": "g_1",         "speaker": "genc",   "text": "Akşam sahilde buluşuyoruz, gelsene.", "phases": ["Ikindi", "Aksam"] },
+  { "id": "g_2",         "speaker": "genc",   "text": "Dolmuş yine dolu geçti, bir sonrakini bekleyeceğiz.", "places": ["durak_meydan", "durak_muftu"], "weight": 3 },
+
+  { "id": "d_1",         "speaker": "dolmusci", "text": "Arkaya doğru ilerleyelim, kapı kapanıyor.", "weight": 2 },
+  { "id": "d_2",         "speaker": "dolmusci", "text": "Yol kaygan, yavaş gidiyoruz, merak etme.", "weathers": ["Cisenti", "Saganak"], "weight": 3 },
+  { "id": "d_3",         "speaker": "dolmusci", "text": "Bozuk ver abi, para üstüm kalmadı.", "phases": ["Safak", "Sabah"] }
+]

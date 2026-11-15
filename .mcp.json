@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "rize-unreal": {
+      "command": "python3",
+      "args": ["RizeSim/Tools/mcp/rize_unreal_mcp.py"],
+      "env": {
+        "RIZE_UE_URL": "http://127.0.0.1:30010"
+      }
+    }
+  }
+}

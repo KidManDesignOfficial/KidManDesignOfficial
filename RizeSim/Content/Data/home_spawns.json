@@ -1,0 +1,35 @@
+{
+  "SahilDairesi": {
+    "label": "Sahil Dairesi",
+    "map": "merkez",
+    "player_start_tag": "Ev_Sahil",
+    "location_cm": [
+      -7777.8,
+      -53055.6,
+      1483.4
+    ],
+    "elevation_m": 13.8
+  },
+  "MahalleEvi": {
+    "label": "Yokuşlu Mahalle Evi",
+    "map": "merkez",
+    "player_start_tag": "Ev_Mahalle",
+    "location_cm": [
+      0.0,
+      -0.0,
+      7533.1
+    ],
+    "elevation_m": 74.3
+  },
+  "YaylaEvi": {
+    "label": "Yayla Evi",
+    "map": "ayder",
+    "player_start_tag": "Ev_Yayla",
+    "location_cm": [
+      5952.4,
+      18650.8,
+      125227.5
+    ],
+    "elevation_m": 1251.3
+  }
+}

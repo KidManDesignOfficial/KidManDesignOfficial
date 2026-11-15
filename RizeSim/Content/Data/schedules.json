@@ -1,0 +1,62 @@
+[
+  {
+    "id": "esnaf_bakkal",
+    "entries": [
+      { "from": 6.75, "to": 7.0,  "activity": "kepenk_ac",    "location": "bakkal_kapi" },
+      { "from": 7.0,  "to": 12.5, "activity": "tezgah",       "location": "bakkal_tezgah" },
+      { "from": 12.5, "to": 13.25,"activity": "ogle_yemegi",  "location": "lokanta_masa", "weekdays": 63 },
+      { "from": 13.25,"to": 22.5, "activity": "tezgah",       "location": "bakkal_tezgah" },
+      { "from": 22.5, "to": 23.5, "activity": "cay_okey",     "location": "kiraathane_masa" }
+    ]
+  },
+  {
+    "id": "cayci",
+    "entries": [
+      { "from": 6.25, "to": 21.0, "activity": "semaver_basi", "location": "cay_ocagi_tezgah" },
+      { "from": 9.0,  "to": 9.5,  "activity": "tepsi_tur",    "location": "carsi_dukkan_onu" },
+      { "from": 15.0, "to": 15.5, "activity": "tepsi_tur",    "location": "carsi_dukkan_onu" }
+    ]
+  },
+  {
+    "id": "emekli_amca",
+    "entries": [
+      { "from": 5.0,  "to": 6.0,  "activity": "sabah_namazi", "location": "cami_avlu" },
+      { "from": 7.5,  "to": 8.5,  "activity": "simit_al",     "location": "firin_onu" },
+      { "from": 8.5,  "to": 11.5, "activity": "cay_gazete",   "location": "cay_ocagi_masa" },
+      { "from": 11.5, "to": 12.5, "activity": "carsi_tur",    "location": "carsi_kaldirim" },
+      { "from": 14.0, "to": 17.0, "activity": "cay_okey",     "location": "kiraathane_masa" },
+      { "from": 17.5, "to": 19.5, "activity": "sahil_yuru",   "location": "sahil_yuruyus" },
+      { "from": 19.5, "to": 22.0, "activity": "cay_okey",     "location": "kiraathane_masa" }
+    ]
+  },
+  {
+    "id": "ogrenci",
+    "entries": [
+      { "from": 7.25, "to": 7.75, "activity": "dolmus_bekle", "location": "durak_meydan", "weekdays": 31 },
+      { "from": 12.0, "to": 13.0, "activity": "ogle_simit",   "location": "firin_onu", "weekdays": 31 },
+      { "from": 16.5, "to": 18.0, "activity": "carsi_tur",    "location": "carsi_kaldirim" },
+      { "from": 18.0, "to": 20.5, "activity": "sahil_oturma", "location": "sahil_bank" },
+      { "from": 11.0, "to": 18.0, "activity": "sahil_yuru",   "location": "sahil_yuruyus", "weekdays": 96 }
+    ]
+  },
+  {
+    "id": "memur",
+    "entries": [
+      { "from": 7.75, "to": 8.25, "activity": "dolmus_bekle", "location": "durak_muftu", "weekdays": 31 },
+      { "from": 8.25, "to": 12.0, "activity": "is",           "location": "ev", "weekdays": 31 },
+      { "from": 12.0, "to": 13.0, "activity": "ogle_yemegi",  "location": "lokanta_masa", "weekdays": 31 },
+      { "from": 13.0, "to": 17.0, "activity": "is",           "location": "ev", "weekdays": 31 },
+      { "from": 17.0, "to": 17.5, "activity": "dolmus_bekle", "location": "durak_meydan", "weekdays": 31 },
+      { "from": 17.5, "to": 18.25,"activity": "market",       "location": "market_ici" },
+      { "from": 19.0, "to": 20.5, "activity": "aile_yuruyus", "location": "sahil_yuruyus", "weekdays": 96 }
+    ]
+  },
+  {
+    "id": "balikci",
+    "entries": [
+      { "from": 4.5,  "to": 7.0,  "activity": "ag_toplama",   "location": "liman_iskele" },
+      { "from": 7.0,  "to": 19.0, "activity": "tezgah",       "location": "balikci_tezgah" },
+      { "from": 19.0, "to": 21.0, "activity": "cay_okey",     "location": "kiraathane_masa" }
+    ]
+  }
+]

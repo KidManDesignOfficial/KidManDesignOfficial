@@ -1,0 +1,35 @@
+[
+  {
+    "id": "hat_1_kale", "name": "1 — Çarşı · Tophane · Kale", "pathId": "yol_hat_1",
+    "fareKurus": 2500, "firstDepartureHour": 6.5, "lastDepartureHour": 23.0,
+    "headwayMinutes": 12, "rushHeadwayFactor": 0.5,
+    "stops": [
+      { "id": "d_meydan", "name": "Cumhuriyet Meydanı" },
+      { "id": "d_carsi", "name": "Çarşı" },
+      { "id": "d_tophane", "name": "Tophane" },
+      { "id": "d_kale_alti", "name": "Kale Altı" },
+      { "id": "d_kale", "name": "Rize Kalesi" }
+    ]
+  },
+  {
+    "id": "hat_2_piricelebi", "name": "2 — Çarşı · Müftü · Piriçelebi", "pathId": "yol_hat_2",
+    "fareKurus": 2500, "firstDepartureHour": 6.5, "lastDepartureHour": 22.5,
+    "headwayMinutes": 15, "rushHeadwayFactor": 0.6,
+    "stops": [
+      { "id": "d_meydan", "name": "Cumhuriyet Meydanı" },
+      { "id": "d_muftu", "name": "Müftü" },
+      { "id": "d_muftu_yokus", "name": "Müftü Yokuşu" },
+      { "id": "d_piricelebi", "name": "Piriçelebi" }
+    ]
+  },
+  {
+    "id": "hat_3_sahil", "name": "3 — Sahil · Engindere", "pathId": "yol_hat_3",
+    "fareKurus": 2500, "firstDepartureHour": 7.0, "lastDepartureHour": 22.0,
+    "headwayMinutes": 20, "rushHeadwayFactor": 0.6,
+    "stops": [
+      { "id": "d_sahil_park", "name": "Sahil Parkı" },
+      { "id": "d_liman", "name": "Liman" },
+      { "id": "d_engindere", "name": "Engindere" }
+    ]
+  }
+]

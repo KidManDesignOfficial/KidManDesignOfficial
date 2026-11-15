@@ -1,0 +1,77 @@
+[
+  {
+    "id": "bakkal_muftu", "name": "Müftü Mahallesi Bakkalı", "type": "bakkal",
+    "openHour": 7.0, "closeHour": 22.5, "closedWeekdays": [], "ambience": "bakkal_radyo",
+    "products": [
+      { "productId": "ekmek", "stock": 40 }, { "productId": "cay_dokme_1kg", "stock": 8 },
+      { "productId": "cay_dokme_500g", "stock": 12 }, { "productId": "seker_1kg", "stock": 10 },
+      { "productId": "sut_1l", "stock": 12 }, { "productId": "yumurta_10", "stock": 10 },
+      { "productId": "misir_unu_1kg", "stock": 6 }, { "productId": "su_05l", "stock": 30 },
+      { "productId": "ayran", "stock": 20 }, { "productId": "gazete", "stock": 15 },
+      { "productId": "semsiye", "stock": 4, "priceOverrideKurus": 27500 }, { "productId": "cakmak", "stock": 20 }
+    ]
+  },
+  {
+    "id": "market_carsi", "name": "Çarşı Market", "type": "market",
+    "openHour": 8.0, "closeHour": 22.0, "closedWeekdays": [], "ambience": "market_kalabalik",
+    "products": [
+      { "productId": "ekmek", "stock": 60 }, { "productId": "cay_dokme_1kg", "stock": 20 },
+      { "productId": "cay_dokme_500g", "stock": 25 }, { "productId": "seker_1kg", "stock": 20 },
+      { "productId": "sut_1l", "stock": 30 }, { "productId": "yumurta_10", "stock": 20 },
+      { "productId": "tereyagi_500g", "stock": 8 }, { "productId": "kolot_peyniri", "stock": 6 },
+      { "productId": "misir_unu_1kg", "stock": 12 }, { "productId": "karalahana", "stock": 15 },
+      { "productId": "findik_500g", "stock": 10 }, { "productId": "su_05l", "stock": 60 },
+      { "productId": "ayran", "stock": 30 }, { "productId": "semsiye", "stock": 10 }
+    ]
+  },
+  {
+    "id": "firin_tophane", "name": "Tophane Fırını", "type": "firin",
+    "openHour": 5.5, "closeHour": 20.0, "closedWeekdays": [], "ambience": "firin_tas",
+    "products": [
+      { "productId": "simit", "stock": 80 }, { "productId": "ekmek", "stock": 120 },
+      { "productId": "misir_ekmegi", "stock": 25 }, { "productId": "laz_boregi", "stock": 30 },
+      { "productId": "pide_kiymali", "stock": 20 }
+    ]
+  },
+  {
+    "id": "balikci_sahil", "name": "Sahil Balıkçısı", "type": "balikci",
+    "openHour": 7.0, "closeHour": 19.0, "closedWeekdays": [], "ambience": "balikci_martilar",
+    "products": [ { "productId": "hamsi_1kg", "stock": 30 }, { "productId": "istavrit_1kg", "stock": 20 } ]
+  },
+  {
+    "id": "cay_ocagi_carsi", "name": "Çarşı Çay Ocağı", "type": "cay_ocagi",
+    "openHour": 6.5, "closeHour": 21.0, "closedWeekdays": [], "ambience": "cay_ocagi_semaver",
+    "products": [
+      { "productId": "cay_ince_belli", "stock": 999 }, { "productId": "oralet", "stock": 200 },
+      { "productId": "ayran_servis", "stock": 50 }
+    ]
+  },
+  {
+    "id": "kiraathane_meydan", "name": "Meydan Kıraathanesi", "type": "kiraathane",
+    "openHour": 8.0, "closeHour": 0.5, "closedWeekdays": [], "ambience": "kiraathane_okey",
+    "products": [
+      { "productId": "cay_ince_belli", "stock": 999 }, { "productId": "cay_fincan", "stock": 300 },
+      { "productId": "oralet", "stock": 200 }, { "productId": "turk_kahvesi", "stock": 100 }
+    ]
+  },
+  {
+    "id": "lokanta_esnaf", "name": "Esnaf Lokantası", "type": "lokanta",
+    "openHour": 11.0, "closeHour": 21.0, "closedWeekdays": [6], "ambience": "lokanta_mutfak",
+    "products": [
+      { "productId": "lahana_corbasi", "stock": 40 }, { "productId": "mercimek_corbasi", "stock": 40 },
+      { "productId": "kuru_fasulye", "stock": 50 }, { "productId": "pilav", "stock": 80 },
+      { "productId": "kavurma", "stock": 25 }, { "productId": "hamsi_tava", "stock": 30 },
+      { "productId": "kuymak", "stock": 20 }, { "productId": "karalahana_sarma", "stock": 25 },
+      { "productId": "sutlac", "stock": 30 }, { "productId": "laz_boregi_servis", "stock": 30 },
+      { "productId": "ayran_servis", "stock": 60 }, { "productId": "cay_ince_belli", "stock": 999, "priceOverrideKurus": 1000 }
+    ]
+  },
+  {
+    "id": "galeri_sahil", "name": "Sahil Oto Galeri", "type": "galeri",
+    "openHour": 9.0, "closeHour": 19.0, "closedWeekdays": [6], "ambience": "galeri_ic", "products": []
+  },
+  {
+    "id": "tamirci_sanayi", "name": "Sanayi Oto Tamir", "type": "tamirci",
+    "openHour": 8.0, "closeHour": 18.5, "closedWeekdays": [6], "ambience": "tamirci_atolye", "products": []
+  }
+]
