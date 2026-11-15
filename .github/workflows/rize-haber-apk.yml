@@ -1,0 +1,60 @@
+# Rize Haber Android uygulamasını derler ve APK'yı indirilebilir dosya olarak yükler.
+# Çalıştırmak için: GitHub → Actions → "Rize Haber APK" → "Run workflow"
+# (rize-haber/ klasörüne her push'ta da otomatik çalışır.)
+name: Rize Haber APK
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'rize-haber/**'
+      - '.github/workflows/rize-haber-apk.yml'
+
+concurrency:
+  group: rize-haber-apk-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    defaults:
+      run:
+        working-directory: rize-haber
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: rize-haber/package-lock.json
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Bağımlılıkları kur
+        run: npm ci
+
+      - name: Testler ve tip kontrolü
+        run: |
+          npm test
+          npx tsc --noEmit
+
+      - name: Android projesini oluştur
+        run: npx expo prebuild --platform android --no-install
+
+      - name: APK derle
+        working-directory: rize-haber/android
+        run: ./gradlew assembleRelease --no-daemon
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: rize-haber-apk
+          path: rize-haber/android/app/build/outputs/apk/release/*.apk
+          retention-days: 30
