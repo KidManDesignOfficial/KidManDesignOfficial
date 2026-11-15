@@ -66,7 +66,12 @@ export default function WeatherScreen() {
         />
       }
     >
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chips}>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={styles.chipsScroll}
+        contentContainerStyle={styles.chips}
+      >
         {WEATHER_LOCATIONS.map((l) => {
           const active = l.id === locationId;
           return (
@@ -165,8 +170,12 @@ function Stat({ label, value }: { label: string; value: string }) {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background },
   content: { paddingBottom: 24 },
-  chips: { paddingHorizontal: 16, paddingVertical: 12, gap: 8 },
+  chipsScroll: { flexGrow: 0, flexShrink: 0 },
+  chips: { paddingHorizontal: 16, paddingVertical: 12, gap: 8, alignItems: 'center' },
   chip: {
+    flexShrink: 0,
+    minHeight: 38,
+    justifyContent: 'center',
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 999,

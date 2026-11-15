@@ -226,9 +226,13 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: COLORS.text,
   },
-  chipsScroll: { flexGrow: 0 },
-  chips: { paddingHorizontal: 16, paddingVertical: 12, gap: 8 },
+  // ScrollView varsayılan olarak flexShrink: 1 gelir; liste ekranı doldururken şerit ezilmesin.
+  chipsScroll: { flexGrow: 0, flexShrink: 0 },
+  chips: { paddingHorizontal: 16, paddingVertical: 12, gap: 8, alignItems: 'center' },
   chip: {
+    flexShrink: 0,
+    minHeight: 38,
+    justifyContent: 'center',
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 999,
