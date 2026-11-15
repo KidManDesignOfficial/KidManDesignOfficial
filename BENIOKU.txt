@@ -1,0 +1,14 @@
+SON KAT - Android projesi
+
+APK almak icin:
+1. Bilgisayara Android Studio kur (developer.android.com/studio).
+2. Android Studio'da "Open" ile bu klasoru (SonKatAndroid) ac.
+3. Alttaki yukleme bitince ust menuden: Build > Build App Bundle(s) / APK(s) > Build APK(s).
+4. Cikan bildirimde "locate" a bas. APK su klasorde olur:
+   app/build/outputs/apk/debug/app-debug.apk
+5. Bu dosyayi telefona at ve kur.
+
+Oyunu guncellemek icin: yeni SonKat.html dosyasini
+app/src/main/assets/index.html olarak kaydet, tekrar Build APK yap.
+
+Play Store icin: Build > Generate Signed App Bundle ile imzali .aab dosyasi alinir.
