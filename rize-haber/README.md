@@ -6,8 +6,10 @@ Rize'deki günlük haberleri ve hava durumunu gösteren Android uygulaması (Rea
 
 | Ekran | İçerik |
 |---|---|
-| **Haberler** | Google Haberler üzerinden son 7 günün Rize haberleri · kategoriler (Tümü, Gündem, Spor, Ekonomi, Asayiş, İlçeler) · arama · aşağı çekerek yenileme · habere dokununca uygulama içi tarayıcıda kaynağında açılır |
-| **Hava Durumu** | Anlık sıcaklık, hissedilen, nem, rüzgâr, yağış, gün doğumu/batımı · 7 günlük tahmin · Rize Merkez, Çayeli, Pazar, Ardeşen, Fındıklı, Güneysu, İkizdere, Çamlıhemşin, Ayder |
+| **Haberler** | Google Haberler üzerinden son 7 günün Rize haberleri · kategoriler (Tümü, Gündem, Spor, Ekonomi, Asayiş, İlçeler) · arama · aşağı çekerek yenileme · habere dokununca uygulama içi tarayıcıda kaynağında açılır · **Kaydet** ve **Paylaş** düğmeleri |
+| **Kaydedilenler** | Kaydedilen haberler telefonda saklanır, internet yokken de listelenir |
+| **Hava Durumu** | Anlık durum · **24 saatlik tahmin** · 7 günlük tahmin · Rize Merkez, Çayeli, Pazar, Ardeşen, Fındıklı, Güneysu, İkizdere, Çamlıhemşin, Ayder |
+| **Bildirimler** | Haberler ekranındaki 🔕/🔔 düğmesiyle açılır. Uygulama arka planda ~30 dakikada bir yeni haber kontrol eder (kesin zamanı Android belirler; pil tasarrufu modunda gecikebilir). Bildirime dokununca haber açılır. |
 
 Haber metinleri kopyalanmaz; yalnızca başlık, kaynak ve bağlantı gösterilir (telif açısından güvenli yaklaşım).
 Hava durumu verisi: [Open-Meteo](https://open-meteo.com) (ücretsiz, API anahtarı gerektirmez).
@@ -38,11 +40,17 @@ npx expo start      # telefonda Expo Go ile anlık önizleme
 App.tsx                     Ana yerleşim: başlık + alt sekme çubuğu
 src/config.ts               Renkler, haber kategorileri (arama sorguları), ilçe koordinatları
 src/rss.ts                  RSS okuyucu (Google Haberler + genel RSS beslemeleri)
+src/notifications.ts        Arka plan haber kontrolü ve bildirimler
+src/newsDiff.ts             "Hangi haberler yeni?" hesabı
+src/storage.ts              Telefonda kalıcı veri (favoriler, ayarlar)
+src/favorites.tsx           Favori durumu
+src/components/NewsCard.tsx Haber kartı (kaydet / paylaş)
+src/screens/SavedScreen.tsx Kaydedilenler
 src/weather.ts              Open-Meteo istemcisi, hava kodu → Türkçe açıklama
 src/time.ts                 "5 dk önce", gün adları vb.
 src/screens/NewsScreen.tsx  Haber listesi
 src/screens/WeatherScreen.tsx Hava durumu
-test/rss.test.ts            Birim testleri
+test/*.test.ts              Birim testleri
 ```
 
 **Kategori veya ilçe eklemek** için yalnızca `src/config.ts` dosyasını düzenlemek yeterlidir.
@@ -51,5 +59,5 @@ test/rss.test.ts            Birim testleri
 
 - Uygulama simgesi ve açılış ekranı (şu an Expo'nun varsayılanı)
 - Yerel haber sitelerinin RSS beslemelerini eklemek (`src/rss.ts` genel RSS'i destekler)
-- Favorilere kaydetme, yeni haber bildirimi
+- Anında bildirim (Firebase + küçük sunucu ile; şu anki sistem ~30 dk gecikmeli)
 - Google Play yayını: keystore oluşturma, gizlilik politikası, mağaza görselleri

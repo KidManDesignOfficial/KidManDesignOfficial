@@ -128,6 +128,38 @@ export default function WeatherScreen() {
             />
           </View>
 
+          {weather.hourly.length > 0 ? (
+            <>
+              <Text style={styles.sectionTitle}>Saatlik tahmin</Text>
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                style={styles.chipsScroll}
+                contentContainerStyle={styles.hourly}
+              >
+                {weather.hourly.map((hour, i) => {
+                  const h = describeWeatherCode(hour.code, hour.isDay);
+                  return (
+                    <View key={hour.time} style={[styles.hour, i === 0 && styles.hourNow]}>
+                      <Text style={[styles.hourTime, i === 0 && styles.hourNowText]}>
+                        {i === 0 ? 'Şimdi' : clockTime(hour.time)}
+                      </Text>
+                      <Text style={styles.hourIcon} accessibilityLabel={h.label}>
+                        {h.icon}
+                      </Text>
+                      <Text style={[styles.hourTemp, i === 0 && styles.hourNowText]}>
+                        {Math.round(hour.temperature)}°
+                      </Text>
+                      <Text style={[styles.hourRain, i === 0 && styles.hourNowText]}>
+                        {hour.precipitationProbability ? `💧%${hour.precipitationProbability}` : ' '}
+                      </Text>
+                    </View>
+                  );
+                })}
+              </ScrollView>
+            </>
+          ) : null}
+
           <Text style={styles.sectionTitle}>7 günlük tahmin</Text>
           <View style={styles.forecast}>
             {weather.daily.map((day, i) => {
@@ -246,6 +278,23 @@ const styles = StyleSheet.create({
     marginTop: 20,
     marginBottom: 8,
   },
+  hourly: { paddingHorizontal: 16, gap: 8 },
+  hour: {
+    width: 64,
+    alignItems: 'center',
+    paddingVertical: 10,
+    gap: 4,
+    borderRadius: 14,
+    backgroundColor: COLORS.card,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+  },
+  hourNow: { backgroundColor: COLORS.primary, borderColor: COLORS.primary },
+  hourNowText: { color: '#FFFFFF' },
+  hourTime: { fontSize: 13, fontWeight: '600', color: COLORS.textMuted },
+  hourIcon: { fontSize: 22 },
+  hourTemp: { fontSize: 16, fontWeight: '700', color: COLORS.text },
+  hourRain: { fontSize: 11, color: COLORS.textMuted },
   forecast: {
     marginHorizontal: 16,
     backgroundColor: COLORS.card,

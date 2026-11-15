@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
-  Image,
   Pressable,
   RefreshControl,
   ScrollView,
@@ -11,11 +10,9 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import * as WebBrowser from 'expo-web-browser';
-
+import { NewsCard } from '../components/NewsCard';
 import { COLORS, NEWS_CATEGORIES, googleNewsRssUrl } from '../config';
 import { fetchRss, type NewsItem } from '../rss';
-import { timeAgo } from '../time';
 
 type CategoryState = {
   items: NewsItem[];
@@ -95,13 +92,6 @@ export default function NewsScreen() {
     );
   }, [state.items, search]);
 
-  const openArticle = useCallback((item: NewsItem) => {
-    WebBrowser.openBrowserAsync(item.link, {
-      toolbarColor: COLORS.primary,
-      controlsColor: COLORS.primary,
-    }).catch(() => {});
-  }, []);
-
   const showFullScreenLoader = state.loading && state.items.length === 0 && !refreshing;
 
   return (
@@ -150,7 +140,7 @@ export default function NewsScreen() {
         <FlatList
           data={visibleItems}
           keyExtractor={(item) => item.id}
-          renderItem={({ item }) => <NewsCard item={item} onPress={openArticle} />}
+          renderItem={({ item }) => <NewsCard item={item} />}
           contentContainerStyle={styles.list}
           refreshControl={
             <RefreshControl
@@ -187,32 +177,6 @@ export default function NewsScreen() {
   );
 }
 
-function NewsCard({ item, onPress }: { item: NewsItem; onPress: (item: NewsItem) => void }) {
-  return (
-    <Pressable
-      onPress={() => onPress(item)}
-      style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
-      accessibilityRole="link"
-      accessibilityLabel={`${item.title}, ${item.source}`}
-    >
-      <View style={styles.cardBody}>
-        <Text style={styles.cardTitle} numberOfLines={3}>
-          {item.title}
-        </Text>
-        {item.summary ? (
-          <Text style={styles.cardSummary} numberOfLines={2}>
-            {item.summary}
-          </Text>
-        ) : null}
-        <Text style={styles.cardMeta} numberOfLines={1}>
-          {[item.source, timeAgo(item.publishedAt)].filter(Boolean).join(' · ')}
-        </Text>
-      </View>
-      {item.imageUrl ? <Image source={{ uri: item.imageUrl }} style={styles.cardImage} /> : null}
-    </Pressable>
-  );
-}
-
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background },
   searchBox: { paddingHorizontal: 16, paddingTop: 12 },
@@ -244,21 +208,6 @@ const styles = StyleSheet.create({
   chipText: { fontSize: 14, fontWeight: '600', color: COLORS.text },
   chipTextActive: { color: '#FFFFFF' },
   list: { paddingHorizontal: 16, paddingBottom: 24, gap: 10, flexGrow: 1 },
-  card: {
-    flexDirection: 'row',
-    gap: 12,
-    backgroundColor: COLORS.card,
-    borderRadius: 14,
-    padding: 14,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-  },
-  cardPressed: { backgroundColor: COLORS.primaryLight },
-  cardBody: { flex: 1, gap: 6 },
-  cardTitle: { fontSize: 16, fontWeight: '700', color: COLORS.text, lineHeight: 22 },
-  cardSummary: { fontSize: 14, color: COLORS.textMuted, lineHeight: 20 },
-  cardMeta: { fontSize: 12, color: COLORS.primary, fontWeight: '600' },
-  cardImage: { width: 84, height: 84, borderRadius: 10, backgroundColor: COLORS.border },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32, gap: 12 },
   muted: { color: COLORS.textMuted, fontSize: 15, textAlign: 'center' },
   errorText: { color: COLORS.error, fontSize: 15, textAlign: 'center' },

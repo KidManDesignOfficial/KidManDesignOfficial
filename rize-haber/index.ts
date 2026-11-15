@@ -1,8 +1,8 @@
 import { registerRootComponent } from 'expo';
 
+// Arka plan bildirim görevi küresel kapsamda tanımlanmalı: uygulama kapalıyken
+// Android görevi çalıştırdığında arayüz yüklenmeden önce bu dosya okunur.
+import './src/notifications';
 import App from './App';
 
-// registerRootComponent calls AppRegistry.registerComponent('main', () => App);
-// It also ensures that whether you load the app in Expo Go or in a native build,
-// the environment is set up appropriately
 registerRootComponent(App);

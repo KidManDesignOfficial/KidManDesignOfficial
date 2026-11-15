@@ -22,8 +22,18 @@ export type DailyForecast = {
   precipitationProbability: number | null;
 };
 
+export type HourlyForecast = {
+  time: string; // YYYY-MM-DDTHH:00 (İstanbul saati)
+  temperature: number;
+  code: number;
+  precipitationProbability: number | null;
+  isDay: boolean;
+};
+
 export type Weather = {
   current: CurrentWeather;
+  /** Şu anki saatten başlayarak önümüzdeki 24 saat. */
+  hourly: HourlyForecast[];
   daily: DailyForecast[];
   sunrise: string | null; // ISO yerel saat
   sunset: string | null;
@@ -54,6 +64,7 @@ export async function fetchWeather(location: WeatherLocation, signal?: AbortSign
     longitude: String(location.longitude),
     current:
       'temperature_2m,apparent_temperature,relative_humidity_2m,wind_speed_10m,precipitation,weather_code,is_day',
+    hourly: 'temperature_2m,weather_code,precipitation_probability,is_day',
     daily: 'weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,sunrise,sunset',
     timezone: 'Europe/Istanbul',
     forecast_days: '7',
@@ -65,6 +76,7 @@ export async function fetchWeather(location: WeatherLocation, signal?: AbortSign
   const data = await response.json();
   const c = data.current;
   const d = data.daily;
+  const h = data.hourly;
 
   return {
     current: {
@@ -76,6 +88,17 @@ export async function fetchWeather(location: WeatherLocation, signal?: AbortSign
       code: c.weather_code,
       isDay: c.is_day === 1,
     },
+    hourly: nextHours(
+      (h.time as string[]).map((time, i) => ({
+        time,
+        temperature: h.temperature_2m[i],
+        code: h.weather_code[i],
+        precipitationProbability: h.precipitation_probability?.[i] ?? null,
+        isDay: h.is_day?.[i] === 1,
+      })),
+      c.time,
+      24,
+    ),
     daily: (d.time as string[]).map((date, i) => ({
       date,
       code: d.weather_code[i],
@@ -86,4 +109,14 @@ export async function fetchWeather(location: WeatherLocation, signal?: AbortSign
     sunrise: d.sunrise?.[0] ?? null,
     sunset: d.sunset?.[0] ?? null,
   };
+}
+
+/**
+ * Saatlik listeyi, içinde bulunulan saatten başlatıp `count` kadar kısaltır.
+ * Zamanlar aynı saat diliminde ve "YYYY-MM-DDTHH:MM" biçiminde olduğundan metin karşılaştırması yeterlidir.
+ */
+export function nextHours<T extends { time: string }>(hours: T[], currentTime: string, count: number): T[] {
+  const currentHour = `${currentTime.slice(0, 13)}:00`;
+  const start = hours.findIndex((hour) => hour.time >= currentHour);
+  return start === -1 ? [] : hours.slice(start, start + count);
 }
