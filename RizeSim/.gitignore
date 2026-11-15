@@ -14,3 +14,4 @@ Tests/Logic/build/
 Tools/**/__pycache__/
 Tools/cache/
 Content/Terrain/*.npy
+Web/world_data.js
