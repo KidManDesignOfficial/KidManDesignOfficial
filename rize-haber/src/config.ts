@@ -40,15 +40,22 @@ export type WeatherLocation = {
   longitude: number;
 };
 
-/** İlçe merkezlerinin yaklaşık koordinatları. */
+/**
+ * Hava durumu konumları: 12 ilçenin tamamı + Ayder Yaylası. İlçe merkezlerinin koordinatları
+ * (harita kaynakları / Wikipedia ile doğrulanmıştır). Tüm ilçelerin listede olması testle denetlenir.
+ */
 export const WEATHER_LOCATIONS: WeatherLocation[] = [
   { id: 'merkez', name: 'Rize Merkez', latitude: 41.0201, longitude: 40.5234 },
-  { id: 'cayeli', name: 'Çayeli', latitude: 41.089, longitude: 40.729 },
-  { id: 'pazar', name: 'Pazar', latitude: 41.179, longitude: 40.885 },
   { id: 'ardesen', name: 'Ardeşen', latitude: 41.1911, longitude: 41.0006 },
+  { id: 'camlihemsin', name: 'Çamlıhemşin', latitude: 41.048, longitude: 41.008 },
+  { id: 'cayeli', name: 'Çayeli', latitude: 41.089, longitude: 40.729 },
+  { id: 'derepazari', name: 'Derepazarı', latitude: 41.024, longitude: 40.4218 },
   { id: 'findikli', name: 'Fındıklı', latitude: 41.273, longitude: 41.142 },
   { id: 'guneysu', name: 'Güneysu', latitude: 40.985, longitude: 40.61 },
+  { id: 'hemsin', name: 'Hemşin', latitude: 41.0503, longitude: 40.9017 },
   { id: 'ikizdere', name: 'İkizdere', latitude: 40.779, longitude: 40.557 },
-  { id: 'camlihemsin', name: 'Çamlıhemşin', latitude: 41.048, longitude: 41.008 },
+  { id: 'iyidere', name: 'İyidere', latitude: 41.012, longitude: 40.362 },
+  { id: 'kalkandere', name: 'Kalkandere', latitude: 40.9288, longitude: 40.4424 },
+  { id: 'pazar', name: 'Pazar', latitude: 41.179, longitude: 40.885 },
   { id: 'ayder', name: 'Ayder Yaylası', latitude: 40.953, longitude: 41.103 },
 ];

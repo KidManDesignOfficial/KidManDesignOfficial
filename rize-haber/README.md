@@ -9,7 +9,7 @@ Rize'deki günlük haberleri ve hava durumunu gösteren Android uygulaması (Rea
 | **Haberler** | Google Haberler üzerinden son 7 günün Rize haberleri · kategoriler · arama · Kaydet / Paylaş · başlıktaki **★ Kaydedilenler** |
 | **Rizespor** | Sıradaki maç kartı (saniye saniye geri sayım, “🍵 Çayını demle” hatırlatması) · canlı skor · son 5 maç formu, sıra ve puan · fikstür ve sonuçlar · Süper Lig puan durumu · kadro (mevki, yaş, uyruk, sakatlık) · transfer ve maç haberleri · **Maç Merkezi:** maç anları zaman çizelgesi, sahada ilk 11’ler, istatistikler, canlıda 30 sn’de bir yenileme ve gol kutlaması |
 | **Çay** | Güncel yaş çay alım fiyatı (resmî kaynak + ilan tarihi) · önceki yıla göre değişim · **tutar hesaplayıcı** · yıllara göre fiyat grafiği · çay gündemi haberleri · kaynak bağlantıları |
-| **Hava** | Anlık durum · 24 saatlik ve 7 günlük tahmin · 9 konum |
+| **Hava** | Anlık durum · 24 saatlik ve 7 günlük tahmin · 12 ilçe + Ayder |
 | **Keşfet** | **Gezi:** 15 yer (yayla, doğa, tarih, müze), haritada aç, gezi listem, paylaş · **Lezzet:** 14 coğrafi işaretli ürün ve yöresel tatlar · **Kültür:** Rize bezi, horon, kemençe, tulum, şenlikler, pratik bilgiler · **Tarihçe** |
 | **Ayarlar** (⚙️) | Tema (Sistem/Açık/Koyu) · 5 renk · yazı boyutu (Normal/Büyük/Çok büyük) · varsayılan hava konumu · bildirimler · kaydedilenleri temizle · hakkında ve veri kaynakları |
 
