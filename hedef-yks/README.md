@@ -10,14 +10,13 @@ Resmî ÖSYM ve MEB kaynaklarına internet üzerinden canlı bağlanır; konu an
 | ÖSYM — `osym.gov.tr/Sayfa/SinavTakvimi` | YKS oturum tarihleri, başvuru, sonuç | Sayfa canlı indirilip ayrıştırılır; geri sayım gelecekteki resmî TYT tarihine kendiliğinden geçer |
 | ÖSYM — `osym.gov.tr/SinavGrubu/Index/2` | YKS duyuruları (tarih, başlık, bağlantı) | Canlı; ana sayfada son duyuru, aranabilir liste |
 | ÖSYM — `osym.gov.tr/SinavGrubu/Menu/323` + `dokuman.osym.gov.tr` | 2018–2026 TYT/AYT/YDT soru kitapçıkları ve cevap anahtarları | Yıllar ve PDF bağlantıları canlı okunur, PDF ÖSYM sunucusundan açılır |
-| Türkçe Vikipedi — `tr.wikipedia.org` (açık kaynak, CC BY-SA 4.0) | Her konunun altında "Kapsamlı anlatım": konuyla eşlenmiş 1–7 maddenin güncel tam metni (234/235 konu, 760 madde) | Madde kaynak metni canlı indirilir, `src/lib/wiki.ts` okunur bölümlere çevirir (şablon/tablo/dipnot temizliği, LaTeX → `x²`, `√`, `a/b`); 7 gün önbellek |
 | MEB OGM Materyal — `ogmmateryal.eba.gov.tr` | Sınıf/ders bazında konu özetleri, video konu anlatımları, MEBİ denemeleri, çıkmış soru çözümleri, puan hesaplama motoru | Her ders ve konu ekranından resmî sayfa uygulama içi tarayıcıda açılır |
 
 - Son başarılı veri cihazda saklanır; internet yoksa "Önbellek · x dk önce" etiketiyle gösterilir, hiç veri yoksa resmî sayfayı açma seçeneği çıkar. Uydurma veri gösterilmez.
 - ÖSYM açık API sunmadığı için yalnızca herkese açık sayfalar okunur. Ayrıştırıcılar gerçek sayfa kopyalarıyla test edilir (`test/osym.test.ts`).
 - Canlı doğrulama: `NODE_USE_ENV_PROXY=1 node --experimental-strip-types scripts/check-live.ts` (ÖSYM) ve `node --experimental-strip-types scripts/verify-sources.ts` (40 MEB bağlantısı, Playwright).
 - MEB ve ÖSYM içerikleri kopyalanmaz; yayın hakları kurumlarına aittir (MEB içerikleri ticari amaçla kullanılamaz).
-- Vikipedi metinleri uygulamaya gömülmez, cihazda canlı indirilir. CC BY-SA 4.0 gereği her maddede madde adı, yazarlar (geçmiş sayfası), lisans bağlantısı ve "biçim sadeleştirildi" notu gösterilir.
+- Vikipedi metinleri (CC BY-SA 4.0) uygulamanın içine gömülüdür (`src/data/wiki/*.json`, `scripts/build-wiki.ts` ile üretilir; internetsiz okunur). CC BY-SA 4.0 gereği her maddede madde adı, yazarlar (geçmiş sayfası), lisans bağlantısı ve "biçim sadeleştirildi" notu gösterilir.
 - Konu → madde eşlemesi (`src/data/wikiMap.ts`) tek tek doğrulandı: madde var, anlam ayrımı değil, yönlendirmeler çözüldü, konuyla ilgili. Uygun madde olmayan konu (Sayı Basamakları) boş bırakıldı.
 
 ## Özellikler
@@ -26,7 +25,7 @@ Resmî ÖSYM ve MEB kaynaklarına internet üzerinden canlı bağlanır; konu an
 | --- | --- |
 | **Ana Sayfa** | ÖSYM takvimine bağlı geri sayım, son ÖSYM YKS duyurusu, günlük hedef halkası, seri (streak), günün sorusu, kaldığın yerden devam, zayıf konular |
 | **Dersler** | TYT 10 ders + AYT 10 ders, 235 konu başlığı (ÖSYM kapsamı). Konu anlatımı → konu testi akışı |
-| **Konu anlatımı** | Sınav odaklı özgün anlatım + altında Vikipedi'den canlı, bölüm bölüm açılan kapsamlı anlatım. Kademeli beliren bloklar, adım adım açılan örnek çözümler, çizilerek beliren fonksiyon grafikleri, zaman çizelgeleri, akış şemaları, formül kartları, sınav taktikleri, okuma ilerleme çubuğu |
+| **Konu anlatımı** | Sınav odaklı özgün anlatım + altında uygulamaya gömülü Türkçe Vikipedi maddelerinden (CC BY-SA 4.0, 234/235 konu, 760 madde) bölüm bölüm açılan kapsamlı anlatım. Kademeli beliren bloklar, adım adım açılan örnek çözümler, çizilerek beliren fonksiyon grafikleri, zaman çizelgeleri, akış şemaları, formül kartları, sınav taktikleri, okuma ilerleme çubuğu |
 | **Soru çözme** | ÖSYM biçimi (A–E), alıştırma modunda anında çözüm; yanlışta sallanma, doğruda yaylanma animasyonu |
 | **Deneme** | Gerçek ders oranlarını ve soru başına süreyi koruyan mini TYT/AYT denemeleri, ders bazında net, geçmiş denemeler |
 | **Sonuç** | Animasyonlu başarı halkası, D/Y/B/net, ders bazında dağılım, soru soru inceleme, başarıda konfeti |

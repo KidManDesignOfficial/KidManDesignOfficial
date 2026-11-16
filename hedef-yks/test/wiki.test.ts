@@ -70,3 +70,19 @@ test('Vikipedi eşlemesi katalogla birebir; tekrar yok', () => {
     for (const t of list) assert.match(t, /^[A-ZÇĞİÖŞÜÂÎÛ0-9]/, `${id}: "${t}" büyük harfle başlamalı`);
   }
 });
+
+test('gömülü paketler: haritadaki her madde pakette var ve okunur uzunlukta', async () => {
+  const { default: fs } = await import('node:fs');
+  const { default: path } = await import('node:path');
+  const dir = path.join(import.meta.dirname, '../src/data/wiki');
+  const missing: string[] = [];
+  for (const [topic, titles] of Object.entries(WIKI_ARTICLES)) {
+    const pack = JSON.parse(fs.readFileSync(path.join(dir, topic.split('.')[0] + '.json'), 'utf8'));
+    for (const t of titles) {
+      const a = pack[t] as [string, number, [number, string][]][] | undefined;
+      const chars = a ? a.reduce((n, s) => n + s[2].reduce((m, b) => m + b[1].length, 0), 0) : 0;
+      if (chars < 600) missing.push(`${topic}: ${t} (${chars})`);
+    }
+  }
+  assert.deepEqual(missing, []);
+});

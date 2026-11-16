@@ -2,25 +2,20 @@
  * Açık kaynak kapsamlı anlatım: konuyla eşlenmiş Türkçe Vikipedi maddeleri canlı indirilir,
  * bölüm bölüm okunur. Lisans (CC BY-SA 4.0) gereği kaynak, yazarlar ve lisans her maddede gösterilir.
  */
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Platform, ScrollView, StyleSheet, View } from 'react-native';
 
 import { WIKI_ARTICLES } from '../data/wikiMap';
 import { tapFeedback } from '../lib/haptics';
-import { useLive } from '../lib/live';
 import { openOfficial } from '../lib/official';
-import { WIKI_LICENSE, parseWikiResponse, wikiApiUrl, wikiHistoryUrl, wikiPageUrl, wikiRawUrl } from '../lib/wiki';
+import { WIKI_PACKS } from '../data/wiki';
+import { WIKI_LICENSE, wikiHistoryUrl, wikiPageUrl } from '../lib/wiki';
 import type { WikiArticle, WikiSection } from '../lib/wiki';
 import { alpha, useTheme } from '../theme';
-import { LiveBadge, LiveError, LiveSkeleton } from './Live';
 import { Chevron, Collapsible, PressableScale, useAnimatedValue } from './motion';
 import { Card, Chip, T } from './ui';
 
-const WEEK = 7 * 24 * 60 * 60 * 1000;
 const WIKI_INK = '#36383D';
-/** Wikimedia kullanıcı aracısı politikası: istemci kendini tanıtmalı (tarayıcı bu başlığı kendisi belirler). */
-const HEADERS: Record<string, string> | undefined = Platform.OS === 'web' ? undefined : { 'User-Agent': 'HedefYKS/1.0 (Android/iOS; YKS egitim uygulamasi)', Accept: 'text/x-wiki, application/json' };
-
 export function wikiArticlesFor(topicId: string): string[] {
   return WIKI_ARTICLES[topicId] ?? [];
 }
@@ -43,7 +38,7 @@ export function WikiLesson({ topicId, accent }: { topicId: string; accent: strin
             Kapsamlı anlatım · açık kaynak
           </T>
           <T size={12} muted>
-            Türkçe Vikipedi · {titles.length} madde · güncel sürüm canlı indirilir
+            Türkçe Vikipedi · {titles.length} madde · uygulamanın içinde, internetsiz okunur
           </T>
         </View>
       </View>
@@ -54,21 +49,24 @@ export function WikiLesson({ topicId, accent }: { topicId: string; accent: strin
           ))}
         </ScrollView>
       ) : null}
-      <ArticleView key={title} title={title} accent={accent} />
+      <ArticleView key={title} topicId={topicId} title={title} accent={accent} />
     </Card>
   );
 }
 
-function ArticleView({ title, accent }: { title: string; accent: string }) {
+/** Maddeyi ders paketinden çıkarır (paket ilk kullanımda yüklenir). */
+export function loadArticle(topicId: string, title: string): WikiArticle | null {
+  const raw = WIKI_PACKS[topicId.split('.')[0]]?.()[title];
+  if (!raw) return null;
+  const sections: WikiSection[] = raw.map(([t, level, blocks]) => ({ title: t, level, blocks: blocks.map(([k, text]) => ({ t: k === 0 ? 'p' : k === 1 ? 'li' : 'math', text })) }));
+  return { title, sections, chars: sections.reduce((n, sec) => n + sec.blocks.reduce((m, b) => m + b.text.length, 0), 0) };
+}
+
+function ArticleView({ topicId, title, accent }: { topicId: string; title: string; accent: string }) {
   const { c } = useTheme();
-  const url = Platform.OS === 'web' ? wikiApiUrl(title) : wikiRawUrl(title);
-  const state = useLive<WikiArticle>(`wiki:${title}`, url, (body) => parseWikiResponse(body, title), WEEK, HEADERS);
-  const a = state.data;
+  const a = useMemo(() => loadArticle(topicId, title), [topicId, title]);
   return (
     <View style={{ gap: 12 }}>
-      <LiveBadge state={state} source="Vikipedi" />
-      {!a && state.loading ? <LiveSkeleton rows={4} /> : null}
-      <LiveError state={state} title="Vikipedi'ye ulaşılamadı" onOpen={() => openOfficial(wikiPageUrl(title), WIKI_INK)} />
       {a ? (
         <>
           <T size={20} weight="800">
@@ -82,7 +80,7 @@ function ArticleView({ title, accent }: { title: string; accent: string }) {
           ))}
           <View style={[styles.credit, { backgroundColor: c.cardAlt }]}>
             <T size={12} muted style={{ lineHeight: 18 }}>
-              Metin: Vikipedi katkıcıları, “{a.title}” maddesi. Lisans: {WIKI_LICENSE.name}. Uygulamada biçim sadeleştirildi (tablolar, görseller, dipnotlar ve kaynakça çıkarıldı;
+              Metin: Vikipedi katkıcıları, “{a.title}” maddesi. Lisans: {WIKI_LICENSE.name}. Uygulamaya gömülürken biçim sadeleştirildi (tablolar, görseller, dipnotlar ve kaynakça çıkarıldı;
               formüller düz metne çevrildi). Vikipedi gönüllülerce yazılır; sınav odaklı müfredat anlatımı bu kartın üstündedir.
             </T>
             <View style={styles.creditLinks}>

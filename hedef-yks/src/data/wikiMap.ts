@@ -3,7 +3,7 @@
  *
  * Her başlık 16.11.2026'da tr.wikipedia.org üzerinde tek tek doğrulandı: madde mevcut, anlam ayrımı değil,
  * yönlendirmeler gerçek başlığa çözüldü, ayrıştırılmış metni en az 600 karakter ve konuyla doğrudan ilgili.
- * Uygun madde bulunmayan konu boş bırakıldı (zorla eşleme yapılmadı). İçerik uygulamada canlı indirilir.
+ * Uygun madde bulunmayan konu boş bırakıldı (zorla eşleme yapılmadı). İçerik build-wiki.ts ile uygulamaya gömülür.
  */
 export const WIKI_ARTICLES: Record<string, string[]> = {
   'tyt-turkce.sozcukte-anlam': ["Mecaz", "Anlambilim"],

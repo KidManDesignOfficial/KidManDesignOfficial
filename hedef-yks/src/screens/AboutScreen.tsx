@@ -44,7 +44,7 @@ export default function AboutScreen() {
       <Card style={{ gap: 8 }}>
         <T weight="800">Gizlilik</T>
         <T size={14} muted>
-          Uygulama hesap gerektirmez ve hiçbir kişisel veri toplamaz. İnternet yalnızca ÖSYM (osym.gov.tr) ve MEB (ogmmateryal.eba.gov.tr) resmî sayfalarını ve Türkçe Vikipedi (tr.wikipedia.org) maddelerini okumak için kullanılır; bu isteklerde senden hiçbir bilgi gönderilmez. Konu anlatımları ve sorular internetsiz de çalışır. İlerlemen, cevapların ve ayarların yalnızca telefonunda saklanır.
+          Uygulama hesap gerektirmez ve hiçbir kişisel veri toplamaz. İnternet yalnızca ÖSYM (osym.gov.tr) ve MEB (ogmmateryal.eba.gov.tr) resmî sayfalarını okumak için kullanılır; bu isteklerde senden hiçbir bilgi gönderilmez. Konu anlatımları (Türkçe Vikipedi maddeleri dahil) ve sorular uygulamanın içindedir, internetsiz çalışır. İlerlemen, cevapların ve ayarların yalnızca telefonunda saklanır.
         </T>
       </Card>
       <Card onPress={() => Linking.openURL(`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(APP_NAME + ' geri bildirim')}`).catch(() => {})}>
