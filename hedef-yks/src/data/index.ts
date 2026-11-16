@@ -11,8 +11,9 @@ import tytSosyal from './subjects/tyt-sosyal.ts';
 import aytMat from './subjects/ayt-mat.ts';
 import aytFen from './subjects/ayt-fen.ts';
 import aytSozel from './subjects/ayt-sozel.ts';
+import { EXTRA } from './subjects/ext/index.ts';
 
-export const CONTENT: SubjectContent[] = [tytTurkce, tytMat, tytGeo, ...tytFen, ...tytSosyal, ...aytMat, ...aytFen, ...aytSozel];
+export const CONTENT: SubjectContent[] = [tytTurkce, tytMat, tytGeo, ...tytFen, ...tytSosyal, ...aytMat, ...aytFen, ...aytSozel, ...EXTRA];
 
 export const LESSONS: Lesson[] = CONTENT.flatMap((c) => c.lessons);
 export const QUESTIONS: Question[] = CONTENT.flatMap((c) => c.questions);

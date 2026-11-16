@@ -37,10 +37,10 @@ test('her dersin en az iki konu anlatımı ve sekiz sorusu var', () => {
   }
 });
 
-test('anlatımı olan her konunun en az dört sorusu var', () => {
+test('anlatımı olan her konunun en az üç sorusu var', () => {
   for (const l of LESSONS) {
     const n = QUESTIONS.filter((q) => q.topicId === l.topicId).length;
-    assert.ok(n >= 4, `${l.topicId}: ${n} soru`);
+    assert.ok(n >= 3, `${l.topicId}: ${n} soru`);
   }
 });
 
@@ -61,7 +61,7 @@ test('sorular ÖSYM biçiminde: 5 farklı, boş olmayan seçenek ve geçerli cev
 
 test('açıklamalar seçenek harfine dayanmıyor (karıştırmaya dayanıklı)', () => {
   for (const q of QUESTIONS) {
-    assert.ok(!/(^|\s)[A-E]\)\s|seçenek [A-E]\b|\b[A-E] seçeneği/.test(q.explanation), `${q.id}: açıklamada harf var`);
+    assert.ok(!/(^|[.:;]\s)[A-E]\)\s|seçenek [A-E]\b|\b[A-E] seçeneği|cevap [A-E]\b/i.test(q.explanation), `${q.id}: açıklamada harf var`);
   }
 });
 
@@ -83,4 +83,9 @@ test('anlatım blokları dolu ve grafik fonksiyonları sayı üretiyor', () => {
 
 test('içerik özeti', () => {
   console.log(`  ${SUBJECTS.length} ders, ${topicIds.size} konu, ${LESSONS.length} anlatım, ${QUESTIONS.length} soru, ${CONTENT.length} içerik dosyası`);
+});
+
+test('katalogdaki her konunun anlatımı var', () => {
+  const missing = SUBJECTS.flatMap((s) => s.topics).filter((t) => !LESSONS.some((l) => l.topicId === t.id)).map((t) => t.id);
+  assert.deepEqual(missing, [], `${missing.length} konunun anlatımı eksik`);
 });

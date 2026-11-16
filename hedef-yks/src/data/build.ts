@@ -7,7 +7,11 @@ import type { Block, Difficulty, Flashcard, Lesson, PlotFn, Question, SubjectCon
 type Letter = 'A' | 'B' | 'C' | 'D' | 'E';
 const LETTERS: Letter[] = ['A', 'B', 'C', 'D', 'E'];
 
-export function builder(subjectId: string) {
+/**
+ * @param tag Aynı derse ikinci bir dosyadan soru eklenirken kimlik çakışmasını önler (`…#b1`).
+ *            Kimlikler cihazdaki ilerlemeyle eşleştiği için sonradan değiştirilmemelidir.
+ */
+export function builder(subjectId: string, tag = '') {
   const lessons: Lesson[] = [];
   const questions: Question[] = [];
   const counters: Record<string, number> = {};
@@ -27,7 +31,7 @@ export function builder(subjectId: string) {
       const topicId = `${subjectId}.${slug}`;
       counters[topicId] = (counters[topicId] ?? 0) + 1;
       questions.push({
-        id: `${topicId}#${counters[topicId]}`,
+        id: `${topicId}#${tag}${counters[topicId]}`,
         topicId,
         text,
         options,
