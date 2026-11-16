@@ -1,0 +1,165 @@
+# Hedef YKS Android uygulamasını derler ve APK'yı indirilebilir dosya olarak yükler.
+# Çalıştırmak için: GitHub → Actions → "Hedef YKS APK" → "Run workflow"
+# (hedef-yks/ klasörüne her push'ta da otomatik çalışır.)
+name: Hedef YKS APK
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'hedef-yks/**'
+      - '.github/workflows/hedef-yks-apk.yml'
+
+concurrency:
+  group: hedef-yks-apk-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    defaults:
+      run:
+        working-directory: hedef-yks
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: hedef-yks/package-lock.json
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Bağımlılıkları kur
+        run: npm ci
+
+      - name: Testler, tip kontrolü ve lint
+        run: |
+          npm test
+          npx tsc --noEmit
+          npm run lint
+
+      - name: Android projesini oluştur
+        run: npx expo prebuild --platform android --no-install
+
+      # Kalıcı imza anahtarı depo Secrets'ta tanımlıysa onu kullan; değilse hata ayıklama anahtarıyla
+      # derlemeye devam et ve uyar. Şifreler hiçbir dosyaya ya da kayda yazılmaz.
+      - name: İmza anahtarını hazırla
+        env:
+          KEYSTORE_BASE64: ${{ secrets.YKS_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.YKS_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.YKS_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.YKS_KEY_PASSWORD }}
+        run: |
+          if [ -n "$KEYSTORE_BASE64" ] && [ -n "$KEYSTORE_PASSWORD" ]; then
+            echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/release.jks"
+            {
+              echo "YKS_KEYSTORE_PATH=$RUNNER_TEMP/release.jks"
+              echo "YKS_KEYSTORE_PASSWORD=$KEYSTORE_PASSWORD"
+              echo "YKS_KEY_ALIAS=${KEY_ALIAS:-hedefyks}"
+              echo "YKS_KEY_PASSWORD=${KEY_PASSWORD:-$KEYSTORE_PASSWORD}"
+            } >> "$GITHUB_ENV"
+            echo "Kalıcı imza anahtarı kullanılacak."
+          else
+            echo "::warning title=İmza anahtarı yok::YKS_KEYSTORE_BASE64 tanımlı değil; APK hata ayıklama anahtarıyla imzalanıyor (Play Store'a yüklenemez)."
+          fi
+
+      - name: APK derle
+        working-directory: hedef-yks/android
+        run: ./gradlew assembleRelease --no-daemon
+
+      - name: İmzayı doğrula
+        run: |
+          # Bu iş akışında komutlar hedef-yks/ klasöründe çalışır.
+          APK=$(ls android/app/build/outputs/apk/release/*.apk | head -1)
+          test -n "$APK" || { echo "::error::APK bulunamadı"; exit 1; }
+          APKSIGNER=$(ls "$ANDROID_HOME"/build-tools/*/apksigner | sort -V | tail -1)
+          CERTS=$("$APKSIGNER" verify --print-certs "$APK")
+          # Çıktı biçimi araç sürümüne göre değişebildiği için yalnızca sertifika satırları gösterilir.
+          echo "$CERTS" | grep -iE "certificate (DN|SHA-256)" || echo "$CERTS"
+          if [ -n "$YKS_KEYSTORE_PATH" ]; then
+            if echo "$CERTS" | grep -q "CN=Hedef YKS"; then
+              echo "✅ APK kalıcı Hedef YKS anahtarıyla imzalandı."
+            else
+              echo "::error::Kalıcı anahtar tanımlı ama APK'da Hedef YKS sertifikası bulunamadı."
+              exit 1
+            fi
+          else
+            echo "⚠️ APK hata ayıklama anahtarıyla imzalandı (kalıcı anahtar tanımlı değil)."
+          fi
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: hedef-yks-apk
+          path: hedef-yks/android/app/build/outputs/apk/release/*.apk
+          retention-days: 30
+
+      # Google Play'e yüklenecek paket (AAB). Play App Signing, bu dosyayı imzalayan anahtarı
+      # "yükleme anahtarı" olarak kaydeder; sonraki tüm güncellemeler aynı anahtarla imzalanmalıdır.
+      - name: AAB derle (Google Play)
+        working-directory: hedef-yks/android
+        run: ./gradlew bundleRelease --no-daemon
+
+      - name: AAB imzasını doğrula
+        run: |
+          AAB=$(ls android/app/build/outputs/bundle/release/*.aab | head -1)
+          test -n "$AAB" || { echo "::error::AAB bulunamadı"; exit 1; }
+          if [ -n "$YKS_KEYSTORE_PATH" ]; then
+            if jarsigner -verify -verbose -certs "$AAB" | grep -q "CN=Hedef YKS"; then
+              echo "✅ AAB kalıcı Hedef YKS anahtarıyla imzalandı."
+            else
+              echo "::error::AAB Hedef YKS anahtarıyla imzalanmamış; Play'e yüklenemez."
+              exit 1
+            fi
+          else
+            echo "::warning::AAB hata ayıklama anahtarıyla imzalandı; Play Console bunu kabul etmez."
+          fi
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: hedef-yks-aab-google-play
+          path: hedef-yks/android/app/build/outputs/bundle/release/*.aab
+          retention-days: 90
+
+  # APK'yı Android emülatöründe açar; açılışta çöken bir sürüm "başarılı" görünmesin.
+  smoke-test:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: hedef-yks-apk
+          path: apk
+
+      - name: KVM'yi etkinleştir
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Emülatörde aç
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          arch: x86_64
+          target: google_apis
+          disable-animations: true
+          script: bash hedef-yks/scripts/smoke-test.sh
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: smoke-test-kayitlari
+          path: smoke/
+          retention-days: 14

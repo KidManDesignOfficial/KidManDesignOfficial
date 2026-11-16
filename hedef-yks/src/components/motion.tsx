@@ -1,0 +1,185 @@
+/**
+ * Uygulama genelindeki hareketler: açılır-kapanır içerik, basınca yaylanma, yumuşak beliriş.
+ *
+ * Tek bir yerde tanımlandıkları için her ekranda aynı süre ve eğri kullanılır. Telefonda
+ * "Hareketi azalt" (erişilebilirlik) açıksa animasyonlar anında tamamlanır.
+ */
+import { useEffect, useState } from 'react';
+import type { ReactNode } from 'react';
+import { AccessibilityInfo, Animated, Easing, Pressable, View } from 'react-native';
+import type { PressableProps, StyleProp, ViewStyle } from 'react-native';
+
+import { Icon } from './Icon';
+
+/**
+ * Bileşen ömrü boyunca sabit kalan animasyon değeri. React Native'in `useAnimatedValue` kancasıyla
+ * aynı işi yapar ama web önizlemesi dahil her platformda çalışır ve React derleyicisiyle uyumludur.
+ */
+export function useAnimatedValue(initial: number): Animated.Value {
+  const [value] = useState(() => new Animated.Value(initial));
+  return value;
+}
+
+/** Doğal hissettiren yavaşlayan eğri (Material "emphasized decelerate"e yakın). */
+export const EASE_OUT = Easing.bezier(0.2, 0.8, 0.2, 1);
+export const DURATION = { short: 180, medium: 300 } as const;
+
+export function useReducedMotion(): boolean {
+  const [reduced, setReduced] = useState(false);
+  useEffect(() => {
+    let mounted = true;
+    AccessibilityInfo.isReduceMotionEnabled()
+      .then((v) => mounted && setReduced(v))
+      .catch(() => {});
+    const sub = AccessibilityInfo.addEventListener('reduceMotionChanged', setReduced);
+    return () => {
+      mounted = false;
+      sub.remove();
+    };
+  }, []);
+  return reduced;
+}
+
+/**
+ * Yüksekliği yumuşakça açılıp kapanan içerik.
+ * İçerik her zaman ölçülür (görünmez katmanda), böylece açılış tam yüksekliğe akıcı biçimde ulaşır.
+ * `progress` verilirse dışarıdaki öğeler (ör. dönen ok) aynı animasyona bağlanabilir.
+ */
+export function Collapsible({
+  open,
+  children,
+  progress: external,
+}: {
+  open: boolean;
+  children: ReactNode;
+  progress?: Animated.Value;
+}) {
+  const reduced = useReducedMotion();
+  const internal = useAnimatedValue(open ? 1 : 0);
+  const progress = external ?? internal;
+  const [height, setHeight] = useState(0);
+
+  useEffect(() => {
+    Animated.timing(progress, {
+      toValue: open ? 1 : 0,
+      duration: reduced ? 0 : DURATION.medium,
+      easing: EASE_OUT,
+      useNativeDriver: false, // yükseklik yerel sürücüyle canlandırılamaz
+    }).start();
+  }, [open, progress, reduced]);
+
+  const animatedHeight = progress.interpolate({ inputRange: [0, 1], outputRange: [0, height] });
+  const opacity = progress.interpolate({ inputRange: [0, 0.4, 1], outputRange: [0, 0.2, 1] });
+  const translateY = progress.interpolate({ inputRange: [0, 1], outputRange: [-8, 0] });
+
+  return (
+    <Animated.View
+      style={{ height: animatedHeight, overflow: 'hidden' }}
+      pointerEvents={open ? 'auto' : 'none'}
+      accessibilityElementsHidden={!open}
+      importantForAccessibility={open ? 'auto' : 'no-hide-descendants'}
+    >
+      <Animated.View
+        style={{ position: 'absolute', left: 0, right: 0, top: 0, opacity, transform: [{ translateY }] }}
+        onLayout={(e) => setHeight(e.nativeEvent.layout.height)}
+      >
+        {children}
+      </Animated.View>
+    </Animated.View>
+  );
+}
+
+/** Basılınca hafifçe küçülüp yaylanarak geri dönen dokunma alanı. */
+export function PressableScale({
+  children,
+  style,
+  containerStyle,
+  scaleTo = 0.97,
+  ...props
+}: PressableProps & {
+  children: ReactNode;
+  /** Ölçeklenen iç görünümün stili (zemin, kenarlık, iç boşluk). */
+  style?: StyleProp<ViewStyle>;
+  /** Dış dokunma alanının stili (ör. satırda yer kaplama: flex, flexGrow). */
+  containerStyle?: StyleProp<ViewStyle>;
+  scaleTo?: number;
+}) {
+  const reduced = useReducedMotion();
+  const scale = useAnimatedValue(1);
+  const to = (value: number) =>
+    Animated.spring(scale, {
+      toValue: value,
+      useNativeDriver: true,
+      speed: 40,
+      bounciness: value === 1 ? 6 : 0,
+    }).start();
+
+  return (
+    <Pressable
+      {...props}
+      style={containerStyle}
+      onPressIn={(e) => {
+        if (!reduced) to(scaleTo);
+        props.onPressIn?.(e);
+      }}
+      onPressOut={(e) => {
+        if (!reduced) to(1);
+        props.onPressOut?.(e);
+      }}
+    >
+      <Animated.View style={[style, { transform: [{ scale }] }]}>{children}</Animated.View>
+    </Pressable>
+  );
+}
+
+/**
+ * Görünür olduğunda hafif yukarı kayarak solarak beliren kapsayıcı.
+ * Görünmezken `display: none` ile gizlenir; içerik bağlı kalır (durum ve kaydırma korunur).
+ */
+export function FadeInView({
+  visible = true,
+  children,
+  style,
+}: {
+  visible?: boolean;
+  children: ReactNode;
+  style?: StyleProp<ViewStyle>;
+}) {
+  const reduced = useReducedMotion();
+  const progress = useAnimatedValue(0);
+
+  useEffect(() => {
+    if (!visible) {
+      progress.setValue(0);
+      return;
+    }
+    Animated.timing(progress, {
+      toValue: 1,
+      duration: reduced ? 0 : DURATION.medium,
+      easing: EASE_OUT,
+      useNativeDriver: true,
+    }).start();
+  }, [visible, progress, reduced]);
+
+  const translateY = progress.interpolate({ inputRange: [0, 1], outputRange: [10, 0] });
+
+  return (
+    <Animated.View
+      style={[style, !visible && { display: 'none' }, { opacity: progress, transform: [{ translateY }] }]}
+    >
+      {children}
+    </Animated.View>
+  );
+}
+
+/** Dönen ok (▾): `progress` 0 → 1 iken 0° → 180°. */
+export function Chevron({ progress, color, size }: { progress: Animated.Value; color: string; size: number }) {
+  const rotate = progress.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '180deg'] });
+  return (
+    <View style={{ width: size, height: size, alignItems: 'center', justifyContent: 'center' }}>
+      <Animated.View style={{ transform: [{ rotate }] }}>
+        <Icon name="chevron-down" size={size} color={color} />
+      </Animated.View>
+    </View>
+  );
+}
