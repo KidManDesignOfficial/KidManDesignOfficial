@@ -7,7 +7,7 @@ import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { openUrl } from './src/components/ui';
 import { FavoritesProvider } from './src/favorites';
 import NewsScreen from './src/screens/NewsScreen';
-import RizeScreen from './src/screens/RizeScreen';
+import DiscoverScreen from './src/screens/DiscoverScreen';
 import SavedScreen from './src/screens/SavedScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
 import TeaScreen from './src/screens/TeaScreen';
@@ -24,7 +24,7 @@ const TABS: { id: Tab; label: string; icon: string; title: string }[] = [
   { id: 'news', label: 'Haberler', icon: '📰', title: 'Rize Haber' },
   { id: 'tea', label: 'Çay', icon: '🍃', title: 'Çay Fiyatları' },
   { id: 'weather', label: 'Hava', icon: '🌦️', title: 'Hava Durumu' },
-  { id: 'rize', label: 'Rize', icon: '🏞️', title: 'Rize’yi Tanı' },
+  { id: 'rize', label: 'Keşfet', icon: '🧭', title: 'Rize’yi Keşfet' },
   { id: 'settings', label: 'Ayarlar', icon: '⚙️', title: 'Ayarlar' },
 ];
 
@@ -145,7 +145,7 @@ function Main() {
             <WeatherScreen />
           </View>
           <View style={[styles.screen, tab !== 'rize' && styles.hidden]}>
-            <RizeScreen />
+            <DiscoverScreen />
           </View>
           <View style={[styles.screen, tab !== 'settings' && styles.hidden]}>
             <SettingsScreen />

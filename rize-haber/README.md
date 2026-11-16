@@ -9,7 +9,7 @@ Rize'deki günlük haberleri ve hava durumunu gösteren Android uygulaması (Rea
 | **Haberler** | Google Haberler üzerinden son 7 günün Rize haberleri · kategoriler · arama · Kaydet / Paylaş · başlıktaki **★ Kaydedilenler** |
 | **Çay** | Güncel yaş çay alım fiyatı (resmî kaynak + ilan tarihi) · önceki yıla göre değişim · **tutar hesaplayıcı** · yıllara göre fiyat grafiği · çay gündemi haberleri · kaynak bağlantıları |
 | **Hava** | Anlık durum · 24 saatlik ve 7 günlük tahmin · 9 konum |
-| **Rize** | Bir bakışta Rize · 12 ilçe · adın kökeni · tarihçe zaman çizelgesi · Rize’de çayın hikâyesi · resmî kaynaklar |
+| **Keşfet** | **Gezi:** 15 yer (yayla, doğa, tarih, müze), haritada aç, gezi listem, paylaş · **Lezzet:** 14 coğrafi işaretli ürün ve yöresel tatlar · **Kültür:** Rize bezi, horon, kemençe, tulum, şenlikler, pratik bilgiler · **Tarihçe** |
 | **Ayarlar** | Tema (Sistem/Açık/Koyu) · 5 renk · yazı boyutu (Normal/Büyük/Çok büyük) · varsayılan hava konumu · bildirimler · kaydedilenleri temizle · hakkında ve veri kaynakları |
 
 Haber metinleri kopyalanmaz; yalnızca başlık, kaynak ve bağlantı gösterilir.
@@ -56,6 +56,7 @@ src/colors.ts, src/theme.tsx Renk paletleri, tema ve kullanıcı ayarları
 src/tea.ts, src/teaData.ts  Çay fiyatı verisi: doğrulama, hesaplama, uzaktan güncelleme
 data/cay.json               Güncel çay fiyatı (uygulama buradan okur)
 src/data/rize.ts            Rize tarihçesi ve çayın hikâyesi (kaynaklarıyla)
+src/data/discover.ts        Gezilecek yerler, lezzetler, kültür (kaynaklarıyla)
 src/components/ui.tsx       Ortak arayüz parçaları
 src/rss.ts                  RSS okuyucu (Google Haberler + genel RSS beslemeleri)
 src/notifications.ts        Arka plan haber kontrolü ve bildirimler
