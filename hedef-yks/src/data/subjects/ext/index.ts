@@ -7,5 +7,6 @@ import tytFen2 from './tyt-fen-2.ts';
 import tytSosyal2 from './tyt-sosyal-2.ts';
 import aytMat2 from './ayt-mat-2.ts';
 import aytFen2 from './ayt-fen-2.ts';
+import aytSozel2 from './ayt-sozel-2.ts';
 
-export const EXTRA: SubjectContent[] = [tytTurkce2, tytMat2, tytGeo2, ...tytFen2, ...tytSosyal2, ...aytMat2, ...aytFen2];
+export const EXTRA: SubjectContent[] = [tytTurkce2, tytMat2, tytGeo2, ...tytFen2, ...tytSosyal2, ...aytMat2, ...aytFen2, ...aytSozel2];
