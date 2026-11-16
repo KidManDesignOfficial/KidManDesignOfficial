@@ -43,7 +43,7 @@ export function LiveBadge({ state, source }: { state: LiveState<unknown>; source
   );
 }
 
-export function LiveError({ state, onOpen }: { state: LiveState<unknown>; onOpen: () => void }) {
+export function LiveError({ state, onOpen, title = 'Resmî siteye ulaşılamadı' }: { state: LiveState<unknown>; onOpen: () => void; title?: string }) {
   const { c } = useTheme();
   if (state.data || state.loading || !state.error) return null;
   return (
@@ -51,14 +51,14 @@ export function LiveError({ state, onOpen }: { state: LiveState<unknown>; onOpen
       <Icon name="cloud-offline" size={20} color={c.warning} />
       <View style={{ flex: 1, gap: 4 }}>
         <T size={13.5} weight="700">
-          Resmî siteye ulaşılamadı
+          {title}
         </T>
         <T size={12.5} muted>
           {state.error}. İnternet bağlantını kontrol edip yenile ya da sayfayı doğrudan aç.
         </T>
         <PressableScale onPress={onOpen} accessibilityRole="link">
           <T size={13} weight="800" color={c.primary}>
-            Resmî sayfayı aç →
+            Sayfayı tarayıcıda aç →
           </T>
         </PressableScale>
       </View>

@@ -1,0 +1,86 @@
+{{Örnekler|20%|
+* al'''ı'''n > alnım
+* kay'''ı'''p > kaybetmek
+* çev'''i'''r- > çevrim
+* bur'''u'''n > burnu
+}}
+'''Ünlü düşmesi''', [[Türkçe]]de görülen bir ses olayıdır. Genellikle ikinci hecesinde [[Ünlü (dil bilimi)|dar bir ünlü]] (ı, i, u, ü) bulunan sözcüklerde görülür ancak istisnaları mevcuttur.
+
+== İki heceli sözcüklerde ==
+İki heceli bazı sözcükler ünlü ile başlayan bir ek aldıklarında ikinci hecedeki dar ünlü düşer:
+
+* yalın-ız = yalnız (aradaki ı harfi düşmüştür)
+* burun-um = burnum (aradaki u harfi düşmüştür)
+* boyun-um = boynum (aradaki u harfi düşmüştür)
+* omuz-um = omzum (aradaki u harfi düşmüştür)
+* ağız-ım = ağzım (aradaki ı harfi düşmüştür)
+* alın-ım = alnım (aradaki ı harfi düşmüştür)
+* karın-ım = karnım (aradaki ı harfi düşmüştür)
+* isim-im = ismim (aradaki i harfi düşmüştür)
+* fikir-imiz = fikrimiz (aradaki i harfi düşmüştür)
+* keşif-im = keşfim (aradaki i harfi düşmüştür) 
+* beyin-in = beynin (aradaki i harfi düşmüştür)
+* resim-in = resmin (aradaki i harfi düşmüştür)
+* devir = devri (burada sadece harf yerinin değişmesi olmuştur)
+
+'''ÖNEMLİ:''' Bu sözcükler bir ikileme oluşturduğunda ünlü düşmesi görül<u>mez</u>:<ref name="TDK">[https://web.archive.org/web/20131030054500/http://www.tdk.gov.tr/index.php?option=com_content&view=article&id=179:Unlu-Dusmesi-&catid=50:yazm-kurallar&Itemid=132 Ünlü Düşmesi] Türk Dil Kurumu</ref>
+
+* burun buruna, omuz omuza, devirden devire, ağızdan ağıza
+
+Bunun haricinde birleşik isim oluşturan bazı isimlerde de ünlü düşmesi görülür:
+* kahve-altı = kahvaltı (aradaki e harfi düşmüştür)
+* ne-için = niçin (aradaki e harfi düşmüştür)
+* ne-asıl = nasıl (aradaki e harfi düşmüştür)
+* sütlü-aş = sütlaç (aradaki ü harfi düşmüştür)
+* güllü-aş = güllaç (aradaki ü harfi düşmüştür)
+* cuma-ertesi = cumartesi (aradaki e harfi düşmüştür)
+* pazar-ertesi = pazartesi (aradaki e harfi düşmüştür)
+
+== İsimden oluşturulan fiillerde ==
+Bazı isimlerin, ünlü ile başlayan yapım ekleri veya [[yardımcı fiil]]ler alarak, [[fiil]] gövdesi haline gelmeleri sonucunda oluşur
+
+* mey'''i'''l+etmek > meyletmek
+* sab'''ı'''r+etmek > sabretmek
+* sey'''i'''r+etmek > seyretmek
+* küf'''ü'''r+etmek > küfretmek
+* em'''i'''r+etmek > emretmek
+* şük'''ü'''r+etmek > şükretmek
+* hap'''i'''s+olmak > hapsolmak
+* kay'''ı'''p+olmak > kaybolmak
+* kah'''ı'''r+olmak > kahrolmak
+* sar'''ı'''-armak > sararmak
+* kok'''u'''-lamak > koklamak
+* yumurt'''a'''-lamak > yumurtlamak
+* iler'''i'''-lemek > ilerlemek
+* oy'''u'''n-amak > oynamak
+* sız'''ı'''-lamak > sızlamak
+
+== Fiilden oluşturulan isimlerde ==
+Fiil köklerinden yapım ekleri ile isme dönüşen bazı sözcüklerde görülür:
+
+* uy'''u'''mak > uyku (u düşmüştür)
+* kıv'''ı'''rmak > kıvrım (ı düşmüştür)
+* dev'''i'''rmek > devrim (i düşmüştür)
+* çev'''i'''rmek > çevre (i düşmüştür)
+* kav'''u'''şmak > kavşak (u düşmüştür)
+* buy'''u'''rmak > buyruk (u düşmüştür)
+
+== Belirtisiz ad tamlamasıyla oluşturulan yer adlarında ==
+* Kadıköy'''ü''' > Kadıköy
+* Tekirdağ'''ı''' > Tekirdağ
+* Elmadağ'''ı''' > Elmadağ
+* Güniz Sokağ'''ı''' > Güniz Sokak
+
+== Yaygın hatalar ==
+
+Aşağı, yukarı, içeri, dışarı, bura, şura, ora, ileri gibi sözcükler herhangi bir ek aldığında sonlarındaki ünlüler konuşma dilinde düşme eğilimi gösterse bile (''yukarıda'' yerine ''yukarda'', ''içeride'' yerine ''içerde'' vs.); yazılışta ünlü düşmesi görül<u>mez</u>:<ref name="TDK"/>
+* aşağ'''ı'''da, yukar'''ı'''dan, içer'''i'''de, dışar'''ı'''da, bur'''a'''dan, şur'''a'''da, or'''a'''da, iler'''i'''de
+
+== Kaynakça ==
+{{kaynakça}}
+
+{{Türkçe Dil Bilgisi}}
+
+{{Otorite kontrolü}}
+
+[[Kategori:Türkçe dilbilgisi]]

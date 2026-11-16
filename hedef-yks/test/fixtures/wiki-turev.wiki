@@ -1,0 +1,228 @@
+{{Diğer anlamı2|Türev}}
+{{Kalkülüs}}
+
+[[Matematik]]te '''türev''', bir [[fonksiyon]]un [[tanım kümesi|tanımlı olduğu]] herhangi bir noktada değişim yönünü veya hızını veren temel bir kavramdır. Tek değişkenli bir fonksiyonun tanım kümesinin belli bir noktasında türevi (eğer varsa), fonksiyonun grafiğine bu noktada karşılık gelen değerde çizilen [[teğet doğru]]nun eğimidir. Teğet doğru, tanım kümesinin bu noktasında fonksiyonun en iyi [[doğrusal yaklaşım]]ıdır. Bu nedenle türev genellikle '''anlık değişim oranı''' ya da daha açık bir ifadeyle, bağımlı değişkendeki anlık değişimin bağımsız değişkendeki anlık değişime oranı olarak tanımlanır. Bir fonksiyonun türevini teorik olarak bulmaya '''türev alma''' denilir. Eğer bir fonksiyonun tanım kümesindeki her değerinde hesaplanan türev değerlerini veren başka bir fonksiyon varsa, bu fonksiyona eldeki fonksiyonun (yani türevi alınan fonksiyonun) '''türevi''' denir.
+
+Türev için birden fazla farklı gösterim vardır. En yaygın kullanılan ikisi ''Lagrange'' gösterimi olan [[türev işareti]] ve ''Leibniz'' gösterimidir. Fizikçiler arasında ''Newton'' gösterimi de yaygındır. [[Gottfried Leibniz|Gottfried Wilhelm Leibniz]]'in adını taşıyan [[Leibniz gösterimi]], iki diferansiyelin oranı olarak gösterilirken, [[türev işareti]] için (′) kullanılır. Daha yüksek mertebeden gösterimler tekrarlanan türeve işaret eder ve bunlar genellikle Leibniz gösteriminde diferansiyellere üst simgeler eklenerek, [[türev işareti]]nde ise işaret sayısı artırılarak gösterilir. Daha yüksek mertebeden türevlerin fizikte uygulamaları yaygındır. Örneğin, hareket eden bir cismin zamana göre konumunun birinci türevi cismin [[hız]]ı iken, konumun zaman ilerledikçe nasıl değiştiğini gösteren ikinci türev cismin [[ivme]]sidir. Diğer deyişle, ivme, hızın zaman ilerledikçe nasıl değiştiğini gösteren ikinci türevdir.
+
+Türevler, birden fazla gerçek değişken üzerinden tanımlı fonksiyonlar için de genelleştirilebilir. Bu genellemede, türev, grafiği (uygun bir çevirme veya döndürmeden sonra) orijinal fonksiyonun grafiğine en iyi doğrusal yaklaşım olan doğrusal bir dönüşüm olarak yeniden yorumlanır. [[Jacobi matrisi]], bağımsız ve bağımlı değişkenlerin seçimiyle verilen bir baza göre bu doğrusal dönüşümü temsil eden matristir ve bağımsız değişkenlerin her birine göre [[kısmi türev]]ler alarak hesaplanabilir. Birden fazla değişkenin gerçel değerli bir fonksiyonu için, Jacobi matrisi [[gradyan|gradyan vektörüne]] indirgenir.
+
+==Tanım ==
+=== Limit üzerinden tanım ===
+[[Dosya:Tangent to a curve.svg|küçükresim|upright=1.36|width=150|length=150|[[Fonksiyon grafiği|Fonksiyonun grafiği]] siyah, [[teğet]] geçen doğrunun grafiği kırmızı renkte gösterilmiştir. Teğet çizginin [[eğim]]i, fonksiyonun türevine eşittir.]]
+[[Dosya:turev1.png|küçükresim|upright=1.09|Türevin geometrik tarifi]]
+
+[[Bir gerçel değişkenli fonksiyon|Bir gerçel değişkenli <math> f</math> fonksiyonun]] [[tanım kümesi]]ndeki bir <math>a</math> noktasındaki türevini hesaplamak için tanım kümesinde bu <math>a</math> noktasını içeren bir açık aralık olmalıdır. Bu koşulda, eğer
+:<math>\lim_{h\rightarrow 0}\frac{f(a+h)-f(a)}{h}</math> 
+varsa; yani, [[limit]] bir gerçel sayıya eşitse, o zaman <math> f</math> fonksiyonuna [[türevlenebilir fonksiyon|'''<math>a</math> noktasında türevlenebilir''']] ya da '''<math> f</math>'nin <math>a</math> noktasında türevi vardır''' denir. O halde, 
+:<math>f'(a)=\lim_{h\rightarrow 0}\frac{f(a+h)-f(a)}{h} \quad\text{ veya } \quad\frac{df}{dx}(a)=\lim_{h\rightarrow 0}\frac{f(a+h)-f(a)}{h}</math>
+yazılır. Eğer limitin değeri <math>L</math> ise, o zaman, <math>L</math>'ye '''<math>f</math>'nin <math>a</math> noktasındaki türevi''' denir ve kısa bir gösterimle 
+:<math>f'(a)=L\quad\text{ veya } \quad \frac{df}{dx}(a)=L</math> 
+olarak yazılır.
+
+Limitin sonsuz olması veya var olmaması durumunda, <math>f</math>'ye <math>a</math> noktasında '''türevlenemez''', <math>f</math>'nin '''a noktasında türevi yoktur''' ya da <math>f</math>, '''a noktasında türevli değildir''' denir.
+
+Yukarıdaki limit <math>a</math> civarında doğrudur. Başka bir deyişle <math>h</math> sayısı <math>0</math> civarında <math>0</math>'a yaklaştıkça <math>a + h</math> sayısı <math>a</math> civarında <math>a</math>'ya yaklaşır. Bu sebepten dolayı, eğer fonksiyonun tanımlı olduğu uç noktalarda türev alma ihtiyacı varsa, limit <math>a + h</math> değerinin tanlı olduğu taraftan, yani soldan limit ya da sağdan limit olarak alınmalıdır.
+
+===ε-δ tanımı ===
+Limit üzerinden verilen türev tanımı [[Limit#ε-δ limit tanımı|ε-δ limit tanımı]] üzerinden de yazılabilir. Eğer limit varsa ve <math>L</math>'ye eşitse, o zaman her <math>\varepsilon>0</math> için bir <math>\delta>0</math> vardır öyle ki bütün <math>|h|<\delta</math> koşulunu sağlayan ve sıfıra eşit olmayan her <math>h</math> için
+<math display="block">\left|L-\frac{f(a+h)-f(a)}h\right|<\varepsilon</math>
+sağlanır. Burada sol taraftaki dik çubuklarla gösterilen [[mutlak değer]]dir.
+
+== Süreklilik ve türevlenebilme ==
+[[Dosya:Right-continuous.svg|küçükresim|upright=1.2|Bu fonksiyonun işaretlenen noktada fonksiyon aynı noktada sürekli olmadığı için türevi yoktur.]]
+
+Eğer bir <math>f</math> fonksiyonu <math>a</math> noktasında türevlenebilir ise, o zaman <math>a</math> noktasında noktada [[Süreklilik|sürekli]] olmak zorundadır. Mesela, bir nokta seçelim ve bu noktada sıçrama gösteren [[basamak fonksiyonunu]] ele alalım. Diğer deyişle, fonksiyon a noktasından küçük sayılar için 0 değerini alacaktır, geriye kalan noktalarda ise 1 değerini alacaktır. Limitin tanımına bakıldığı zaman
+* Eğer <math>h</math> pozitif bir sayı ise <math>\frac{f(a+h)-f(a)}{h}</math> ifadesi 0'a eşit olacaktır. Yani sağdan limit 0'a eşittir.
+* Eğer <math>h</math> negatif bir sayı ise <math>h</math> sayısı (negatif kalarak) <math>0</math>'a yaklaştıkça <math>\frac{f(a+h)-f(a)}{h}</math> ifadesi <math>+\infty</math>'a doğru gidecektir. Yani soldan limit yoktur.
+[[Dosya:Absolute value.svg|küçükresim|upright=1.2|Mutlak değer fonksiyonu süreklidir ama {{math|''x'' {{=}} 0}}'da türevli değildir. Bu noktadaki teğet doğruların eğimleri sağdan ve soldan yaklaşımda aynı değere yaklaşmazlar.]]
+
+Ancak bir fonksiyon tanım kümesindeki her noktada sürekli ise, bu özellik, fonksiyonun her yerde türevli olacağı anlamına gelmez. Mesela, [[mutlak değer fonksiyonu]] 0 noktasında süreklidir ama türevli değildir. Nedeni, 0'da türevi tanımlayan <math>\lim_{h\rightarrow 0}\frac{|0+h|-|0|}{h}</math>
+limitinin bulunamamasıdır. Ancak, bu fonksiyon <math>0</math> haricindeki her noktada türevlidir.
+Bir diğer örnek olarak, <math>\sqrt[3]{x}</math> fonksiyonu verilebilir. Bu fonksiyon 0'da türevli olmayıp da başka her yerde türevli olan bir fonksiyondur. Bu fonksiyonun 0'da türevlenebilir olmayışının nedeni <math>\lim_{h\rightarrow 0}\frac{\sqrt[3]{0+h}-\sqrt[3]{0}}{h}</math> 
+limitinin <math>\infty</math>, yani sonsuz olmasıdır. Dolayısıyla mutlak değer fonksiyonunun grafiği 0 noktasında kırıkken, <math>\sqrt[3]{x}</math> fonksiyonunun grafiği 0'da da kırılmasızdır.
+
+Uygulamada karşılaşılan türevlerin çoğunun her ya da [[hemen hemen her yerde]] türevi vardır.
+
+== Gösterim ==
+{{Ana|Türev gösterimi}}
+Bir fonksiyonun türevini yazmanın yaygın bir yollarından biri, [[Gottfried Leibniz|Gottfried Wilhelm Leibniz]] tarafından 1675 yılında tanımlanan ve türevi iki [[diferansiyel (matematik)|diferansiyelin]] (mesela <math>dy</math> ve <math>dx</math>) bölümü olarak gösteren Leibniz gösterimidir. Bu kullanım, bir fonksiyonu <math>y=f(x)</math> olarak yazarken, yani, bağımlı ve bağımsız değişkenler arasında fonksiyonel bir ilişki gösterilmek istendiğinde yaygın bir şekilde kullanılmaktadır. Bu gösterimde, birinci türev <math>\frac{dy}{dx}</math> ile gösterilir ve ''y'nin x'e göre türevi'' şeklinde okunur. Bu biçimde yazılan türev gösterimi aynı zamanda bir türev operatörünün verilen bir fonksiyona uygulanması olarak da yorumlanabilir. Diğer deyişle, <math>\frac{dy}{dx}=\frac{d}{dx}f(x)</math> yazılırsa, bu, aynı zamanda, <math>f(x)</math> üzerinde x'e göre türev alma operatörü olan <math>\frac{d}{dx}</math>'in uygulanması olarak yorumlanabilir. Daha yüksek türevler, mesela <math>y=f(x)</math>'in <math>n</math>'inci mertebeden türevi, şu gösterim kullanılarak ifade edilir: <math>\frac{d^n y}{dx^n}</math>. Örneğin, <math>\frac{d^2y}{dx^2} = \frac{d}{dx}\Bigl(\frac{d}{dx} f(x)\Bigr)</math> yazıldığında, türevin türevinin alındığını gösterir ve bu tür gösterim uygulamada çok kullanışlı hale gelir. Bazı alternatiflerinin aksine, Leibniz gösterimi, paydada türevlendirme için değişkenin açıkça belirtilmesini içerir ve bu da birden fazla birbiriyle ilişkili nicelikle çalışırken belirsizliği ortadan kaldırır. Bir [[bileşke fonksiyon]]un türevi [[zincir kuralı]] ile ifade edilir. Eğer, <math>u = g(x)</math> ve <math>y = f(g(x))</math> ise, o zaman <math>\frac{dy}{dx} = \frac{dy}{du} \cdot \frac{du}{dx}</math> olur.
+
+Türev için bir diğer yaygın gösterim, bir fonksiyonun hemen yanında kesme işaretine benzeyen [[türev işareti]]nin kullanılmasıdır; bu gösterim, aynı zamanda [[Joseph-Louis Lagrange]]'a atfen Lagrange gösterimi olaraka da bilinir. Birinci türev bu gösterimde <math>f^{\prime}(x)</math> halinde yazılır ve ''f'nin türevi'' olarak okunur. Benzer şekilde, ikinci ve üçüncü türevler şu şekilde yazılabilir: <math>f''(x)</math> ve <math>f'''(x)</math>. Bu noktadan sonraki daha yüksek mertebeden türevlerin sayısını belirtmek için bazı yazarlar üst simge olarak [[Roma rakamları]]nı kullanırken diğerleri sayıyı parantez içine koyar: <math>f^{\mathrm{iv}}</math> veya <math>f^{(4)}</math> gibi. Genel durumda ise, <math>f^{(n)}</math> kullanılır.
+
+''Newton gösteriminde'' veya ''nokta gösterimi''nde, zamana göre türevi temsil etmek için bir fonksiyon sembolünün üzerine bir nokta yerleştirilir. Eğer <math>y</math> zamana bağlı bir fonksiyonsa, o zaman birinci ve ikinci mertebeden türevler sırasıyla <math>\dot{y}</math> ve <math>\ddot{y} </math> biçiminde gösterilirler. Bu gösterim yalnızca zaman veya yay uzunluğuna göre türevler için kullanılır. Kullanımı, fizik ve diferansiyel geometrideki diferansiyel denklemlerde de mevcuttur. Ancak, nokta gösterimi yüksek mertebeden türevler (4 veya daha fazla mertebeden) için yönetilemez hale gelir ve birden fazla bağımsız değişkenle baş edemez.
+
+Başka bir gösterim ise [[diferansiyel operatörü]] sembolüyle gösteren ''D-gösterimidir''. Bu gösterimde türevi gösterirken <math>D</math> operatörü kullanılır. Mesela, <math>f(x)</math>'in birinci türevi gösterilirken <math>D f(x)</math> yazılır. Daha yüksek mertebeden türevler için üst simge kullanılır: <math>D^n f(x)</math>. Bu notasyona bazen Euler gösterimi denir; ancak, bu gösterim Euler tarafından değil [[Louis François Antoine Arbogast]] ilk defa kullanılmıştır. Bu notasyonun kısmi türeve yönelik kullanımı da çok elverişlidir. Kısmi türevi belirtmek için, türevlenen değişken bir alt simge ile gösterilir, örneğin <math>u = f(x, y)</math> fonksiyonu için ⁠<math>x</math>'e göre kısmi türev <math>D_x u</math> veya <math>D_x f(x,y)</math> olarak yazılabilir. Daha yüksek kısmi türevler ise üst simgeler veya çoklu alt simgelerle gösterilebilir. Örneğin, yine <math>u = f(x, y)</math> fonksiyonu için <math display=inline>D_{xy} f(x,y) = \frac{\partial}{\partial y} \Bigl(\frac{\partial}{\partial x} f(x,y) \Bigr)</math> ve {{tmath|1= \textstyle D_{x}^2 f(x,y) = \frac{\partial}{\partial x} \Bigl(\frac{\partial}{\partial x} f(x,y) \Bigr) }} yazılabilir.
+
+== Türev alma kuralları ==
+{{Ana|Türev alma kuralları}}
+=== Temel fonksiyonlar için kurallar ===
+Aşağıda en yaygın temel fonksiyonların türevleri için kurallar verilmiştir. Burada,
+<math>a</math> gerçek bir sayıdır ve <math>e</math> [[doğal logaritma]]nın tabanı ve yaklaşık olarak 2.71828'dir.
+
+=== Birleşik fonksiyonlar için kurallar ===
+* Kuvvet fonksiyonlarının türevi ([[kuvvet kanunu]]):
+*: <math> \frac{d}{dx}x^a = ax^{a-1} </math>
+<!--BU LISTEYE EKLEME YAPMAYINIZ-->
+* [[Üstel fonksiyon]], [[doğal logaritma]] ve genel tabanlı logaritmanın türevi
+*: <math> \frac{d}{dx}e^x = e^x </math>
+*: <math> \frac{d}{dx}a^x = a^x\ln(a)  </math>, <math>\quad(a > 0 ) </math>
+*: <math> \frac{d}{dx}\ln(x) = \frac{1}{x} </math>, <math>\quad(x > 0 ) </math>
+*: <math> \frac{d}{dx}\log_a(x) = \frac{1}{x\ln(a)}  </math>, <math>\quad(x, a > 0 ) </math> 
+<!--BU LISTEYE EKLEME YAPMAYINIZ-->
+* [[Trigonometrik fonksiyonlar]]ın türevi
+*: <math> \frac{d}{dx}\sin(x) = \cos(x) </math>
+*: <math> \frac{d}{dx}\cos(x) = -\sin(x) </math>
+*: <math> \frac{d}{dx}\tan(x) = \sec^2(x) = \frac{1}{\cos^2(x)} = 1 + \tan^2(x) </math>
+<!--BU LISTEYE EKLEME YAPMAYINIZ-->
+* [[Ters trigonometrik fonksiyonlar]]ın türevi
+*: <math> \frac{d}{dx}\arcsin(x) = \frac{1}{\sqrt{1-x^2}},\quad</math> <math> -1 < x < 1 </math> için
+*: <math> \frac{d}{dx}\arccos(x)= -\frac{1}{\sqrt{1-x^2}},\quad</math> <math> -1 < x < 1 </math> için
+*: <math> \frac{d}{dx}\arctan(x)= \frac{1}{{1+x^2}} </math>
+<!--BU LISTEYE EKLEME YAPMAYINIZ-->
+
+=== Basit işlemlerle elde edilmiş fonksiyonlar için türevler ===
+Aşağıda, temel fonksiyonlardan basit [[aritmetik]] işlemler veya bileşke yoluyla elde edilmiş fonksiyonların türevini hesaplamak için bilinen en temel kurallardan bazıları verilmiştir. Bu amaçla <math>f</math> ve <math>g</math> fonksiyon olsun.
+* ''Sabit fonksiyon'': eğer <math>f</math> sabitse, o zaman her <math>x</math> için
+*: <math>f'(x) = 0. </math>
+* ''[[Türevin doğrusallığı|Toplama kuralı]]'':
+*: <math>(\alpha f + \beta g)' = \alpha f' + \beta g' </math> (her <math>f</math> ve <math>g</math> fonksiyonu ve bütün <math>\alpha</math> ve <math> \beta</math> [[Reel sayılar|gerçel sayıları]] için).
+* ''[[Çarpma kuralı]]'':
+*: <math>(fg)' = f 'g + fg' </math> (her <math>f</math> ve <math>g</math> fonksiyonu için)
+:: Özel bir durum olarak, her <math>\alpha</math> sayısı için <math>(\alpha f)' = \alpha f'</math>  olur çünkü is <math>\alpha</math> sayısı sabittir ve <math>\alpha' f = 0 \cdot f = 0</math> olur.
+
+* ''[[Bölme kuralı]]'':
+*: <math>\left(\frac{f}{g} \right)' = \frac{f'g - fg'}{g^2}</math> (her <math>f</math> ve <math>g\ne 0</math> olan her <math>g</math> fonksiyonu için)
+* [[Bileşke fonksiyon]]lar için ''[[Zincir kuralı]]'' : Eğer {{tmath|1= f(x) = h(g(x)) }}ise, o zaman
+*: <math>f'(x) = h'(g(x)) \cdot g'(x). </math>
+
+=== Örnek===
+<math>f(x) = x^4 + \sin \left(x^2\right) - \ln(x) e^x + 7</math> olsun. O zaman, 
+<math display="block"> \begin{align}
+ f'(x) &= 4 x^{(4-1)}+ \frac{d\left(x^2\right)}{dx}\cos \left(x^2\right) - \frac{d\left(\ln {x}\right)}{dx} e^x - \ln(x) \frac{d\left(e^x\right)}{dx} + 0 \\
+ &= 4x^3 + 2x\cos \left(x^2\right) - \frac{1}{x} e^x - \ln(x) e^x.
+\end{align} </math>
+Burada ikinci terim zincir kuralı kullanılarak ve üçüncü terim çarpım kuralı kullanılarak hesaplanmıştır. Ayrıca, <math> x^2 </math>, <math> x^4 </math>, <math> \sin (x) </math>, <math> \ln (x) </math>, <math> e^x </math> ve sabit <math> 7 </math> gibi temel fonksiyonların türevleri de kullanıldı.
+
+== Yüksek mertebeden türevler ==
+Daha yüksek mertebeden türevler, bir fonksiyonun tekrar tekrar türevlenmesinin sonucudur. 
+<math> f </math> türevlenebilir bir fonksiyon ise 
+* <math> f </math>nin ''birinci'' türevi fonksiyonun türevidir ve <math>f'</math> ile gösterilir. 
+* <math> f' </math>nin türevi ise <math>f </math>nin ''ikinci'' türevidir ve <math>f''</math> ile gösterilir. 
+* <math> f'' </math>nin türevi ise <math>f </math>nin ''üçüncü'' türevidir ve <math>f'''</math> ile gösterilir. 
+Bu süreç tekrarlanarak, eğer türev varsa, fonksiyonun ''(n-1)''inci türevi başlangıçta alınan fonksiyonun ''n'''inci türevidir. [[#Gösterim|Gösterim]] kısmında verilen bilgiye de dayanarak, 
+*<math> f^{(n-1)}</math>in türevi <math>f </math>nin ''n'''inci türevidir ve <math> f^{(n)}</math> olarak gösterilir.
+
+=== ''C<sup>k</sup>'' fonksiyon ===
+Arka arkaya <math>k</math> tane türevi hesaplanabilen fonksiyonlara '''<math>k</math> kere türevli''' ya da '''k kere türevlenebilir fonksiyon'''lar denilir. Eğer, <math>k</math>inci türev aynı zamanda sürekli ise o zaman bu fonksiyon <math>C^k</math> sınıfına aittir. Daha matematiksel bir ifadeyle, bir <math>\Omega</math> kümesi üzerinde tanımlı bir <math>f</math> fonksiyonu verilsin. Eğer bu fonksiyon <math>k</math> kere türevlenebilen ve <math>k</math>'inci türevi [[sürekli fonksiyon|sürekli]] olan bir fonksiyon ise, o zaman <math>f\in C^k(\Omega)</math> yazılır ve fonksiyona '''<math>k</math> kere sürekli türevlenebilir fonksiyon''' denir.
+
+=== ''C<sup>∞</sup>'' fonksiyon  ===
+{{Ana|Düzgün fonksiyon}}
+[[Tanım kümesi]]ndeki bütün noktalarda ''sonsuz kere türevli'' olan, yani, keyfi bir <math>k</math> pozitif bir tam sayısı için <math>k</math>'inci türevi var olan bir fonksiyona '''düzgün fonksiyon''' ya da '''sonsuz türevli fonksiyon''' denir.<ref group=not>Nadiren de olsa bazı kitap ve tezlerde '''''pürüzsüz fonksiyon''''' kullanımı da vardır.</ref> Diğer deyişle, <math>k</math> kere türevlenme sayısında herhangi bir sınır yoksa, yani fonksiyon için hesaplanabilen yüksek mertebeden herhangi bir türevinin türevi yine hesaplanabiliyorsa, bu fonksiyona ''sonsuz kere türevli'' ya da ''düzgün fonksiyon'' denir. Düzgün bir fonksiyonun türevlenebilirlik sınıfını göstermek için <math>C^{\infty}</math> gösterimi kullanılır. 
+Daha matematiksel bir ifadeyle, bir <math>\Omega</math> kümesi üzerinde tanımlı bir <math>f</math> fonksiyonu verilsin. Eğer bu fonksiyon sonsuz türevlenebilir bir fonksiyon ise, o zaman <math>f\in C^{\infty}(\Omega)</math> yazılır.
+
+== Diğer boyutlarda türev ==
+=== Vektör değerli fonksiyonlar ===
+Vektör değerli bir fonksiyon <math> \mathbf{y} </math> gerçel sayılar üzerindeki gerçel bir değişkeni bir <math>\mathbb R^n</math> [[vektör uzayı]]ndaki vektörlere gönderir. Bir vektör değerli fonksiyon, koordinat fonksiyonlarına ayrılabilir yani <math> \mathbf{y} = (y_1(t), y_2(t), \dots, y_n(t))</math> yazılabilir. <math> \R^2 </math> ve <math> \R^3 </math>'deki [[parametrik eğri]]ler bu fonksiyonların güzel bir örneğidir. Bu fonksiyonların koordinat fonksiyonlarının here biri gerçel değerli olduğu için yukarıda verilen türev tanımları her biri için geçerlidir. 
+O zaman, <math> \mathbf{y}(t) </math>'nin türevi <math> \mathbf{y}(t) </math>inin koordinate fonksiyonlarının türevlerinden oluşan bir vektör olur ki buna da ''tanjant'' ya da ''teğet vektör'' denilir.
+
+=== Kısmî türev ===
+'''Kısmî türev''', çok değişkenli bir [[fonksiyon]]un sadece ilgili değişkeni sabit değilken alınan türevdir. Bu tarz türevleri içeren denklemlere [[Kısmi diferansiyel denklem|kısmî diferansiyel denklem]] denir.
+
+==== Kısmî türevin tanımı ====
+
+<math>z:{{\mathbb{R}}^{n}}\times {{\mathbb{R}}^{n}}\to \mathbb{R}</math>
+
+<math>z=f({{x}_{1}},{{x}_{2}},...,{{x}_{m}},...,{{x}_{n}})</math>
+
+şeklinde tanımlanan ''n'' tane bağımsız değişkene bağlı ''z'' fonksiyonunun diğer değişkenler sabit tutularak herhangi bir değişkendeki <math>\Delta {{x}_{m}}</math> değişimine karşılık fonksiyonun değişim hızı
+
+<math>\frac{\Delta z}{\Delta {{x}_{m}}}=\frac{f({{x}_{1}},{{x}_{2}},...,{{x}_{m}}+\Delta {{x}_{m}},...,{{x}_{n}})-f({{x}_{1}},{{x}_{2}},...,{{x}_{m}},...,{{x}_{n}})}{\Delta {{x}_{m}}}</math>
+
+<math>\Delta {{x}_{m}}=h</math>
+
+<math>\frac{\partial z}{\partial {{x}_{m}}}=\underset{h\to 0}{\mathop{\lim }}\,\frac{f({{x}_{1}},{{x}_{2}},...,{{x}_{m}}+h,...,{{x}_{n}})-f({{x}_{1}},{{x}_{2}},...,{{x}_{m}},...,{{x}_{n}})}{h}</math>
+
+ifadesine <math>z</math> fonksiyonunun <math>{{x}_{m}}</math> değişkenine göre kısmî türevi denir.
+
+<math>\frac{\partial f}{\partial {{x}_{m}}}={{f}_{{{x}_{m}}}}={{D}_{{{x}_{m}}}}f=\frac{\partial z}{\partial {{x}_{m}}}={{z}_{{{x}_{m}}}}</math>
+
+şeklinde gösterilir.
+
+<math>z=f\left( x,y \right)</math> ise;
+
+<math>{{f}_{x}}\left( x,y \right)=\underset{h\to 0}{\mathop{\lim }}\,\frac{f\left( x+h,y \right)-f\left( x,y \right)}{h}</math>
+
+<math>{{f}_{y}}\left( x,y \right)=\underset{k\to 0}{\mathop{\lim }}\,\frac{f\left( x,y+k \right)-f\left( x,y \right)}{k}</math>
+
+Örnek:
+
+<math>\begin{align}
+ & f(x,y)={{x}^{3}}+{{x}^{2}}{{y}}-{{y}^{3}} \\ 
+ & {{f}_{x}}={{\left( {{x}^{3}} \right)}_{x}}+{{\left( {{x}^{2}}y \right)}_{x}}-{{\left( {{y}^{3}} \right)}_{x}} \\ 
+ & {{f}_{x}}=3{{x}^{2}}+2xy-0 \\ 
+ & {{f}_{x}}=3{{x}^{2}}+2xy \\ 
+\end{align}</math>
+
+===Yönlü  türev===
+{{Ana|Yönlü türev}}
+
+Eğer ''f'' bir '''R'''<sup>n</sup> üzerinde gerçek değerli fonksiyon ise [[koordinat ekseni|koordinat eksenlerinin]] yönü içinde ''f'' in kısmî türevi içinde çeşitli ölçmeler ise (mesela ''f'' bir ''x'' ve ''y'' fonksiyonunun ''x'' yönü ve ''y'' yönü içinde ''f'' 'nin kısmî türevinde çeşitli ölçmeler ise) buna [[yönlü türev]] denir.
+
+Bununla birlikte köşegen çizgi {{Kayma|1=''y'' = ''x''}} boyunca gibi herhangi diğer yön içinde ''f'' in yönlü ölçü çeşitleri yoktur.
+
+Burada yönlü türev ölçüsü kullanılıyor.
+
+:<math>\mathbf{v} = (v_1,\ldots,v_n).</math>
+
+bir [[vektör]]se '''v'''nin yönü içinde ''f''in '''yönlü türev'''inin '''x''' noktasında sınırıdır.
+
+:<math>\mathrm{D}_{\mathbf{v}}{f}(\mathbf{x}) = \lim_{h \rightarrow 0}{\frac{f(\mathbf{x} + h\mathbf{v}) - f(\mathbf{x})}{h}}.</math>
+
+Bazı durumlarda bu vektörün uzunluğunu değiştirme sonrası yön türevi hesaplamak veya tahmin etmek daha kolay olabilir. Genellikle bu bir [[birim vektör]] yönünde bir yönde türevinin hesaplanması içinde sorunu açmak için yapılır. Bunun nasıl çalıştığını görmek için bunu {{Kayma|1='''v''' = λ'''u'''}} varsayalım.{{Kayma|1=''h'' = ''k''/λ}} fark katsayısı içinde yerine konur.Aradaki fark katsayısı:
+
+:<math>\frac{f(\mathbf{x} + (k/\lambda)(\lambda\mathbf{u})) - f(\mathbf{x})}{k/\lambda}
+= \lambda\cdot\frac{f(\mathbf{x} + k\mathbf{u}) - f(\mathbf{x})}{k}.</math>
+
+Bu '''u''' sırasıyla ''f''in yönlü türevi için λ zaman içinde farklı katsayısıdır. Dahası sıfıra yönelen ''k'' olarak alınan limit olarak aynı ''h'' ve ''k'' için herhangi diğerinin çarpımıdır. Bunun için {{Kayma|1=D<sub>'''v'''</sub>(''f'') = λD<sub>'''u'''</sub>(''f'')}}. Bu nedenle yeniden ölçeklendirme özelliği, yönlü türevler sık sık sadece birim vektörler için kabul edilir.
+
+Eğer ''f'''in tüm kısmî türevleri var ve '''x''''de sürekli ve formülü ile '''v''' yönünde ''f'' içinde belirlenen yönlü türev ise
+
+:<math>\mathrm{D}_{\mathbf{v}}{f}(\boldsymbol{x}) = \sum_{j=1}^n v_j \frac{\partial f}{\partial x_j}.</math>
+
+Bu [[toplam türev]]in tanımının bir sonucudur. Bu yönlü türev, aşağıda '''v''' içinde [[linear map|doğrusal]]dır. Bu da
+
+{{Kayma|1=D<sub>'''v''' + '''w'''</sub>(''f'') = D<sub>'''v'''</sub>(''f'') + D<sub>'''w'''</sub>(''f'')}}.
+
+demektir. Aynı tanım, ayrıca ''f'' olduğunda '''R'''<sup>m</sup> içindeki değerleri ile bir fonksiyondur. Yukardaki tanım, vektörlerin her bir bileşeni için uygulanır. Bu durum içinde yönlü türev '''R'''<sup>m</sup> içinde bir vektördür.
+
+===Toplam türev===
+{{Ana|Toplam türev}}
+Bir <math>f</math> fonksiyonu <math> \R^n </math>deki açık bir kümeden {{tmath|1= \R^m }}'e tanımlanmış bir fonksiyonsa, <math> f </math>'nin seçilen bir noktadaki ve yöndeki yönlü türevi <math> f </math>'nin yine aynı noktada ve aynı yönde en iyi doğrusal yaklaşımıdır. Ancak, <math>n>1</math> ise yönlü türev <math> f </math>'nin davranışı hakkında tam bir açıklama veremez. Toplam türevi bu bağlamda tam bir açıklama sağlamaktadır. Yani, bir {{tmath|1= \mathbf{a} }} vektöründen başlayan herhangi bir <math> \mathbf{v} </math> vektörü için aşağıdaki doğrusal yaklaşım sağlanır:
+<math display="block">f(\mathbf{a} + \mathbf{v}) \approx f(\mathbf{a}) + f'(\mathbf{a})\mathbf{v}.</math>
+
+Benzer bir şekilde, tek değişkenli fonksiyonlar için tanımlana türevde de <math> f'(\mathbf{a}) </math> buradaki yaklaşım hatasını olabildiğince küçük yapacak şekilde seçilir. <math> f </math>'nin bir <math> \mathbf{a} </math> noktasındaki toplam türevi 
+<math> f'(\mathbf{a}) \colon \R^n \to \R^m </math>, 
+<math display="block">\lim_{\mathbf{h}\to 0} \frac{\lVert f(\mathbf{a} + \mathbf{h}) - (f(\mathbf{a}) + f'(\mathbf{a})\mathbf{h})\rVert}{\lVert\mathbf{h}\rVert} = 0</math>
+olacak şekilde biricik olarak tanımlanan doğrusal bir dönüşümdür. Burada, <math> \mathbf{h} </math>, {{tmath|1= \R^n }} içinde bir vektördür; ancak, <math> f'(\mathbf{a}) \mathbf{h}, </math> {{tmath|1= \R^m }} içinde bir vektördür.
+
+Toplam türev, eğer bir noktada varsa, o zaman yine aynı noktada bütün kısmi türevler ve yönlü türevler de vardır. Bu halde, bütün {{tmath|1= \mathbf{v} }} vektörü için, <math> f </math>'nin 
+{{tmath|1= \mathbf{v} }} yönündeki yönlü türevi <math>f'(\mathbf{a})\mathbf{v} </math> olur. Eğer <math> f </math>, koordinat fonksiyonları cinsinden; yani, {{tmath|1= f = (f_1, f_2, \dots, f_m) }} olacak şekilde yazılırsa, o zaman toplam türev kısmi türevlerin matrisi olarak ifade edilebilir: 
+<math display="block">f'(\mathbf{a}) = \operatorname{Jac}_{\mathbf{a}} = \left(\frac{\partial f_i}{\partial x_j}\right)_{ij}.</math>
+Bu matrise <math> f </math>'nin <math> a </math> noktasındaki [[Jacobi matrisi]] denir.
+
+== Ayrıca bakınız ==
+* [[İntegral]]
+
+{{Otorite kontrolü}}
+
+== Notlar==
+<references group=not/>
+
+== Kaynakça ==
+{{Kaynakça}}
+
+[[Kategori:Türev| ]]
+[[Kategori:Analiz (matematik)]]
+[[Kategori:Diferansiyel hesap]]
+[[Kategori:Fonksiyonlar]]

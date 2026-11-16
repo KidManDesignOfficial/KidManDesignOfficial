@@ -1,0 +1,152 @@
+{{Savaş bilgi kutusu
+| çatışma           = Sakarya Meydan Muharebesi
+| parçası           = [[Kurtuluş Savaşı Batı Cephesi]]
+| resim             = Battle of Sakarya 1921.jpg
+| resim_boyutu      = 325px
+| başlık            = Türk komuta kademesi [[Duatepe]]'de savaşı yönetirken. [[Fevzi Çakmak|Mustafa Fevzi]] (Çakmak), [[Kâzım Özalp|Köprülü Kâzım]] (Özalp), [[Mustafa Kemal Atatürk|Mustafa Kemal]] (Atatürk), [[İsmet İnönü|İsmet]] (İnönü) ve [[Hayrullah Fişek|Hayrullah]] (Fişek)
+| tarih             = 22 Ağustos - 13 Eylül 1921<br>({{Yıl, ay, hafta ve güne göre zaman |ay1=08|gün1=22|yıl1=1921|ay2=09|gün2=13|yıl2=1921}})
+| yer               = [[Sakarya Nehri]]'nin doğusu
+| bölge             = [[Ankara]]
+| sebep             = 
+| sonuç             = Türk zaferi<ref name="toplukaynak">
+* Michael Llewellyn Smith "Ionian Vision" Hurst & Company London 1973 ISBN 1-85065-413-1, pg.227–234
+*Christopher Chant "Warfare of the 20th. Century – Armed Conflicts Outside the Two World Wars" Chartwell Books Inc. New Jersey 1988. ISBN 1-55521-233-6, ss.21–23
+* [[Stanford J. Shaw]], ''[https://archive.org/details/fromempiretorepu003.2shaw_t5e1/page/1410 From Empire to Republic: The Turkish War of National Liberation, 1918-1923 : a Documentary Study]'', 200, s. 1410: "It was only the '''Turkish victory at Sakarya''' that France decided to move ahead with the talks on the basis of the Turkish National Pact since they knew they lacked the will or the resources to win a military victory over the Kemalists in Cilicia."
+* {{Akademik dergi kaynağı |soyadı= Kissane |ad= Bill |tarih= 2022 |başlık= Was There a Civil War in Anatolia between the Ottoman Collapse in World War I and the Establishment of the Republic of Turkey in 1923? |url=https://journals.sagepub.com/doi/10.1177/16118944221130213 |dergi=Journal of Modern European History |cilt=20 |sayı=4 |yayıncı=[[Sage Journals]] |sayfalar=453-467|doi=10.1177/16118944221130213 |url-erişimi=aboneli |jstor=27360303 |erişimtarihi=1 Kasım 2026 |alıntı=The initially spontaneous nationalist forces, the Kuvayi Milliye, were eventually placed under a centralised command. Important military victories took place, '''notably against the Greek forces at Sakarya''' (late August, early September 1921) and during the second battle of Inönü between 23 March and 1 April 1921. }}
+* {{Akademik dergi kaynağı |soyadı1=Liebisch-Gümüş |ad1=Carolin |soyadı2=Yenen |ad2=Alp |tarih=2023 |başlık=Petitions, Propaganda, and Plots: Transnational Dynamics of Diplomacy During the Turkish War of Independence |url=https://www.tandfonline.com/doi/full/10.1080/19448953.2022.2143776 |dergi=Journal of Balkan and Near Eastern Studies |cilt=25 |sayı=2 |yayıncı=[[Taylor & Francis]] |issn=1944-8961 |sayfalar=185-206|url-erişimi=aboneli |doi=10.1080/19448953.2022.2143776 |erişim-tarihi=3 Kasım 2026 |alıntı=Even after the '''Turkish forces were victorious at the decisive Battle of Sakarya''' in September 1921 and Enver desperately left for Turkestan, British officials continued to believe that Enverists could topple Mustafa Kemal.}}
+* {{Kitap kaynağı |soyadı1=Uyar |ad1=Mesut |yazarbağı1=Mesut Uyar |soyadı2=Erickson |ad2=Edward J. |yazarbağı2=Edward J. Erickson |erişimtarihi=3 Kasım 2026 |tarih=2025 |yayıncı=[[Taylor & Francis]] |yer= [[London]] |isbn=9781003360261 |doi=10.4324/9781003360261 |url-erişimi=aboneli |başlık=The Routledge Handbook of Modern Turkish History |url=https://www.taylorfrancis.com/books/edit/10.4324/9781003360261/routledge-handbook-modern-turkish-history-mesut-uyar-edward-erickson?refId=f5bf6bd8-aa3c-4938-9199-12a6f3df3662&context=ubx|bölüm=Turkish War of Independence |bölümurl=https://www.taylorfrancis.com/chapters/edit/10.4324/9781003360261-20/turkish-war-independence-1919%E2%80%9322-mehmet-fatih-ba%C5%9F |alıntı=The 22-day Battle of Sakarya and the Turkish pursuit resulted in [...] '''Turkish victory''' marked a turning point.}}
+* {{Akademik dergi kaynağı |soyadı=Krzak |ad=Andrzej |tarih= 2023 |başlık=The Greco-Turkish War of 1919–1922: Causes, Course, Effects |url=https://ejournals.eu/en/journal/ssb/article/the-greco-turkish-war-of-1919-1922-causes-course-effects |dergi=Central European and Balkan Studies |cilt=32 |sayı=1 |yayıncı=Jan Dlugosz University |sayfalar=65-87|doi=10.4467/2543733XSSB.23.004.18430 |doi-access=free |yer=[[Częstochowa]] |erişimtarihi= 3 Kasım 2026 |alıntı=Mustafa Kemal Pasha (1881–1938), known as Kemal Atatürk from 1934 onwards, was a Turkish general and statesman, actively involved in the 1908 Young Turk Revolution, the 1912 Italo-Turkish War, and the 1912–1913 Balkan Wars. From 1921 to 1922, he spearheaded the driving out of the Greco-British forces from Turkey (with a '''significant victory at the Sakarya River''' in 1921), earning him the title “Ghazi”, meaning “victorious". }}
+* {{Kitap kaynağı |soyadı= Friedman |ad= Isaiah | url = https://books.google.com.tr/books?id=N_g_ZI46xncC&redir_esc=y |başlık= British Miscalculations: The Rise of Muslim Nationalism, 1918–1925 |yayıncı= Transaction Publishers |yıl= 2012 | isbn = 978-1-4128-4710-0  |erişimtarihi=3 Kasım 2026 |id= [[Taylor & Francis]] |sayfalar=265-266|alıntı=On August 10, the Greek army launched their frontal attack on the center, where the Turks were entrenched in unexpected strength. The battle raged for twenty-two days. It was the longest pitched battle in modern history. It was a ferocious struggle. The Greeks had lost eighteen thousand men and the Turks nearly that many. It was, as Howard Sachar aptly described, “a primeval contest of extermination.” The Turkish army was skillfully conducted by Kemal Atatürk. He managed to disrupt the Greek supply services leaving his adversaries at the mercy of the malevolent sun and succeeded in breaking through the Greek defenses. Overwhelmed, their units lost their nerve and began collapsing like rows of dominos. King Constantine, who had stayed at Smyrna, as well as at the supreme headquarters, returned to Athens with little honour.}}
+* {{Akademik dergi kaynağı |ad=Tomasz |soyadı=Grzywański |tarih=2024 |başlık=The Involvement of the European Powers in the Greco-Turkish War of 1919–1922 from the Perspective of the Documents of the Second Department of Polish General Staff |url=https://ejournals.eu/en/journal/ssb/article/the-involvement-of-the-european-powers-in-the-greco-turkish-war-of-1919-1922-from-the-perspective-of-the-documents-of-the-second-department-of-polish-general-staff-polish-oddzial-ii-sztabu-generalnego-wojska-polskiego |dergi=Central European and Balkan Studies |cilt=33 |sayı=1 |yayıncı=EJournals |sayfalar=257-270|doi=10.4467/2543733XSSB.24.014.20038 |doi-access=free |erişimtarihi=3 Kasım 2026 |alıntı=After '''the victory over Sakarya''', Atatürk’s troops set their sights on recapturing all of Anatolia and finally defeating the Greeks. According to written accounts, the Turkish army in the final stages of the war was characterised by high morale [...] On the Greek side, the situation was the opposite – as a result of their defeat, the Greek forces were unable to take any offensive action.}}
+* {{Kitap kaynağı |soyadı=Omissi |ad=David E. |yazarbağı=David E. Omissi |başlık=Air Power and Colonial Control: Royal Air Force 1919-1939 |url=https://www.manchesterhive.com/display/9781526123589/9781526123589.xml |erişimtarihi=3 Kasım 2026 |tarih=2017 |yayıncı=[[Manchester University Press]] |yer=[[Manchester]] |isbn=9781526123589 |oclc=23054062 |doi=10.7765/9781526123589.00012 |sayfa=28 |bölüm=Iraq and the Survival of the RAF (1920-25) |bölümurl=https://www.manchesterhive.com/display/9781526123589/9781526123589.00012.xml?rskey=urvNvK&result=2&print |alıntı=The chance of an invasion increased towards the end of 1921 as the '''Turkish army inflicted major defeats upon the Greeks''' in Anatolia and Mustafa Kemal settled some of his outstanding differences with France and the Soviet Union: the Turkish forces released by these political and military successes could now be used elsewhere{{emdash}}perhaps to invade Iraq. |arşivtarihi=21 Nisan 2024 |url-erişimi=aboneli |arşivurl=https://web.archive.org/web/20240421034034/https://www.manchesterhive.com/display/9781526123589/9781526123589.xml}}
+</ref><br>
+*Yunan taarruzunun durdurulması<ref>Michael Llewellyn Smith "Ionian Vision" Hurst & Company London 1973 ISBN 1-85065-413-1, pg.227–232</ref>
+*Yunan ordusunun [[Sakarya Nehri|Sakarya]]'nın batısına atılması<ref>{{Kitap kaynağı|url=https://kho.msu.edu.tr/haberler/2022/sakarya_sempozyumu/sakarya_sempozyumu.pdf|başlık=Sakarya Sempozyumu|erişimtarihi=20 Ocak 2023|sayfa=89|yayıncı=MSÜ - Kara Harp Okulu Dekanlığı|arşivurl=https://web.archive.org/web/20230120165525/https://kho.msu.edu.tr/haberler/2022/sakarya_sempozyumu/sakarya_sempozyumu.pdf|arşivtarihi=20 Ocak 2023|ölüurl=hayır}}</ref>
+* Yunan ilerleyişi başarısızlıkla sonuçlandı
+| coğrafi_değişiklikler = 
+| savaşan1          = {{bayraksimge|Yunan Krallığı}} [[Yunanistan Krallığı|Yunan Krallığı]]
+| savaşan2          = {{bayraksimge resim|Flag of the Ottoman Empire.svg|boyut=20px}} [[Ankara Hükûmeti]]
+| savaşan3          = 
+| komutan1          = {{bayraksimge|Yunan Krallığı}} [[I. Konstantin (Yunanistan kralı)|I. Konstantin]] <br /> {{bayraksimge|Yunan Krallığı}} [[Anastasios Papulas]]
+| komutan2          = {{bayraksimge resim|Flag of the Ottoman Empire.svg|boyut=20px}} [[Mustafa Kemal Atatürk|Mustafa Kemal Paşa]] <br /> {{bayraksimge resim|Flag of the Ottoman Empire.svg|boyut=20px}} [[Fevzi Çakmak|Fevzi Paşa]] <br /> {{bayraksimge resim|Flag of the Ottoman Empire.svg|boyut=20px}} [[İsmet İnönü|İsmet Paşa]] <br /> {{bayraksimge resim|Flag of the Ottoman Empire.svg|boyut=20px}} [[Rüştü Paşa]] <br />
+| komutan3          = 
+| güç1              = 110.000<ref name="Travlos2020">{{kitap kaynağı |soyadı1=Travlos |ad1=Konstantinos |başlık=Salvation and Catastrophe: The Greek-Turkish War, 1919-1922 |çeviribaşlık=Kurtuluş ve Felaket: 1919-1922 Yunan-Türk Savaşı |url=https://books.google.com.tr/books/about/Salvation_and_Catastrophe.html?id=OtAAEAAAQBAJ&redir_esc=y |erişimtarihi=12 Kasım 2026 |tarih=2021 |yayıncı=[[Bloomsbury Publishing]] |dil=İngilizce|isbn=9781498585088 |lccn=2020030777 |sayfa=190}}</ref>-120.000 er, 3.780 subay, 57.000 tüfek, 2.768 makinalı tüfek, 386 top, 1.350 kılıç, 3.800 hayvan, 600 adet 3 tonluk kamyon, 240 adet 1 tonluk kamyon, 18 uçak<ref name="Türkiye Tarihi IV">Koçak, Cemil and Akşin, Sina and Tunçay, Mete and Özdemir, Hikmet and Boratav, Korkut and Hilav, Selahattin and Katoğlu, Murat and Ödekan, Ayla (2005) Yakın Çağ Türkiye tarihi. Türkiye Tarihi: Çağdaş Türkiye (1908-1980). Cem Tarih Dizisi . Cem Yayınevi, İstanbul, pp. 85-173. ISBN 9754065567</ref>
+| güç2              = ~96.000 er<ref name="Travlos2021"/>, 5.401 subay, 54.572 tüfek, 825 makinalı tüfek, 196 top, 1.309 kılıç, 32.137 hayvan, 1.284 at/katır arabası, 2 uçak<ref name="Türkiye Tarihi IV"/>
+| güç3              = 
+| kayıp1            = 3.758 ölü, 18.955 yaralı, 354 kayıp<ref name="tsk">{{Web kaynağı | url = http://www.tsk.tr/8_tarihten_kesitler/8_4_turk_tarihinde_onemli_gunler/sakarya_meydan_muharebesi/sakarya_meydan_muharebesi.htm | başlık = Sakarya Meydan Muharebesi. | yayımcı = Genelkurmay Başkanlığı. | erişimtarihi = 12 Ağustos 2009 | arşivurl = https://web.archive.org/web/20160304002736/http://www.tsk.tr/8_tarihten_kesitler/8_4_turk_tarihinde_onemli_gunler/sakarya_meydan_muharebesi/sakarya_meydan_muharebesi.htm | arşivtarihi = 4 Mart 2016 | ölüurl = evet }}</ref><br>''Başka kaynaklara göre:''<br>15.000 ölü, 25.000 yaralı<ref>''Belgelerle Türk tarihi dergisi 80-83'', Menteş Kitabevi, 2003, sayfa 72</ref><ref>Sabahattin Selek, ''İstiklâl Harbi; yeni Türk Devletinin kuruluşu'', 1965, sayfa 283</ref>
+'''Toplam''': 23.267 zayiat<ref name="Routledge2025">{{Kitap kaynağı |soyadı1=Uyar |ad1=Mesut |yazarbağı1=Mesut Uyar |soyadı2=Erickson |ad2=Edward J. |yazarbağı2=Edward J. Erickson |erişimtarihi=3 Kasım 2026 |tarih=2025 |yayıncı=[[Taylor & Francis]] |yer= [[London]] |isbn=9781003360261 |doi=10.4324/9781003360261 |url-erişimi=aboneli |başlık=The Routledge Handbook of Modern Turkish History |url=https://www.taylorfrancis.com/books/edit/10.4324/9781003360261/routledge-handbook-modern-turkish-history-mesut-uyar-edward-erickson?refId=f5bf6bd8-aa3c-4938-9199-12a6f3df3662&context=ubx|bölüm=Turkish War of Independence |bölümurl=https://www.taylorfrancis.com/chapters/edit/10.4324/9781003360261-20/turkish-war-independence-1919%E2%80%9322-mehmet-fatih-ba%C5%9F |alıntı=The 22-day Battle of Sakarya and the Turkish pursuit resulted in 23,267 Greek casualties, including 3,958 dead, and 37,900 Turkish casualties, including 5,713 dead.}}</ref><ref>{{Akademik dergi kaynağı |soyadı=Krzak |ad=Andrzej |tarih= 2023 |başlık=The Greco-Turkish War of 1919–1922: Causes, Course, Effects |url=https://ejournals.eu/en/journal/ssb/article/the-greco-turkish-war-of-1919-1922-causes-course-effects |dergi=Central European and Balkan Studies |cilt=32 |sayı=1 |yayıncı=Jan Dlugosz Üniversitesi |sayfalar=65-87|doi=10.4467/2543733XSSB.23.004.18430 |doi-access=ücretsiz |yer=[[Częstochowa]] |erişimtarihi= 12 Kasım 2026 |alıntı= On September 13, the Greek army abandoned its bridgeheads on the east bank and crossed the Sakarya River, having suffered over 23,000 casualties, including killed and wounded.}}</ref>
+| kayıp2            = 5.713 ölü<br>'''Toplam''': 37.900 zayiat<ref name="Routledge2025"/>
+| kayıp3            = 
+| notlar            = 
+}}
+{{Kurtuluş Savaşı Batı Cephesi}}
+'''Sakarya Meydan Muharebesi''', [[Türk Kurtuluş Savaşı]]'nın önemli bir [[muharebe]]si.
+
+Sakarya Meydan Muharebesi, [[Türk Kurtuluş Savaşı|Kurtuluş Savaşı]]'nın dönüm noktası sayılır.<ref>{{Web kaynağı |url=http://www.ankaram.net/ankara/tr/index.php?page=tanitimdetay&katid=1&id=47 |başlık=Başkent Ankara - Müzeler - Alagöz Karargâh Müzesi |erişimtarihi=24 Haziran 2011 |arşivurl=https://web.archive.org/web/20160307013023/http://ankaram.net/ankara/tr/index.php?id=47&katid=1&page=tanitimdetay |arşivtarihi=7 Mart 2016 |ölüurl=evet }}</ref><ref>[http://www.dha.com.tr/haberdetay.asp?tarih=14.06.2011&Newsid=53172&Categoryid=1]{{Ölü bağlantı|date=Aralık 2022}} Doğan Haber Ajansı; ''POLATLI'DA TARİHİ GÜN''; 13.09.2010</ref><ref>[http://www.dho.edu.tr/pusula/64/ataturkungercekciligi.html] {{Webarşiv|url=https://web.archive.org/web/20110701022200/http://www.dho.edu.tr/pusula/64/ataturkungercekciligi.html|tarih=1 Temmuz 2011}} Pusula 64. Sayı; ''Atatürk'ün Gerçekçiliği''; Yunus Emre YILDIRIM</ref><ref>[http://www.hurriyet.com.tr/gundem/9887746.asp?m=1] {{Ölü bağlantı|date=Ekim 2026 }} Hürriyet; ''Türk tarihinin dönüm noktası 87 yaşında''; 13 Eylül 2008</ref><ref>[http://www.pto.org.tr/polatli.asp] {{Webarşiv|url=https://web.archive.org/web/20120111040446/http://www.pto.org.tr/polatli.asp|tarih=11 Ocak 2012}} Polatlı Ticaret Odası</ref><ref>[http://www.ttatl.k12.tr/?p=981] {{Webarşiv|url=https://web.archive.org/web/20180822182130/http://www.ttatl.k12.tr/?p=981|tarih=22 Ağustos 2018}} Ankara Türk Telekom Teknik Ve Endüstri Meslek Lisesi; Polatlı Gezimiz</ref><ref>[http://www.radikal.com.tr/Radikal.aspx?aType=RadikalYazar&Date=17.03.2011&ArticleID=1043172] {{Webarşiv|url=https://web.archive.org/web/20101031133032/http://www.radikal.com.tr/Radikal.aspx?aType=RadikalYazar|tarih=31 Ekim 2010}} Radikal; ''Altı Ok'a karşı Sakarya!''; Efkan Bucak; 17/03/2011</ref><ref>{{Haber kaynağı|url=http://www.haber7.com/haber/20080805/Turkiyenin-en-buyuk-anit-Polatlida.php|başlık=Türkiye'nin en büyük anıtı Polatlı'da|erişimtarihi=1 Ağustos 2009|arşivtarihi=23 Ekim 2008|arşivurl=https://web.archive.org/web/20081023160244/http://www.haber7.com/haber/20080805/Turkiyenin-en-buyuk-anit-Polatlida.php|ölüurl=hayır|yayımcı=haber7}}</ref> [[İsmail Habip Sevük]], Sakarya Meydan Muharebesi'nin önemini, "13 Eylül 1683 günü [[II. Viyana Kuşatması|Viyana]]'da başlayan çekilme, 238 sene sonra Sakarya'da durdurulmuştur." sözüyle ifade etmiştir.<ref name="tsk"/><ref>Kate Fleet, Suraiya Faroqhi, Reşat Kasaba: ''[[The Cambridge History of Turkey]] (Volume 4)''], [[Cambridge University Press]], 2008, ISBN 0-521-62096-1, [http://books.google.mk/books?ei=GeR4T8f2Eoj34QT18d2ADw&hl=de&id=iOoGH4GckQgC&dq=%22sheikh+said+rebellion+35000%22&q=%22the+retreat+that+started+in+vienna+on+13+september%22#v=snippet&q=%22the%20retreat%20that%20started%20in%20vienna%20on%2013%20september%22&f=false sayfa 138] {{Webarşiv|url=https://web.archive.org/web/20141209045816/http://books.google.mk/books?ei=GeR4T8f2Eoj34QT18d2ADw&hl=de&id=iOoGH4GckQgC&dq=%22sheikh+said+rebellion+35000%22&q=%22the+retreat+that+started+in+vienna+on+13+september%22#v=snippet&q=%22the%20retreat%20that%20started%20in%20vienna%20on%2013%20september%22&f=false|tarih=9 Aralık 2014}}.</ref>
+[[Dosya:Sakaryarivermapfinal.jpg|küçükresim|upright=1.09|sağ|[[Sakarya Nehri]]]]
+
+== Arka plan ==
+Sakarya Meydan Muharebesi, Anadolu Türk tarihinin en önemli savaşlarından biridir. [[Yunanlar|Yunan]] General Papulas tarafından Yunan ordularına Ankara'ya harekât emri verilmişti. Savaşı Yunan tarafı kazansaydı TBMM, [[Sevr Antlaşması]]'nı kabul etmek durumunda kalabilirdi.
+
+General [[Anastasios Papulas]] başlangıçta bu harekâta şiddetle karşı çıktı. Papulas'a göre [[Yunanlar|Yunan]] ordusunu ıssız ve yolsuz Anadolu topraklarının derinine sürüklemek sonuçları ağır olabilecek bir maceraydı. Öte yandan savaş karşıtı örgütlerin ordu içine sızdırdığı broşürler Yunan askerinin savaşa olan inancını önemli ölçüde kırmıştı. Ancak Papulas kamuoyundan gelen yoğun baskılara ve "Ankara Fatihi" olmanın cazibesine karşı koyamayarak ordusuna taarruz emri vermiştir.
+
+== Muharebe ==
+[[Türkiye Büyük Millet Meclisi|TBMM]] ordusu, [[Kütahya-Eskişehir Muharebeleri]]'ndeki yenilgisinden sonra cephe kritik bir duruma düşmüştü. Cepheye gelerek durumu yerinde gören ve komutayı eline alan [[Türkiye Büyük Millet Meclisi|TBMM]] Başkanı ve Başkomutan [[Mustafa Kemal Atatürk|Mustafa Kemal Paşa]] ile [[2. İcra Vekilleri Heyeti|İcra Vekilleri Heyeti Başkanı]] [[Fevzi Çakmak|Fevzi Paşa]], [[Türk Kurtuluş Savaşı Batı Cephesi|Batı Cephesi]] birliklerinin [[Yunanlar|Yunan]] ordusuyla arada büyük bir mesafe bırakılarak [[Sakarya Nehri]]'nin doğusuna çekilmesine ve savunmayı bu hatta devam ettirmesine karar verdiler.
+
+[[Mustafa Kemal Atatürk|Gazi Mustafa Kemal Paşa]], "Hatt-ı müdafaa yoktur; sath-ı müdafaa vardır. O satıh bütün vatandır. Vatanın her karış toprağı vatandaş kanıyla sulanmadıkça vatan terk olunamaz. Onun için küçük, büyük her cüzütamı (birlik), bulunduğu mevziden atılabilir. Fakat küçük, büyük her cüzütam ilk durabildiği noktada, tekrar düşmana karşı cephe teşkil edip muharebeye devam eder. Yanındaki cüzütamın çekilmeye mecbur olduğunu gören cüzütamlar, ona tabi olamaz. Bulunduğu mevzide nihayete kadar sebat ve mukavemete mecburdur."<ref>[[Mustafa Kemal Atatürk]], [[Nutuk (Mustafa Kemal Atatürk)|Nutuk]], [[Türkiye İş Bankası Kültür Yayınları]], sayfa 418</ref> emrini vererek muharebeyi geniş bir alana yaydı. Böylece Yunan kuvvetleri de karargâhlarından uzaklaşıp bölünmüş olacaktı.
+
+[[Türkiye Büyük Millet Meclisi|TBMM]], 3 Ağustos 1921'de [[Erkân-ı Harbiye-i Umûmiye Vekâleti|Genelkurmay Başkanı]] [[İsmet İnönü|İsmet Paşa]]'yı azlederek, aynı zamanda Başvekil ve Millî Müdafaa Vekili de olan [[Fevzi Çakmak|Fevzi Paşa]]'yı bu makama da atadı.
+
+22 Temmuz 1921'de [[Sakarya Nehri]] doğusuna çekilmeye başlayan Türk ordusu, güneyden kuzeye 5. Süvari Kolordusu ([[Çal Dağı]] güneyinde), 12, 1, 2, 3 ve 4. gruplar ile Mürettep Kolordu birinci hatta olacak şekilde tertiplendi. Çekilişin hızlı bir şekilde tamamlanmasından sonra Yunan birlikleri taarruz pozisyonu için tam dokuz gün Türk birlikleri ile karşılaşmadan yürüdü. Bu yürüyüşün hangi yöne doğru olduğu Türk keşif birlikleri tarafından tespit edilerek cephe komutanlığına bildirildi. Bu savaşın kaderini belirleyecek stratejik hatalardan biri oldu. Yunan taarruzu baskın olma özelliğini kaybetti. Ancak 14 Ağustos'ta ileri harekâta geçen Yunan ordusu, 23 Ağustos'tan itibaren 3. Kolordu ile Sakarya Nehri doğusundaki Türk kuvvetlerini tespit, 1. Kolordu ile [[Haymana]] istikametinde, 2. Kolordu ile [[Mangal Dağı]] güneydoğusunda kuşatıcı taarruza başladı. Fakat bu taarruzlarında başarısız oldular.
+
+Kuşatma taarruzunda başarı sağlayamayan Yunan kuvvetleri, sıklet merkezini ortaya kaydırarak savunma mevzilerini [[Haymana]] istikametinde yarmak istedi. 2 Eylül'de Yunan birlikleri, [[Ankara]]'ya kadar en stratejik dağ olan [[Çal Dağı]]'nın tamamını ele geçirdi. Fakat Türk birlikleri [[Ankara]]'ya kadar geri çekilmeyerek alan savunması yapmaya başladı. Yunan birlikleri [[Ankara]]'ya 50&nbsp;km kalacak derecede bazı ilerlemeler sağlasa da Türk birliklerinin yıpratıcı savunmasından kurtulamadı. Ayrıca 5. Türk [[Süvari|Süvari Kolordusu]] tarafından cephe ikmal hatlarına yapılan taarruzlar Yunan taarruzunun hızının kırılmasında önemli etkenlerden biri oldu. Yunan ordusu 9 Eylül'e kadar süren yarma teşebbüsünde de başarılı olamayınca, bulunduğu hatlarda kalarak savunmaya karar verdi.
+
+[[Türk Silahlı Kuvvetleri|Türk Ordusu]]'nun 10 Eylül'de başlattığı, bizzat [[Mustafa Kemal Atatürk|Mustafa Kemal Paşa]]'nın komuta ettiği, genel karşı taarruzla Yunan kuvvetlerinin savunma için tertiplenmesine mani olundu. Aynı gün Türk birlikleri stratejik bir nokta olan [[Çal Dağı]]'nı geri aldı. 13 Eylül'e kadar süren Türk taarruzu sonucunda Yunan ordusu, [[Eskişehir]]-[[Afyonkarahisar|Afyon]]'un hattının doğusuna kadar çekilerek bu bölgede savunma için tertiplenmeye başladı. Bu çekilme sonucu 20 Eylül'de [[Sivrihisar]], 22 Eylül'de [[Emirdağ|Aziziye]] ve 24 Eylül'de [[Bolvadin]] ve [[Çay, Afyonkarahisar|Çay]] düşman işgalinden kurtulmuştur.
+
+Çekilen [[Yunanistan Silahlı Kuvvetleri|Yunan ordusunu]] takip amacıyla harekâta 13 Eylül 1921 itibarıyla süvari tümenleri ve bazı piyade tümenleri ile devam edildi. Fakat teçhizat ve istihkâm yetersizliği gibi sebeplerle taarruzlar durduruldu. Aynı gün Batı Cephesi'ne bağlı birliklerin komuta yapısı değiştirildi. [[1. Ordu (Türkiye)|1]] ve [[2. Ordu (Türkiye)|2. Ordu]] kuruldu. Grup Komutanlıkları lağvedilerek yerine 1, 2, 3, 4 ve 5. Kolordular ile kolordu seviyesinde Kocaeli Grup Komutanlığı kuruldu.
+
+Savaş, 22 gün ve gece sürerek 100&nbsp;km uzunluğunda bir alanda cereyan etti. [[Yunanistan Silahlı Kuvvetleri|Yunan ordusu]], [[Ankara]]'nın 50&nbsp;km kadar yakınından geri çekildi. Cephe hattının uzunluğu 135-190 kilometre arasında değişiyordu.<ref name="Travlos2020"/>
+
+[[Yunanlar|Yunan]] ordusu geri çekilirken [[Türkler]]in kullanabileceği hiçbir şey bırakmamak için özen gösterdi. [[Demiryolu ulaşımı|Demir yollarını]] ve [[köprü]]leri havaya uçurdu ve birçok [[köy]]ü yaktı.<ref>Michael Llewellyn Smith "Ionian Vision" Hurst & Company London 1973 ISBN 1-85065-413-1, sayfa 234</ref>
+
+<gallery mode="packed-hover">
+Dosya:GreekWoundedRecovery.jpg|Yaralı Yunan askerleri sedyelere konuluyor
+Dosya:TurkishPrisoners.jpg|Türk esirler
+Dosya:GreekInfantryWaitinginCover.jpg|Yunan piyadeleri taarruz emri bekliyor
+Dosya:GreekAdvancePolatli.jpg|Yunan piyadeleri Ankara - Polatlı'ya ilerliyor
+Dosya:Greek Evzones of the 1-38 Evzones Regiment advance towards Turkish positions, 1921.jpg|Yunan Evzonların hücumu
+Dosya:Dead of Greek soldiers after the battle of Sakarya.jpg|Muharebeden sonra Yunan askerlerinin cesetleri
+</gallery>
+
+== Muharebe sonrası ==
+[[Dosya:Battle of Sangarios 1921.png|küçükresim|sağ|upright=1.09|Sakarya Meydan Muharebesi'ni betimleyen bir Yunan taş basması resim.]]
+Sakarya Meydan Muharebesi sonunda Türk ordusunun zayiatı; 5713 ölü, 18.480 yaralı, 828 esir ve 14.268 kayıp olmak üzere toplam 39.289'dur. Yunan ordusunun zayiatı ise 3758 ölü, 18.955 yaralı, 354 kayıp olmak üzere toplam 23.007'dir. Sakarya Meydan Muharebesi'nde çok fazla subay kaybı olduğu için bu Muharebeye "Subay Muharebesi" adı da verilmiştir. Mustafa Kemal Atatürk bu muharebe için "Sakarya [[Armageddon|Melhame-i Kübrası]]" yani kan gölü, kan deryası demiştir.
+
+[[Yunanlar]] için geri çekilmek haricinde başka bir seçenek kalmadı. Geri çekilirken [[Türkler|Türk]] sivil halkına karşı yaptığı tecavüzler, kundaklamalar ve yağmacılık sonucunda 1 milyonun üzerinde sivil [[Türkler|Türk]] evsiz kaldı.<ref>Christopher Chant "Warfare of the 20th. Century - Armed Conflicts Outside the Two World Wars" Chartwell Books Inc. New Jersey 1988. ISBN 1-55521-233-6, sayfa 23</ref>
+
+Mayıs 1922'de Yunan Ordusu Başkomutanı General [[Anastasios Papoulas]] ve kurmay heyeti istifa etti. Yerine General [[Georgios Hatzianestis]] atandı.
+
+Mustafa Kemal Atatürk, ünlü "''Hatt-ı müdafaa yoktur, sath-ı müdafaa vardır. Bu satıh bütün vatandır. Vatanın her karış toprağı vatandaş kanıyla sulanmadıkça vatan terk olunamaz.''" sözünü bu savaşa atfen TBMM'de söylemiştir. Muharebenin ardından Miralay [[Fahrettin Altay|Fahrettin Bey]], Miralay [[Kâzım Özalp|Kâzım Bey]], Miralay [[Selahattin Adil|Selahattin Adil Bey]] ve Miralay [[Mehmet Rüştü Sakarya|Rüştü Bey]], [[mirliva]] rütbesine terfi etti ve [[paşa]] oldu. Mustafa Kemal Paşa [[Türkiye Büyük Millet Meclisi|TBMM]] tarafından [[müşir]] rütbesine terfi ettirildi ve kendisine [[gazi]] ünvanı verildi.
+
+[[Mustafa Kemal Atatürk|Atatürk]], Sakarya Meydan Muharebesi'ne kadar bir askerî rütbesi olmadığını, [[Osmanlı Devleti]] tarafından verilmiş olan rütbelerin yine Osmanlı Devleti tarafından alınmış olduğunu belirtir. ''[[Nutuk (Mustafa Kemal Atatürk)|Nutuk]]''<nowiki/>'ta şu ifadeleri kullanır: "Sakarya muharebesi neticesine kadar, bir rütbe-i askeriyeye haiz değildim. Ondan sonra, Büyük Millet Meclisince Müşir (Mareşal) rütbesi ile Gazi ünvanı tevcih edildi. Osmanlı Devleti'nin rütbesinin, yine o devlet tarafından alınmış olduğu malûmdur."<ref>Nutuk, Büyük Millet Meclisince bana Müşir rütbesiyle Gazi ünvanı verilmesi yan başlıklı bölüm</ref>
+
+# Sakarya Savaşı'nın kazanılmasıyla, [[Türk milleti]]nin savaşın kazanılacağına olan inancı yerine gelmiştir. [[İstanbul]]'da, tüm camilerde [[Sakarya]]'da hayatını kaybeden askerler için mevlitler okunmuştur. O ana kadar, Ankara'ya mesafeli duran [[Mütareke basını|İstanbul basını]]nda dahi bir sevinç duygusu oluşmuştur.
+# Uluslararası toplumun (özellikle İngiltere'nin) [[Türkiye Büyük Millet Meclisi|TBMM]] güçlerine bakışı değişmiş ve [[Yunanistan]], arkasındaki [[İngiltere]] desteğini kaybetmiştir.
+# 13 Eylül 1683 tarihinde [[II. Viyana Kuşatması]] ile başlayan Türk geri çekilmesi yine bir 13 Eylül günü bu savaş ile durmuş, yeniden ilerleme başlamıştır. Bu yönden bu savaşın sembolik önemi de Türk Tarihi açısından çok fazladır.
+
+== Üst kademe komutanları ==
+* [[Türkiye Büyük Millet Meclisi|TBMM]] Başkanı ve [[Türk Orduları]] Başkomutanı: [[Mustafa Kemal Atatürk]]
+* Başvekil ve Genelkurmay Başkanı: [[Birinci Ferik]] [[Mustafa Fevzi Çakmak]]
+* Millî Müdafaa Vekili: [[Mirliva]] [[Refet Paşa]]
+* Batı Cephesi: Komutanı [[Mirliva]] [[İsmet İnönü|Mustafa İsmet İnönü]]
+** 1. Grup: Komutanı [[Albay]] [[İzzettin Çalışlar]]
+*** 24. Tümen: Komutanı [[Yarbay]] [[Ahmet Fuat Bulca]]
+*** 23. Tümen: Komutanı [[Yarbay]] [[Ömer Halis Bıyıktay]]
+** 2. Grup: Komutanı [[Albay]] [[Mehmet Selahattin Adil]]
+*** 4. Tümen: Komutanı [[Albay]] [[Mehmet Sabri Erçetin]]
+*** 5. Tümen: Komutanı [[Yarbay]] [[Mehmet Kenan Dalbaşar]]
+*** 9. Tümen: Komutanı [[Albay]] [[Sıtkı Üke]]
+** 3. Grup: Komutanı [[Mirliva]] [[Yusuf İzzet Met]]
+*** 7. Tümen: Komutanı [[Yarbay]] [[Ahmet Derviş]]
+*** 8. Tümen: Komutanı [[Albay]] [[Kazım Sevüktekin]]
+*** 15. Tümen: Komutanı [[Albay]] [[Şükrü Naili Gökberk]]
+** 4. Grup: Komutanı [[Albay]] [[Kemalettin Sami Gökçen]]
+*** 5. Kafkas Tümeni: Komutanı [[Yarbay]] [[Cemil Cahit Toydemir]]
+*** 61. Tümen: Komutanı [[Albay]] [[Mehmet Rüştü Sakarya]]
+** 5. Grup: Komutanı [[Albay]] [[Fahrettin Altay]]
+*** 14. Süvari Tümeni: Komutanı [[Yarbay]] [[Mehmet Suphi Kula]]
+*** 4. Süvari Tugayı: Komutanı [[Yarbay]] [[Hacı Mehmet Arif Örgüç]]
+** 12. Grup: Komutanı [[Albay]] [[Halit Karsıalan]]
+*** 11. Tümen: Komutanı [[Albay]] [[Abdülrezzak]] sonra [[Yarbay]] [[Saffet]]
+** Mürettep Kolordu: Komutanı [[Albay]] [[Kazım Fikri Özalp]]
+*** 1. Tümen: Komutanı [[Yarbay]] [[Abdurrahman Nafiz Gürman]]
+*** 17. Tümen: Komutanı [[Albay]] [[Hüseyin Nurettin Özsu]]
+*** 41. Tümen: Komutanı [[Yarbay]] [[Şerif Yaçağaz]]
+*** 1. Süvari Tümeni: Komutanı [[Yarbay]] [[Osman Zati Korol]]
+** Batı Cephesine Doğrudan Bağlı Birlikler
+*** 2. Süvari Tümeni: Komutanı [[Yarbay]] [[Ethem Servet Boral]]
+*** 3. Süvari Tümeni: Komutanı [[Yarbay]] [[İbrahim Çolak (asker)|İbrahim Çolak]]
+*** Mürettep Tümen: Komutanı [[Yarbay]] [[Ahmet Zeki Soydemir]]
+*** 3. Kafkas Tümeni: Komutanı [[Yarbay]] [[Halit Akmansü]]
+*** 6. Tümen: Komutanı [[Yarbay]] [[Hüseyin Nazmi Solok]]
+*** 57. Tümen: Komutanı [[Yarbay]] [[Hasan Mümtaz Çeçen]]
+
+==Ayrıca bakınız==
+* [[Mehmetçik Anıtı]]
+* [[Sakarya Meydan Muharebesi Tarihî Millî Parkı]]
+* [[Türk Kurtuluş Savaşı]]
+
+== Kaynakça ==
+{{kaynakça}}
+
+== Dış bağlantılar ==
+{{Commons|Category:Battle of Sakarya}}
+* [http://www.tsk.tr/8_tarihten_kesitler/8_4_turk_tarihinde_onemli_gunler/sakarya_meydan_muharebesi/sakarya_meydan_muharebesi.htm ''Genelkurmay Başkanlığı'nın Sakarya Meydan Muharebesi konulu sayfası.'']{{Webarşiv|url=https://web.archive.org/web/20160304002736/http://www.tsk.tr/8_tarihten_kesitler/8_4_turk_tarihinde_onemli_gunler/sakarya_meydan_muharebesi/sakarya_meydan_muharebesi.htm |tarih=4 Mart 2016 }}
+
+
+{{Kurtuluş savaşı zaman şeridi}}
+
+{{Türk Kurtuluş Savaşı}}{{Otorite kontrolü}}
+
+[[Kategori:Türk Kurtuluş Savaşı Batı Cephesi'nde muharebeler]]
+[[Kategori:Mustafa Kemal Atatürk'ün Savaşları]]

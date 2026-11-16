@@ -5,6 +5,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { BlockView } from '../components/Blocks';
 import { Icon } from '../components/Icon';
 import { OfficialLinks } from '../components/OfficialLinks';
+import { WikiLesson } from '../components/WikiLesson';
 import { PressableScale, useAnimatedValue } from '../components/motion';
 import { Button, Card, Screen, T } from '../components/ui';
 import { LESSON_BY_TOPIC, questionsOfTopic, subjectOfTopic, topicTitle } from '../data';
@@ -69,6 +70,7 @@ export default function LessonScreen({ topicId }: { topicId: string }) {
         {lesson.blocks.map((b, i) => (
           <BlockView key={i} block={b} accent={s.colors[1]} index={i} />
         ))}
+        <WikiLesson topicId={topicId} accent={s.colors[1]} />
         {lesson.cards?.length ? (
           <Card onPress={() => nav.push({ name: 'flashcards', subjectId: s.id })}>
             <View style={styles.row}>

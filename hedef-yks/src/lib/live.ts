@@ -21,11 +21,11 @@ export type LiveState<T> = {
 
 const PREFIX = 'hedefyks:live:v1:';
 
-export async function fetchText(url: string, timeoutMs = 15000): Promise<string> {
+export async function fetchText(url: string, timeoutMs = 15000, headers?: Record<string, string>): Promise<string> {
   const ctrl = new AbortController();
   const t = setTimeout(() => ctrl.abort(), timeoutMs);
   try {
-    const res = await fetch(url, { signal: ctrl.signal, headers: { Accept: 'text/html,application/xhtml+xml' } });
+    const res = await fetch(url, { signal: ctrl.signal, headers: headers ?? { Accept: 'text/html,application/xhtml+xml' } });
     if (!res.ok) throw new Error(`Sunucu ${res.status} yanıtı verdi`);
     return await res.text();
   } catch (e) {
@@ -42,7 +42,7 @@ export async function fetchText(url: string, timeoutMs = 15000): Promise<string>
  * @param parse HTML → veri; boş sonuç (dizi uzunluğu 0) "sayfa yapısı değişti" sayılır
  * @param maxAgeMs bu süreden yeni önbellek varsa ağ isteği atılmaz (yenile ile zorlanabilir)
  */
-export function useLive<T>(key: string, url: string | null, parse: (html: string) => T, maxAgeMs = 30 * 60 * 1000): LiveState<T> {
+export function useLive<T>(key: string, url: string | null, parse: (html: string) => T, maxAgeMs = 30 * 60 * 1000, headers?: Record<string, string>): LiveState<T> {
   const [data, setData] = useState<T | null>(null);
   const [fetchedAt, setFetchedAt] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
@@ -53,6 +53,7 @@ export function useLive<T>(key: string, url: string | null, parse: (html: string
   useEffect(() => {
     parseRef.current = parse;
   }, [parse]);
+  const headersRef = useRef(headers);
   const forced = useRef(false);
 
   useEffect(() => {
@@ -79,7 +80,7 @@ export function useLive<T>(key: string, url: string | null, parse: (html: string
       }
       forced.current = false;
       try {
-        const parsed = parseRef.current(await fetchText(url));
+        const parsed = parseRef.current(await fetchText(url, 15000, headersRef.current));
         if (Array.isArray(parsed) && parsed.length === 0) throw new Error('Resmi sayfanın yapısı değişmiş olabilir');
         const at = Date.now();
         if (!alive) return;

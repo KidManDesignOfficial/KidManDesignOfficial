@@ -32,7 +32,7 @@ export default function AboutScreen() {
       <Card style={{ gap: 8 }}>
         <T weight="800">Canlı resmî veriler</T>
         <T size={14} muted>
-          Sınav takvimi, YKS duyuruları ve 2018’den bu yana çıkmış soru kitapçıkları ÖSYM’nin sayfalarından anlık okunur; son başarılı veri internetsiz kullanım için cihazda saklanır. MEB konu özetleri, video anlatımlar, denemeler ve puan hesaplama motoru MEB OGM Materyal’in resmî sayfalarında açılır. Uygulama ÖSYM ve MEB ile bağlantılı değildir.
+          Sınav takvimi, YKS duyuruları ve 2018’den bu yana çıkmış soru kitapçıkları ÖSYM’nin sayfalarından anlık okunur; son başarılı veri internetsiz kullanım için cihazda saklanır. MEB konu özetleri, video anlatımlar, denemeler ve puan hesaplama motoru MEB OGM Materyal’in resmî sayfalarında açılır. Her konunun altındaki “Kapsamlı anlatım” bölümü, konuyla eşlenmiş Türkçe Vikipedi maddelerinin güncel sürümünü canlı indirir (açık lisans: CC BY-SA 4.0; yazar ve lisans bilgisi her maddede gösterilir). Uygulama ÖSYM, MEB ve Wikimedia Vakfı ile bağlantılı değildir.
         </T>
       </Card>
       <Card style={{ gap: 8 }}>
@@ -44,7 +44,7 @@ export default function AboutScreen() {
       <Card style={{ gap: 8 }}>
         <T weight="800">Gizlilik</T>
         <T size={14} muted>
-          Uygulama hesap gerektirmez ve hiçbir kişisel veri toplamaz. İnternet yalnızca ÖSYM (osym.gov.tr) ve MEB (ogmmateryal.eba.gov.tr) resmî sayfalarını okumak için kullanılır; bu isteklerde senden hiçbir bilgi gönderilmez. Konu anlatımları ve sorular internetsiz de çalışır. İlerlemen, cevapların ve ayarların yalnızca telefonunda saklanır.
+          Uygulama hesap gerektirmez ve hiçbir kişisel veri toplamaz. İnternet yalnızca ÖSYM (osym.gov.tr) ve MEB (ogmmateryal.eba.gov.tr) resmî sayfalarını ve Türkçe Vikipedi (tr.wikipedia.org) maddelerini okumak için kullanılır; bu isteklerde senden hiçbir bilgi gönderilmez. Konu anlatımları ve sorular internetsiz de çalışır. İlerlemen, cevapların ve ayarların yalnızca telefonunda saklanır.
         </T>
       </Card>
       <Card onPress={() => Linking.openURL(`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(APP_NAME + ' geri bildirim')}`).catch(() => {})}>
