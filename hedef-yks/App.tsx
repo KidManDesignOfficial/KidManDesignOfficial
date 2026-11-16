@@ -27,6 +27,9 @@ import SettingsScreen from './src/screens/SettingsScreen';
 import SubjectScreen from './src/screens/SubjectScreen';
 import SubjectsScreen from './src/screens/SubjectsScreen';
 import TeacherScreen from './src/screens/TeacherScreen';
+import OfficialScreen from './src/screens/OfficialScreen';
+import AnnouncementsScreen from './src/screens/AnnouncementsScreen';
+import PastPapersScreen from './src/screens/PastPapersScreen';
 import WrongBookScreen from './src/screens/WrongBookScreen';
 import { StoreProvider, useStore } from './src/store';
 import { ThemeProvider, useTheme } from './src/theme';
@@ -92,8 +95,8 @@ function renderTab(t: Tab) {
       return <SubjectsScreen />;
     case 'exam':
       return <ExamScreen />;
-    case 'teacher':
-      return <TeacherScreen />;
+    case 'official':
+      return <OfficialScreen />;
     case 'profile':
       return <ProfileScreen />;
   }
@@ -121,6 +124,12 @@ function renderRoute(r: Route) {
       return <SettingsScreen />;
     case 'about':
       return <AboutScreen />;
+    case 'announcements':
+      return <AnnouncementsScreen />;
+    case 'papers':
+      return <PastPapersScreen />;
+    case 'teacher':
+      return <TeacherScreen />;
   }
 }
 
@@ -128,7 +137,7 @@ const TABS: { id: Tab; label: string; icon: IconName; active: IconName }[] = [
   { id: 'home', label: 'Ana Sayfa', icon: 'home-outline', active: 'home' },
   { id: 'subjects', label: 'Dersler', icon: 'library-outline', active: 'library' },
   { id: 'exam', label: 'Deneme', icon: 'document-text-outline', active: 'document-text' },
-  { id: 'teacher', label: 'Öğretmen', icon: 'easel-outline', active: 'easel' },
+  { id: 'official', label: 'Resmî', icon: 'shield-checkmark-outline', active: 'shield-checkmark' },
   { id: 'profile', label: 'Profil', icon: 'person-outline', active: 'person' },
 ];
 

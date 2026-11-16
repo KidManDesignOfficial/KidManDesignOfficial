@@ -2,6 +2,7 @@ import { StyleSheet, View } from 'react-native';
 
 import { Appear } from '../components/Blocks';
 import { Icon } from '../components/Icon';
+import { OfficialLinks } from '../components/OfficialLinks';
 import { ProgressRing } from '../components/ProgressRing';
 import { Button, Card, Screen, T } from '../components/ui';
 import { LESSON_BY_TOPIC, SUBJECT_BY_ID, questionsOfSubject, questionsOfTopic } from '../data';
@@ -89,8 +90,9 @@ export default function SubjectScreen({ subjectId }: { subjectId: string }) {
           </Appear>
         );
       })}
+      <OfficialLinks subjectId={s.id} />
       <T size={12} muted center style={{ marginTop: 8 }}>
-        Konu başlıkları ÖSYM YKS kapsamı ve MEB öğretim programıyla uyumludur. Yeni anlatımlar güncellemelerle eklenir.
+        Konu başlıkları ÖSYM YKS kapsamı ve MEB öğretim programıyla uyumludur. Her konunun anlatımı, formül kartları ve çözümlü soruları vardır.
       </T>
     </Screen>
   );

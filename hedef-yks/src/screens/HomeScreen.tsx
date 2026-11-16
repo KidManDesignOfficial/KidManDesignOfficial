@@ -17,6 +17,8 @@ import { useNav } from '../nav';
 import { useStore } from '../store';
 import { GRADIENT, alpha, useTheme } from '../theme';
 import { DEFAULT_EXAM_DATE } from '../config';
+import { trDate } from '../components/Live';
+import { examTarget, openOfficial, useCalendar, useYksAnnouncements } from '../lib/official';
 
 function greeting(): string {
   const h = new Date().getHours();
@@ -32,8 +34,12 @@ export default function HomeScreen() {
   const nav = useNav();
   const insets = useSafeAreaInsets();
   const t = totals(state);
-  const exam = parseTrDate(state.examDate) ?? parseTrDate(DEFAULT_EXAM_DATE)!;
+  const cal = useCalendar();
+  const ann = useYksAnnouncements();
+  const target = examTarget(cal.data, parseTrDate(state.examDate) ?? parseTrDate(DEFAULT_EXAM_DATE)!);
+  const exam = target.date;
   const left = daysUntil(exam);
+  const latest = ann.data?.[0];
   const goal = Math.min(1, t.today.questions / Math.max(1, state.dailyGoal));
   const daily = useMemo(() => dailyQuestion(state.field), [state.field]);
   const dailyDone = state.answers[daily.id];
@@ -53,8 +59,10 @@ export default function HomeScreen() {
         }),
     },
     { icon: 'bookmarks', label: 'Yanlışlarım', color: c.danger, onPress: () => nav.push({ name: 'wrongbook' }) },
-    { icon: 'albums', label: 'Kartlar', color: c.success, onPress: () => nav.push({ name: 'flashcards' }) },
-    { icon: 'calculator', label: 'Net hesapla', color: c.info, onPress: () => nav.push({ name: 'netcalc' }) },
+    { icon: 'documents', label: 'Çıkmış sorular', color: c.info, onPress: () => nav.push({ name: 'papers' }) },
+    state.role === 'teacher'
+      ? { icon: 'easel', label: 'Öğretmen', color: c.success, onPress: () => nav.push({ name: 'teacher' }) }
+      : { icon: 'albums', label: 'Kartlar', color: c.success, onPress: () => nav.push({ name: 'flashcards' }) },
   ];
 
   return (
@@ -85,7 +93,7 @@ export default function HomeScreen() {
           <View style={styles.countdown}>
             <View style={{ flex: 1, gap: 4 }}>
               <T size={12.5} weight="700" color="rgba(255,255,255,0.75)">
-                YKS 2027’YE KALAN
+                {target.official ? `${target.year}-YKS’YE KALAN` : `YKS ${exam.getFullYear()}’YE KALAN`}
               </T>
               <View style={{ flexDirection: 'row', alignItems: 'flex-end', gap: 6 }}>
                 <T size={44} weight="900" color="#FFFFFF" style={{ lineHeight: 50 }}>
@@ -96,7 +104,7 @@ export default function HomeScreen() {
                 </T>
               </View>
               <T size={12.5} color="rgba(255,255,255,0.75)">
-                TYT: {longTrDate(exam)}
+                TYT: {longTrDate(exam)} · {target.official ? 'ÖSYM resmî takvimi' : 'tahmini tarih'}
               </T>
             </View>
             <ProgressRing value={goal} size={96} stroke={10} colors={['#FFD27A', '#FF7A45']} track="rgba(255,255,255,0.18)">
@@ -134,6 +142,27 @@ export default function HomeScreen() {
             ))}
           </View>
         </Appear>
+
+        {latest ? (
+          <Appear delay={170}>
+            <Card onPress={() => openOfficial(latest.url, '#0B2A5E')} accessibilityLabel={`ÖSYM duyurusu: ${latest.title}`}>
+              <View style={styles.row}>
+                <IconBadge name="megaphone" color="#1E4FA0" size={42} />
+                <View style={{ flex: 1 }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                    <View style={[styles.liveDot, { backgroundColor: ann.error ? c.warning : c.success }]} />
+                    <T size={11.5} weight="800" color="#1E4FA0">
+                      ÖSYM · SON YKS DUYURUSU · {trDate(latest.date)}
+                    </T>
+                  </View>
+                  <T size={14.5} weight="700" lines={2}>
+                    {latest.title}
+                  </T>
+                </View>
+              </View>
+            </Card>
+          </Appear>
+        ) : null}
 
         {last && lastSubject ? (
           <Appear delay={200}>
@@ -297,4 +326,5 @@ const styles = StyleSheet.create({
   subjectMini: { width: 128, height: 112, borderRadius: 22, padding: 14, justifyContent: 'space-between' },
   statsRow: { flexDirection: 'row', alignItems: 'center' },
   vr: { width: 1, height: 32 },
+  liveDot: { width: 7, height: 7, borderRadius: 4 },
 });

@@ -4,6 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 
 import { BlockView } from '../components/Blocks';
 import { Icon } from '../components/Icon';
+import { OfficialLinks } from '../components/OfficialLinks';
 import { PressableScale, useAnimatedValue } from '../components/motion';
 import { Button, Card, Screen, T } from '../components/ui';
 import { LESSON_BY_TOPIC, questionsOfTopic, subjectOfTopic, topicTitle } from '../data';
@@ -79,6 +80,7 @@ export default function LessonScreen({ topicId }: { topicId: string }) {
             </View>
           </Card>
         ) : null}
+        <OfficialLinks subjectId={s.id} compact />
         <Card style={{ gap: 12 }}>
           <T size={17} weight="800">
             Konuyu pekiştir

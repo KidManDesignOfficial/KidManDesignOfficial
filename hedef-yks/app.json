@@ -47,7 +47,8 @@
           }
         }
       ],
-      "./plugins/withReleaseSigning"
+      "./plugins/withReleaseSigning",
+      "expo-web-browser"
     ]
   }
 }

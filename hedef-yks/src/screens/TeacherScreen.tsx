@@ -3,12 +3,11 @@
  * paylaşma (WhatsApp, e-posta, yazdırma uygulamaları) ve sınıfta tahtaya yansıtarak çözme.
  */
 import { useMemo, useState } from 'react';
-import { ScrollView, Share, StyleSheet, View } from 'react-native';
+import { Share, StyleSheet, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Icon } from '../components/Icon';
-import { Button, Card, Chip, T } from '../components/ui';
+import { Button, Card, Chip, Screen, T } from '../components/ui';
 import { SUBJECTS, questionsOfSubject } from '../data';
 import type { Difficulty, Exam } from '../data';
 import { successFeedback } from '../lib/haptics';
@@ -21,7 +20,6 @@ const COUNTS = [5, 10, 15, 20];
 export default function TeacherScreen() {
   const { c } = useTheme();
   const nav = useNav();
-  const insets = useSafeAreaInsets();
   const [exam, setExam] = useState<Exam>('TYT');
   const [subjectId, setSubjectId] = useState('tyt-mat');
   const [topics, setTopics] = useState<string[]>([]);
@@ -41,7 +39,7 @@ export default function TeacherScreen() {
   const title = `${subject.exam} ${subject.name} Çalışma Kâğıdı (${sheet.length} soru)`;
 
   return (
-    <ScrollView contentContainerStyle={[styles.content, { paddingTop: insets.top + 16 }]} showsVerticalScrollIndicator={false}>
+    <Screen title="Öğretmen Paneli" subtitle="Çalışma kâğıdı ve sınıf içi test" contentStyle={{ gap: 12 }}>
       <LinearGradient colors={GRADIENT.teacher} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.hero}>
         <Icon name="easel" size={30} color="#FFFFFF" />
         <View style={{ flex: 1 }}>
@@ -163,12 +161,11 @@ export default function TeacherScreen() {
       <T size={12} muted center>
         Sorular özgün olarak hazırlanmıştır ve ÖSYM soru biçimine (5 seçenek) uygundur.
       </T>
-    </ScrollView>
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  content: { padding: 16, paddingBottom: 32, gap: 12 },
   hero: { flexDirection: 'row', gap: 14, alignItems: 'center', padding: 18, borderRadius: 24 },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   row: { flexDirection: 'row', alignItems: 'center', gap: 8 },

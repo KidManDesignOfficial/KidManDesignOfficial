@@ -127,13 +127,13 @@ b.q('paragraf', '"Kitap okumak yalnızca bilgi edinmek için değil, empati yete
   'İnsanların duyguları birbirine benzer.',
 ], 'B', 'Paragraf, okumanın empatiyi, yani başkalarını anlama yeteneğini geliştirdiğini anlatır; son cümle bunu toparlar.', 1);
 
-b.q('paragraf', '"Bir araştırmaya göre her gün en az yarım saat kitap okuyan öğrencilerin yüzde altmış sekizi, okumayanlara göre sınavlarda daha yüksek başarı göstermiştir."\n\nBu cümlede kullanılan düşünceyi geliştirme yolu aşağıdakilerden hangisidir?', [
+b.q('paragraf', '"Bir araştırmaya göre her gün en az yarım saat kitap okuyan öğrencilerin yüzde altmış sekizi deneme sınavlarındaki netlerini bir dönemde en az beş artırmıştır."\n\nBu cümlede kullanılan düşünceyi geliştirme yolu aşağıdakilerden hangisidir?', [
   'Tanık gösterme',
   'Benzetme',
   'Tanımlama',
   'Sayısal verilerden yararlanma',
   'Karşılaştırma',
-], 'D', 'Düşünce bir oranla (yüzde altmış sekiz) desteklenmiştir. Bir karşılaştırma da sezilse de cümlenin dayanağı sayısal veridir.', 2);
+], 'D', 'Düşünce bir oran (yüzde altmış sekiz) ve bir sayı (beş net) ile desteklenmiştir. Cümlede iki şey karşılaştırılmadığı, tanım ya da benzetme yapılmadığı, kimsenin sözüne başvurulmadığı için yanıt sayısal verilerden yararlanmadır.', 2);
 
 b.q('paragraf', 'Aşağıdaki cümlelerden hangisi bir paragrafın giriş cümlesi olmaya en uygundur?', [
   'Bu nedenle şairler duygularını dizelere dökmüştür.',

@@ -22,6 +22,8 @@ export default function ProfileScreen() {
   const max = Math.max(state.dailyGoal, ...week.map((d) => d.questions));
 
   const links: { icon: IconName; label: string; color: string; route: Route; badge?: number }[] = [
+    { icon: 'easel', label: 'Öğretmen paneli', color: c.info, route: { name: 'teacher' } },
+    { icon: 'documents', label: 'ÖSYM çıkmış sorular', color: '#1E4FA0', route: { name: 'papers' } },
     { icon: 'bookmarks', label: 'Yanlış Defteri', color: c.danger, route: { name: 'wrongbook' }, badge: state.wrongBook.length },
     { icon: 'bookmark', label: 'Kaydedilen konular', color: c.warning, route: { name: 'bookmarks' }, badge: state.bookmarks.length },
     { icon: 'albums', label: 'Formül ve bilgi kartları', color: c.success, route: { name: 'flashcards' } },

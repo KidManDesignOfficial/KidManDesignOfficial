@@ -8,6 +8,7 @@
     "node_modules",
     "android",
     "ios",
-    "test"
+    "test",
+    "scripts"
   ]
 }

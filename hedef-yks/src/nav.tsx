@@ -11,7 +11,7 @@ import { Animated, BackHandler, Dimensions, StyleSheet } from 'react-native';
 import { EASE_OUT, useAnimatedValue, useReducedMotion } from './components/motion';
 import { useTheme } from './theme';
 
-export type Tab = 'home' | 'subjects' | 'exam' | 'teacher' | 'profile';
+export type Tab = 'home' | 'subjects' | 'exam' | 'official' | 'profile';
 
 export type QuizMode = 'practice' | 'exam';
 export type QuizConfig = {
@@ -35,7 +35,10 @@ export type Route =
   | { name: 'flashcards'; subjectId?: string }
   | { name: 'netcalc' }
   | { name: 'settings' }
-  | { name: 'about' };
+  | { name: 'about' }
+  | { name: 'announcements' }
+  | { name: 'papers' }
+  | { name: 'teacher' };
 
 type Entry = { key: number; route: Route; leaving: boolean };
 
@@ -120,7 +123,7 @@ export function NavProvider({
   return (
     <Ctx.Provider value={value}>
       <Animated.View style={[styles.fill, { backgroundColor: c.bg }]}>
-        {(['home', 'subjects', 'exam', 'teacher', 'profile'] as Tab[]).map((t) =>
+        {(['home', 'subjects', 'exam', 'official', 'profile'] as Tab[]).map((t) =>
           mounted.has(t) ? (
             <Animated.View key={t} style={[styles.fill, t !== tab && styles.hidden]}>
               {renderTab(t, t === tab)}
