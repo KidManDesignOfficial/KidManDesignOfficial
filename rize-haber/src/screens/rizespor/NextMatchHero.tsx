@@ -205,7 +205,7 @@ export default function NextMatchHero({
             >
               <View style={styles.btnInner}>
                 <Icon name={reminders ? 'notifications' : 'notifications-outline'} size={16} color={reminders ? CLUB_COLORS.greenDark : '#FFFFFF'} />
-                <Text style={[styles.btnText, reminders && styles.btnTextOn]}>{reminders ? 'Hatırlatma açık' : 'Maçtan önce hatırlat'}</Text>
+                <Text style={[styles.btnText, reminders && styles.btnTextOn]}>{reminders ? 'Hatırlatma açık' : 'Bana hatırlat'}</Text>
               </View>
             </PressableScale>
           ) : null}

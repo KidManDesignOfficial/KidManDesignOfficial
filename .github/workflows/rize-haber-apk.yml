@@ -102,6 +102,33 @@ jobs:
           path: rize-haber/android/app/build/outputs/apk/release/*.apk
           retention-days: 30
 
+      # Google Play'e yüklenecek paket (AAB). Play App Signing, bu dosyayı imzalayan anahtarı
+      # "yükleme anahtarı" olarak kaydeder; sonraki tüm güncellemeler aynı anahtarla imzalanmalıdır.
+      - name: AAB derle (Google Play)
+        working-directory: rize-haber/android
+        run: ./gradlew bundleRelease --no-daemon
+
+      - name: AAB imzasını doğrula
+        run: |
+          AAB=$(ls android/app/build/outputs/bundle/release/*.aab | head -1)
+          test -n "$AAB" || { echo "::error::AAB bulunamadı"; exit 1; }
+          if [ -n "$RIZE_KEYSTORE_PATH" ]; then
+            if jarsigner -verify -verbose -certs "$AAB" | grep -q "CN=Rize Haber"; then
+              echo "✅ AAB kalıcı Rize Haber anahtarıyla imzalandı."
+            else
+              echo "::error::AAB Rize Haber anahtarıyla imzalanmamış; Play'e yüklenemez."
+              exit 1
+            fi
+          else
+            echo "::warning::AAB hata ayıklama anahtarıyla imzalandı; Play Console bunu kabul etmez."
+          fi
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: rize-haber-aab-google-play
+          path: rize-haber/android/app/build/outputs/bundle/release/*.aab
+          retention-days: 90
+
   # APK'yı Android emülatöründe açar; açılışta çöken bir sürüm "başarılı" görünmesin.
   smoke-test:
     needs: build

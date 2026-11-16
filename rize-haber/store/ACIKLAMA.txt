@@ -1,0 +1,43 @@
+Rize Haber, Rize’ye dair her şeyi tek uygulamada toplar: gündem, Çaykur Rizespor, yaş çay alım fiyatı, hava durumu ve şehrin gezi rehberi.
+
+📰 RİZE’NİN GÜNDEMİ
+• Rize ve ilçelerinden güncel haberler; Gündem, Spor, Ekonomi, Asayiş ve İlçeler kategorileri
+• Her haber kaynağıyla birlikte gösterilir ve tek dokunuşla kaynağında açılır
+• Haberleri kaydedin, WhatsApp ve diğer uygulamalarla paylaşın
+• İsteğe bağlı yeni haber bildirimleri
+• İnternet yokken son yüklenen haberler görüntülenir
+
+⚽ ÇAYKUR RİZESPOR
+• Sıradaki maç için geri sayım
+• “🍵 Çayını demle, maç başlıyor!” – maçtan 30 dakika önce hatırlatma
+• Fikstür, sonuçlar ve son 5 maç formu
+• Süper Lig puan durumu ve takım kadrosu
+• Maç Merkezi: maç anları, sahada ilk 11’ler ve istatistikler; canlı maçlarda otomatik yenileme
+• Transfer ve maç haberleri
+
+🍃 YAŞ ÇAY ALIM FİYATI
+• Resmî kaynaklarda ilan edilen güncel yaş çay alım fiyatı ve ilan tarihi
+• Teslim ettiğiniz miktarın tutarını hesaplayan hesaplayıcı
+• Yıllara göre fiyat karşılaştırması ve çay gündemi
+
+🌦️ HAVA DURUMU
+• Rize’nin 12 ilçesi ve Ayder Yaylası için anlık, saatlik ve 7 günlük tahmin
+
+🧭 RİZE’Yİ KEŞFET
+• Gezilecek yerler: yaylalar, şelaleler, kaleler ve müzeler; haritada açın, gezi listenize ekleyin
+• Rize lezzetleri: coğrafi işaretli ürünler ve yöresel tatlar
+• Kültür: Rize bezi, horon, kemençe, tulum ve yayla şenlikleri
+• Rize’nin tarihçesi ve çayın hikâyesi
+
+⚙️ SİZE GÖRE
+• Açık, koyu ve sistem teması; beş farklı renk
+• Büyük ve çok büyük yazı boyutu seçenekleri
+• Akıcı ve sade arayüz
+
+🔒 GİZLİLİK
+Hesap gerekmez. Reklam yoktur. Kişisel veri toplanmaz; ayarlarınız ve kaydettikleriniz yalnızca telefonunuzda saklanır.
+
+ℹ️ BİLGİLENDİRME
+Rize Haber bağımsız bir uygulamadır; herhangi bir kamu kurumu, Çaykur Rizespor veya ÇAYKUR ile bağlantılı değildir. Haber başlıkları Google Haberler üzerinden, kaynak yayın kuruluşları belirtilerek gösterilir; haberlerin hakları ilgili yayın kuruluşlarına aittir. Hava durumu verisi Open-Meteo’dan, maç ve puan durumu verileri ESPN’den alınır ve gecikmeli olabilir. Resmî bilgiler ilgili kurumların yayımladığı kaynaklardan derlenir ve uygulama içinde kaynak bağlantılarıyla sunulur.
+
+Görüş ve önerileriniz için: Ayarlar → İletişim

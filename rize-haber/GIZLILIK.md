@@ -67,5 +67,8 @@ bağlantılarıyla sunulur.
 
 ## Değişiklikler ve iletişim
 
-Bu politika güncellenirse yürürlük tarihi değiştirilir. Soru ve görüşleriniz için uygulamadaki
-**Ayarlar → Görüş bildir** bağlantısını kullanabilirsiniz.
+Bu politika güncellenirse yürürlük tarihi değiştirilir. Soru ve görüşleriniz için:
+
+- **Geliştirici:** KIDMAN
+- **E-posta:** cikskral03@gmail.com
+- Uygulamada **Ayarlar → İletişim** veya **Ayarlar → Görüş bildir**

@@ -19,7 +19,7 @@ import { Icon } from '../components/Icon';
 import { Card, Chip, ChipRow, LinkRow, SectionTitle, openUrl } from '../components/ui';
 import { PressableScale } from '../components/motion';
 import type { IconName } from '../components/Icon';
-import { WEATHER_LOCATIONS } from '../config';
+import { CONTACT_EMAIL, DEVELOPER_NAME, WEATHER_LOCATIONS } from '../config';
 import { useFavorites } from '../favorites';
 import { disableNewsNotifications, enableNewsNotifications, setMatchFeature } from '../notifications';
 import { REMINDER_MINUTES, getMatchSettings } from '../rizespor/reminders';
@@ -233,8 +233,20 @@ export default function SettingsScreen() {
           Rize Haber; Rize’nin haberlerini, hava durumunu, yaş çay alım fiyatını, Çaykur Rizespor’u ve gezi
           rehberini tek yerde toplar.
         </Text>
-        <Text style={styles.version}>Sürüm {APP_VERSION}</Text>
+        <Text style={styles.version}>
+          Sürüm {APP_VERSION} · Geliştirici: {DEVELOPER_NAME}
+        </Text>
         <View style={styles.divider} />
+        <ActionRow
+          icon="mail-outline"
+          label="İletişim"
+          hint={CONTACT_EMAIL}
+          onPress={() =>
+            Linking.openURL(
+              `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(`Rize Haber ${APP_VERSION}`)}`,
+            ).catch(() => {})
+          }
+        />
         <ActionRow
           icon="chatbubble-ellipses-outline"
           label="Görüş bildir"

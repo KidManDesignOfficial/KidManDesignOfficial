@@ -59,3 +59,7 @@ export const WEATHER_LOCATIONS: WeatherLocation[] = [
   { id: 'pazar', name: 'Pazar', latitude: 41.179, longitude: 40.885 },
   { id: 'ayder', name: 'Ayder Yaylası', latitude: 40.953, longitude: 41.103 },
 ];
+
+/** Play Store'da ve uygulamada görünen geliştirici bilgileri (haber uygulaması kuralı gereği iletişim zorunludur). */
+export const DEVELOPER_NAME = 'KIDMAN';
+export const CONTACT_EMAIL = 'cikskral03@gmail.com';
