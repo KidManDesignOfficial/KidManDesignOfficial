@@ -1,8 +1,9 @@
-import { memo, useCallback, useEffect, useMemo, useState } from 'react';
-import { Linking, Pressable, ScrollView, Share, StyleSheet, Text, View } from 'react-native';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Animated, Linking, Pressable, ScrollView, Share, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 
 import { mix } from '../../colors';
+import { Chevron, Collapsible, FadeInView, PressableScale } from '../../components/motion';
 import { Chip, ChipRow, openUrl } from '../../components/ui';
 import { PLACE_CATEGORIES, PLACES, mapsUrl, type Place, type PlaceCategory } from '../../data/discover';
 import { loadPlaceList, savePlaceList } from '../../storage';
@@ -101,7 +102,7 @@ export default function PlacesView() {
           </Text>
         </View>
       ) : (
-        <View style={styles.list}>
+        <FadeInView key={filter} style={styles.list}>
           {visible.map((place) => (
             <PlaceCard
               key={place.id}
@@ -114,7 +115,7 @@ export default function PlacesView() {
               fs={fs}
             />
           ))}
-        </View>
+        </FadeInView>
       )}
     </ScrollView>
   );
@@ -132,6 +133,7 @@ type CardProps = {
 
 const PlaceCard = memo(function PlaceCard({ place, open, inList, onToggleOpen, onToggleList, colors, fs }: CardProps) {
   const category = PLACE_CATEGORIES.find((c) => c.id === place.category)!;
+  const progress = useRef(new Animated.Value(open ? 1 : 0)).current;
   const tint = colors.isDark ? mix(CATEGORY_TINT[place.category], '#000000', 0.25) : CATEGORY_TINT[place.category];
 
   const styles = useMemo(
@@ -159,14 +161,16 @@ const PlaceCard = memo(function PlaceCard({ place, open, inList, onToggleOpen, o
         body: { padding: 16, gap: 10 },
         tagline: { fontSize: fs(15), color: colors.text, lineHeight: fs(21), fontWeight: '500' },
         more: { fontSize: fs(13), color: colors.primary, fontWeight: '700' },
+        moreRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+        details: { paddingHorizontal: 16, paddingBottom: 16, gap: 10 },
         description: { fontSize: fs(14), color: colors.text, lineHeight: fs(21) },
         highlight: { flexDirection: 'row', gap: 8 },
         bullet: { color: tint, fontSize: fs(14), fontWeight: '800' },
         highlightText: { flex: 1, fontSize: fs(14), color: colors.text, lineHeight: fs(20) },
         note: { fontSize: fs(12), color: colors.textMuted, fontStyle: 'italic', lineHeight: fs(17) },
         actions: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 4 },
+        actionWrap: { flexGrow: 1, flexBasis: '45%' },
         action: {
-          flexGrow: 1,
           alignItems: 'center',
           paddingVertical: 10,
           paddingHorizontal: 12,
@@ -189,11 +193,13 @@ const PlaceCard = memo(function PlaceCard({ place, open, inList, onToggleOpen, o
 
   return (
     <View style={styles.card}>
-      <Pressable
+      <PressableScale
         onPress={onToggleOpen}
+        scaleTo={0.985}
         accessibilityRole="button"
         accessibilityState={{ expanded: open }}
         accessibilityLabel={`${place.name}, ${place.district}. ${place.tagline}`}
+        accessibilityHint={open ? 'Ayrıntıları kapatır' : 'Ayrıntıları açar'}
       >
         <LinearGradient colors={[tint, mix(tint, '#000000', 0.3)]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.band}>
           <View style={styles.bandTop}>
@@ -208,14 +214,17 @@ const PlaceCard = memo(function PlaceCard({ place, open, inList, onToggleOpen, o
           <Text style={styles.district}>📍 {place.district}</Text>
         </LinearGradient>
 
-        <View style={[styles.body, open && { paddingBottom: 0 }]}>
-          <Text style={styles.tagline}>{place.tagline}</Text>
-          {!open ? <Text style={styles.more}>Ayrıntılar ▾</Text> : null}
-        </View>
-      </Pressable>
-
-      {open ? (
         <View style={styles.body}>
+          <Text style={styles.tagline}>{place.tagline}</Text>
+          <View style={styles.moreRow}>
+            <Text style={styles.more}>{open ? 'Daha az göster' : 'Ayrıntılar'}</Text>
+            <Chevron progress={progress} color={colors.primary} size={fs(14)} />
+          </View>
+        </View>
+      </PressableScale>
+
+      <Collapsible open={open} progress={progress}>
+        <View style={styles.details}>
           <Text style={styles.description}>{place.description}</Text>
           {place.highlights.map((h) => (
             <View key={h} style={styles.highlight}>
@@ -226,33 +235,41 @@ const PlaceCard = memo(function PlaceCard({ place, open, inList, onToggleOpen, o
           {place.note ? <Text style={styles.note}>Not: {place.note}</Text> : null}
 
           <View style={styles.actions}>
-            <Pressable
+            <PressableScale
               onPress={() => Linking.openURL(mapsUrl(place.mapsQuery)).catch(() => {})}
               style={[styles.action, styles.actionPrimary]}
+              containerStyle={styles.actionWrap}
               accessibilityRole="button"
             >
               <Text style={[styles.actionText, styles.actionTextPrimary]}>🗺️ Haritada aç</Text>
-            </Pressable>
-            <Pressable
+            </PressableScale>
+            <PressableScale
               onPress={onToggleList}
               style={[styles.action, inList && styles.actionActive]}
+              containerStyle={styles.actionWrap}
               accessibilityRole="button"
               accessibilityState={{ selected: inList }}
             >
               <Text style={styles.actionText}>{inList ? '♥ Listemde' : '♡ Listeme ekle'}</Text>
-            </Pressable>
-            <Pressable onPress={share} style={styles.action} accessibilityRole="button">
+            </PressableScale>
+            <PressableScale onPress={share} style={styles.action} containerStyle={styles.actionWrap} accessibilityRole="button">
               <Text style={styles.actionText}>↗ Paylaş</Text>
-            </Pressable>
-            <Pressable onPress={() => openUrl(place.sourceUrl, colors)} style={styles.action} accessibilityRole="link">
+            </PressableScale>
+            <PressableScale
+              onPress={() => openUrl(place.sourceUrl, colors)}
+              style={styles.action}
+              containerStyle={styles.actionWrap}
+              accessibilityRole="link"
+            >
               <Text style={styles.actionText}>📄 Kaynak</Text>
-            </Pressable>
+            </PressableScale>
           </View>
-          <Pressable onPress={onToggleOpen} accessibilityRole="button">
-            <Text style={styles.more}>Kapat ▴</Text>
+          <Pressable onPress={onToggleOpen} accessibilityRole="button" hitSlop={8} style={styles.moreRow}>
+            <Text style={styles.more}>Kapat</Text>
+            <Chevron progress={progress} color={colors.primary} size={fs(14)} />
           </Pressable>
         </View>
-      ) : null}
+      </Collapsible>
     </View>
   );
 });

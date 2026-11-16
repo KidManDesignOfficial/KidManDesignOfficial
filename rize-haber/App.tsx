@@ -4,6 +4,7 @@ import { StatusBar } from 'expo-status-bar';
 import * as Notifications from 'expo-notifications';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
+import { FadeInView } from './src/components/motion';
 import { openUrl } from './src/components/ui';
 import { FavoritesProvider } from './src/favorites';
 import NewsScreen from './src/screens/NewsScreen';
@@ -88,7 +89,6 @@ function Main() {
         headerButtonText: { color: '#FFFFFF', fontSize: fs(14), fontWeight: '700' },
         body: { flex: 1, backgroundColor: colors.background },
         screen: { flex: 1 },
-        hidden: { display: 'none' },
         tabBar: {
           flexDirection: 'row',
           backgroundColor: colors.card,
@@ -132,24 +132,24 @@ function Main() {
 
         {/* Ekranlar bağlı kalır; sekme değişince yüklenen veri ve kaydırma konumu korunur. */}
         <View style={styles.body}>
-          <View style={[styles.screen, (tab !== 'news' || showSaved) && styles.hidden]}>
+          <FadeInView visible={tab === 'news' && !showSaved} style={styles.screen}>
             <NewsScreen />
-          </View>
-          <View style={[styles.screen, (tab !== 'news' || !showSaved) && styles.hidden]}>
+          </FadeInView>
+          <FadeInView visible={tab === 'news' && showSaved} style={styles.screen}>
             <SavedScreen />
-          </View>
-          <View style={[styles.screen, tab !== 'tea' && styles.hidden]}>
+          </FadeInView>
+          <FadeInView visible={tab === 'tea'} style={styles.screen}>
             <TeaScreen />
-          </View>
-          <View style={[styles.screen, tab !== 'weather' && styles.hidden]}>
+          </FadeInView>
+          <FadeInView visible={tab === 'weather'} style={styles.screen}>
             <WeatherScreen />
-          </View>
-          <View style={[styles.screen, tab !== 'rize' && styles.hidden]}>
+          </FadeInView>
+          <FadeInView visible={tab === 'rize'} style={styles.screen}>
             <DiscoverScreen />
-          </View>
-          <View style={[styles.screen, tab !== 'settings' && styles.hidden]}>
+          </FadeInView>
+          <FadeInView visible={tab === 'settings'} style={styles.screen}>
             <SettingsScreen />
-          </View>
+          </FadeInView>
         </View>
 
         <SafeAreaView edges={['bottom']} style={styles.tabBar} accessibilityRole="tablist">
