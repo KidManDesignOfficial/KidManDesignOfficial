@@ -15,9 +15,19 @@ import { Platform } from 'react-native';
 
 import { NEWS_CATEGORIES, googleNewsRssUrl } from './config';
 import { diffNews } from './newsDiff';
+import { fetchFixtures } from './rizespor/api';
+import {
+  ensureMatchChannel,
+  ensurePermission,
+  getMatchSettings,
+  rizesporBackgroundCheck,
+  setMatchSetting,
+  syncMatchReminders,
+} from './rizespor/reminders';
 import { fetchRss } from './rss';
 import {
   clearSeenIds,
+  loadNotificationsEnabled,
   loadSeenIds,
   saveNotificationsEnabled,
   saveSeenIds,
@@ -73,16 +83,40 @@ export async function checkForNewNews(): Promise<number> {
   return fresh.length;
 }
 
+/** Görev; haber bildirimi ve Rizespor özelliklerinden açık olanları sırayla çalıştırır. */
 TaskManager.defineTask(NEWS_TASK, async () => {
-  try {
-    await checkForNewNews();
-    return BackgroundTask.BackgroundTaskResult.Success;
-  } catch {
-    return BackgroundTask.BackgroundTaskResult.Failed;
+  let failed = false;
+  if (await loadNotificationsEnabled()) {
+    await checkForNewNews().catch(() => {
+      failed = true;
+    });
   }
+  const match = await getMatchSettings();
+  if (match.reminders || match.scoreAlerts) {
+    await rizesporBackgroundCheck().catch(() => {
+      failed = true;
+    });
+  }
+  return failed ? BackgroundTask.BackgroundTaskResult.Failed : BackgroundTask.BackgroundTaskResult.Success;
 });
 
 export type EnableResult = 'enabled' | 'permission-denied' | 'unavailable';
+
+/** Herhangi bir arka plan özelliği açıksa görevi kaydeder; hepsi kapalıysa kaldırır. */
+async function refreshBackgroundTask(): Promise<'ok' | 'unavailable'> {
+  const match = await getMatchSettings();
+  const needed = (await loadNotificationsEnabled()) || match.reminders || match.scoreAlerts;
+  const registered = await TaskManager.isTaskRegisteredAsync(NEWS_TASK);
+  if (!needed) {
+    if (registered) await BackgroundTask.unregisterTaskAsync(NEWS_TASK);
+    return 'ok';
+  }
+  if (registered) return 'ok';
+  const status = await BackgroundTask.getStatusAsync();
+  if (status !== BackgroundTask.BackgroundTaskStatus.Available) return 'unavailable';
+  await BackgroundTask.registerTaskAsync(NEWS_TASK, { minimumInterval: CHECK_INTERVAL_MINUTES });
+  return 'ok';
+}
 
 export async function enableNewsNotifications(): Promise<EnableResult> {
   if (Platform.OS === 'android') {
@@ -92,17 +126,13 @@ export async function enableNewsNotifications(): Promise<EnableResult> {
       importance: Notifications.AndroidImportance.HIGH,
     });
   }
+  if (!(await ensurePermission())) return 'permission-denied';
 
-  let permission = await Notifications.getPermissionsAsync();
-  if (!permission.granted) permission = await Notifications.requestPermissionsAsync();
-  if (!permission.granted) return 'permission-denied';
-
-  const status = await BackgroundTask.getStatusAsync();
-  if (status !== BackgroundTask.BackgroundTaskStatus.Available) return 'unavailable';
-
-  await BackgroundTask.registerTaskAsync(NEWS_TASK, { minimumInterval: CHECK_INTERVAL_MINUTES });
   await saveNotificationsEnabled(true);
-
+  if ((await refreshBackgroundTask()) === 'unavailable') {
+    await saveNotificationsEnabled(false);
+    return 'unavailable';
+  }
   // Şu anki haberleri "görüldü" say; böylece ilk bildirim gerçekten yeni bir haber için gelir.
   await clearSeenIds();
   checkForNewNews().catch(() => {});
@@ -111,7 +141,26 @@ export async function enableNewsNotifications(): Promise<EnableResult> {
 
 export async function disableNewsNotifications(): Promise<void> {
   await saveNotificationsEnabled(false);
-  if (await TaskManager.isTaskRegisteredAsync(NEWS_TASK)) {
-    await BackgroundTask.unregisterTaskAsync(NEWS_TASK);
+  await refreshBackgroundTask();
+}
+
+/** Maç hatırlatması / skor bildirimi aç-kapat. Hatırlatmalar hemen kurulur ya da silinir. */
+export async function setMatchFeature(key: 'reminders' | 'scoreAlerts', enabled: boolean): Promise<EnableResult> {
+  if (enabled) {
+    await ensureMatchChannel();
+    if (!(await ensurePermission())) return 'permission-denied';
   }
+  await setMatchSetting(key, enabled);
+  const bg = await refreshBackgroundTask();
+  if (key === 'reminders') {
+    const fixtures = await fetchFixtures().catch(() => null);
+    if (fixtures) await syncMatchReminders(fixtures);
+    else if (!enabled) await syncMatchReminders([]);
+  }
+  // Hatırlatmalar arka plan görevi olmadan da çalışır; skor bildirimi ise göreve muhtaçtır.
+  if (enabled && key === 'scoreAlerts' && bg === 'unavailable') {
+    await setMatchSetting(key, false);
+    return 'unavailable';
+  }
+  return 'enabled';
 }

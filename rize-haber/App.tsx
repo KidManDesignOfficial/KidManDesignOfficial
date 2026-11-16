@@ -1,14 +1,17 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { BackHandler, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import * as Notifications from 'expo-notifications';
+import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 import { FadeInView } from './src/components/motion';
 import { openUrl } from './src/components/ui';
 import { FavoritesProvider } from './src/favorites';
-import NewsScreen from './src/screens/NewsScreen';
+import { CLUB_COLORS } from './src/rizespor/names';
 import DiscoverScreen from './src/screens/DiscoverScreen';
+import NewsScreen from './src/screens/NewsScreen';
+import RizesporScreen from './src/screens/RizesporScreen';
 import SavedScreen from './src/screens/SavedScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
 import TeaScreen from './src/screens/TeaScreen';
@@ -19,14 +22,14 @@ import { ThemeProvider, useTheme } from './src/theme';
 const useNotificationResponse =
   Platform.OS === 'web' ? () => null : Notifications.useLastNotificationResponse;
 
-type Tab = 'news' | 'tea' | 'weather' | 'rize' | 'settings';
+type Tab = 'news' | 'rizespor' | 'tea' | 'weather' | 'rize';
 
 const TABS: { id: Tab; label: string; icon: string; title: string }[] = [
   { id: 'news', label: 'Haberler', icon: '📰', title: 'Rize Haber' },
+  { id: 'rizespor', label: 'Rizespor', icon: '⚽', title: 'Çaykur Rizespor' },
   { id: 'tea', label: 'Çay', icon: '🍃', title: 'Çay Fiyatları' },
   { id: 'weather', label: 'Hava', icon: '🌦️', title: 'Hava Durumu' },
   { id: 'rize', label: 'Keşfet', icon: '🧭', title: 'Rize’yi Keşfet' },
-  { id: 'settings', label: 'Ayarlar', icon: '⚙️', title: 'Ayarlar' },
 ];
 
 export default function App() {
@@ -45,12 +48,27 @@ function Main() {
   const { colors, fs } = useTheme();
   const [tab, setTab] = useState<Tab>('news');
   const [showSaved, setShowSaved] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+  const [openMatchId, setOpenMatchId] = useState<string | null>(null);
+  // Rizespor sekmesi ilk açıldığında yüklenir (gereksiz ağ isteği yapılmaz).
+  const [rizesporMounted, setRizesporMounted] = useState(false);
   const activeTab = TABS.find((t) => t.id === tab)!;
-  useOpenNotifications(setTab, () => setShowSaved(false));
 
-  // Android geri tuşu: önce Kaydedilenler'i kapat, sonra Haberler sekmesine dön.
+  const goTo = useCallback((t: Tab) => {
+    setTab(t);
+    setShowSettings(false);
+    if (t === 'rizespor') setRizesporMounted(true);
+  }, []);
+
+  useOpenNotifications(goTo, () => setShowSaved(false), setOpenMatchId);
+
+  // Android geri tuşu: önce Ayarlar'ı / Kaydedilenler'i kapat, sonra Haberler sekmesine dön.
   useEffect(() => {
     const sub = BackHandler.addEventListener('hardwareBackPress', () => {
+      if (showSettings) {
+        setShowSettings(false);
+        return true;
+      }
       if (showSaved) {
         setShowSaved(false);
         return true;
@@ -62,8 +80,9 @@ function Main() {
       return false;
     });
     return () => sub.remove();
-  }, [showSaved, tab]);
+  }, [showSaved, showSettings, tab]);
 
+  const club = tab === 'rizespor' && !showSettings;
   const styles = useMemo(
     () =>
       StyleSheet.create({
@@ -72,16 +91,18 @@ function Main() {
           flexDirection: 'row',
           alignItems: 'center',
           justifyContent: 'space-between',
-          gap: 12,
-          backgroundColor: colors.header,
+          gap: 8,
           paddingHorizontal: 16,
-          paddingVertical: 14,
+          paddingVertical: 12,
         },
         headerTitle: { flexShrink: 1, color: '#FFFFFF', fontSize: fs(22), fontWeight: '800' },
+        headerActions: { flexDirection: 'row', gap: 8 },
         headerButton: {
           minHeight: 36,
+          minWidth: 36,
+          alignItems: 'center',
           justifyContent: 'center',
-          paddingHorizontal: 12,
+          paddingHorizontal: 10,
           borderRadius: 999,
           backgroundColor: 'rgba(255,255,255,0.16)',
         },
@@ -97,76 +118,102 @@ function Main() {
         },
         tabButton: { flex: 1, alignItems: 'center', paddingTop: 8, paddingBottom: 6, gap: 2 },
         tabIndicator: { position: 'absolute', top: 0, height: 3, width: 28, borderRadius: 2 },
-        tabIndicatorActive: { backgroundColor: colors.primary },
         tabIcon: { fontSize: 22 },
         tabInactive: { opacity: 0.45 },
         tabLabel: { fontSize: fs(11), fontWeight: '600', color: colors.textMuted },
-        tabLabelActive: { color: colors.primary },
       }),
     [colors, fs],
   );
 
-  const title = tab === 'news' && showSaved ? 'Kaydedilenler' : activeTab.title;
+  const title = showSettings ? 'Ayarlar' : tab === 'news' && showSaved ? 'Kaydedilenler' : activeTab.title;
+
+  const headerContent = (
+    <View style={styles.header}>
+      <Text style={styles.headerTitle} numberOfLines={1}>
+        {title}
+      </Text>
+      <View style={styles.headerActions}>
+        {tab === 'news' && !showSettings ? (
+          <Pressable
+            onPress={() => setShowSaved((v) => !v)}
+            style={[styles.headerButton, showSaved && styles.headerButtonActive]}
+            accessibilityRole="button"
+            accessibilityState={{ selected: showSaved }}
+            accessibilityLabel={showSaved ? 'Haberlere dön' : 'Kaydedilen haberler'}
+            hitSlop={6}
+          >
+            <Text style={styles.headerButtonText}>{showSaved ? '← Haberler' : '★ Kayıtlı'}</Text>
+          </Pressable>
+        ) : null}
+        <Pressable
+          onPress={() => setShowSettings((v) => !v)}
+          style={[styles.headerButton, showSettings && styles.headerButtonActive]}
+          accessibilityRole="button"
+          accessibilityState={{ selected: showSettings }}
+          accessibilityLabel={showSettings ? 'Ayarları kapat' : 'Ayarlar'}
+          hitSlop={6}
+        >
+          <Text style={styles.headerButtonText}>{showSettings ? '✕' : '⚙️'}</Text>
+        </Pressable>
+      </View>
+    </View>
+  );
 
   return (
     <>
       <StatusBar style="light" />
-      <SafeAreaView style={styles.root} edges={['top', 'left', 'right']}>
-        <View style={styles.header}>
-          <Text style={styles.headerTitle} numberOfLines={1}>
-            {title}
-          </Text>
-          {tab === 'news' ? (
-            <Pressable
-              onPress={() => setShowSaved((v) => !v)}
-              style={[styles.headerButton, showSaved && styles.headerButtonActive]}
-              accessibilityRole="button"
-              accessibilityState={{ selected: showSaved }}
-              accessibilityLabel={showSaved ? 'Haberlere dön' : 'Kaydedilen haberler'}
-              hitSlop={8}
-            >
-              <Text style={styles.headerButtonText}>{showSaved ? '← Haberler' : '★ Kaydedilenler'}</Text>
-            </Pressable>
-          ) : null}
-        </View>
+      <SafeAreaView style={[styles.root, club && { backgroundColor: CLUB_COLORS.green }]} edges={['top', 'left', 'right']}>
+        {club ? (
+          <LinearGradient colors={[CLUB_COLORS.green, CLUB_COLORS.blue]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
+            {headerContent}
+          </LinearGradient>
+        ) : (
+          <View style={{ backgroundColor: colors.header }}>{headerContent}</View>
+        )}
 
         {/* Ekranlar bağlı kalır; sekme değişince yüklenen veri ve kaydırma konumu korunur. */}
         <View style={styles.body}>
-          <FadeInView visible={tab === 'news' && !showSaved} style={styles.screen}>
+          <FadeInView visible={!showSettings && tab === 'news' && !showSaved} style={styles.screen}>
             <NewsScreen />
           </FadeInView>
-          <FadeInView visible={tab === 'news' && showSaved} style={styles.screen}>
+          <FadeInView visible={!showSettings && tab === 'news' && showSaved} style={styles.screen}>
             <SavedScreen />
           </FadeInView>
-          <FadeInView visible={tab === 'tea'} style={styles.screen}>
+          {rizesporMounted ? (
+            <FadeInView visible={!showSettings && tab === 'rizespor'} style={styles.screen}>
+              <RizesporScreen openMatchId={openMatchId} />
+            </FadeInView>
+          ) : null}
+          <FadeInView visible={!showSettings && tab === 'tea'} style={styles.screen}>
             <TeaScreen />
           </FadeInView>
-          <FadeInView visible={tab === 'weather'} style={styles.screen}>
+          <FadeInView visible={!showSettings && tab === 'weather'} style={styles.screen}>
             <WeatherScreen />
           </FadeInView>
-          <FadeInView visible={tab === 'rize'} style={styles.screen}>
+          <FadeInView visible={!showSettings && tab === 'rize'} style={styles.screen}>
             <DiscoverScreen />
           </FadeInView>
-          <FadeInView visible={tab === 'settings'} style={styles.screen}>
+          <FadeInView visible={showSettings} style={styles.screen}>
             <SettingsScreen />
           </FadeInView>
         </View>
 
         <SafeAreaView edges={['bottom']} style={styles.tabBar} accessibilityRole="tablist">
           {TABS.map((t) => {
-            const active = t.id === tab;
+            const active = t.id === tab && !showSettings;
+            const accent = t.id === 'rizespor' ? CLUB_COLORS.green : colors.primary;
             return (
               <Pressable
                 key={t.id}
-                onPress={() => setTab(t.id)}
+                onPress={() => goTo(t.id)}
                 style={styles.tabButton}
                 accessibilityRole="tab"
                 accessibilityState={{ selected: active }}
                 accessibilityLabel={t.label}
               >
-                <View style={[styles.tabIndicator, active && styles.tabIndicatorActive]} />
+                <View style={[styles.tabIndicator, active && { backgroundColor: accent }]} />
                 <Text style={[styles.tabIcon, !active && styles.tabInactive]}>{t.icon}</Text>
-                <Text style={[styles.tabLabel, active && styles.tabLabelActive]} numberOfLines={1}>
+                <Text style={[styles.tabLabel, active && { color: accent }]} numberOfLines={1}>
                   {t.label}
                 </Text>
               </Pressable>
@@ -178,8 +225,11 @@ function Main() {
   );
 }
 
-/** Bildirime dokunulunca: tek haberse onu açar, özet bildirimse Haberler sekmesine geçer. */
-function useOpenNotifications(setTab: (tab: Tab) => void, closeSaved: () => void) {
+/**
+ * Bildirime dokunulunca: haber bildirimi ise haberi açar; Rizespor bildirimi ise Rizespor
+ * sekmesine geçip ilgili maçı açar.
+ */
+function useOpenNotifications(goTo: (tab: Tab) => void, closeSaved: () => void, openMatch: (id: string | null) => void) {
   const { colors } = useTheme();
   const response = useNotificationResponse();
   const handled = useRef<string | null>(null);
@@ -190,9 +240,14 @@ function useOpenNotifications(setTab: (tab: Tab) => void, closeSaved: () => void
     if (handled.current === id) return;
     handled.current = id;
 
-    setTab('news');
+    const data = response.notification.request.content.data ?? {};
+    if (data.screen === 'rizespor') {
+      goTo('rizespor');
+      if (typeof data.matchId === 'string') openMatch(data.matchId);
+      return;
+    }
+    goTo('news');
     closeSaved();
-    const url = response.notification.request.content.data?.url;
-    if (typeof url === 'string') openUrl(url, colors);
-  }, [response, setTab, closeSaved, colors]);
+    if (typeof data.url === 'string') openUrl(data.url, colors);
+  }, [response, goTo, closeSaved, openMatch, colors]);
 }

@@ -15,7 +15,8 @@ import Constants from 'expo-constants';
 import { Card, Chip, ChipRow, LinkRow, SectionTitle } from '../components/ui';
 import { WEATHER_LOCATIONS } from '../config';
 import { useFavorites } from '../favorites';
-import { disableNewsNotifications, enableNewsNotifications } from '../notifications';
+import { disableNewsNotifications, enableNewsNotifications, setMatchFeature } from '../notifications';
+import { REMINDER_MINUTES, getMatchSettings } from '../rizespor/reminders';
 import { loadNotificationsEnabled } from '../storage';
 import {
   ACCENTS,
@@ -38,6 +39,7 @@ const DATA_SOURCES = [
   { label: 'Çay fiyatları: T.C. Tarım ve Orman Bakanlığı', url: 'https://www.tarimorman.gov.tr' },
   { label: 'Çay sektörü: ÇAYKUR', url: 'https://www.caykur.gov.tr' },
   { label: 'Tarihçe: Rize Valiliği', url: 'https://www.rize.gov.tr' },
+  { label: 'Rizespor maç verileri: ESPN (gayriresmî)', url: 'https://www.espn.com/soccer/team/_/id/7656' },
 ];
 
 export default function SettingsScreen() {
@@ -174,6 +176,20 @@ export default function SettingsScreen() {
       <SectionTitle>Bildirimler</SectionTitle>
       <Card>
         <NotificationSetting styles={styles} />
+        <View style={styles.divider} />
+        <MatchSetting
+          styles={styles}
+          settingKey="reminders"
+          label="⚽ Maç hatırlatmaları"
+          hint={`Rizespor maçlarından ${REMINDER_MINUTES} dakika önce: “🍵 Çayını demle, maç başlıyor!”`}
+        />
+        <View style={styles.divider} />
+        <MatchSetting
+          styles={styles}
+          settingKey="scoreAlerts"
+          label="🥅 Skor bildirimleri"
+          hint="Maç başladı, gol ve maç sonu. Arka planda en sık ~15–30 dakikada bir kontrol edildiği için gecikmeli gelebilir; anlık takip için Maç Merkezi’ni açın."
+        />
       </Card>
 
       <SectionTitle>Veriler</SectionTitle>
@@ -316,6 +332,73 @@ function NotificationSetting({ styles }: { styles: Record<string, object> }) {
           trackColor={{ true: colors.primary, false: colors.border }}
           thumbColor="#FFFFFF"
           accessibilityLabel="Yeni haber bildirimleri"
+        />
+      )}
+    </View>
+  );
+}
+
+function MatchSetting({
+  styles,
+  settingKey,
+  label,
+  hint,
+}: {
+  styles: Record<string, object>;
+  settingKey: 'reminders' | 'scoreAlerts';
+  label: string;
+  hint: string;
+}) {
+  const { colors } = useTheme();
+  const [enabled, setEnabled] = useState<boolean | null>(null);
+  const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    getMatchSettings().then((s) => setEnabled(s[settingKey]));
+  }, [settingKey]);
+
+  const toggle = useCallback(
+    async (next: boolean) => {
+      if (busy) return;
+      setBusy(true);
+      try {
+        const result = await setMatchFeature(settingKey, next);
+        if (result === 'enabled') setEnabled(next);
+        else if (result === 'permission-denied') {
+          Alert.alert('Bildirim izni gerekli', 'Telefon ayarlarından Rize Haber uygulamasına bildirim izni verin.', [
+            { text: 'Vazgeç', style: 'cancel' },
+            { text: 'Ayarları aç', onPress: () => Linking.openSettings() },
+          ]);
+        } else {
+          Alert.alert(
+            'Arka plan kısıtlı',
+            'Telefonunuz uygulamanın arka planda çalışmasına izin vermiyor. Ayarlar → Uygulamalar → Rize Haber → Pil bölümünden kısıtlamayı kaldırabilirsiniz.',
+          );
+        }
+      } catch {
+        Alert.alert('Bir sorun oluştu', 'Ayar değiştirilemedi. Lütfen tekrar deneyin.');
+      } finally {
+        setBusy(false);
+      }
+    },
+    [busy, settingKey],
+  );
+
+  return (
+    <View style={styles.switchRow}>
+      <View style={{ flex: 1 }}>
+        <Text style={styles.rowLabel}>{label}</Text>
+        <Text style={styles.rowHint}>{hint}</Text>
+      </View>
+      {enabled === null || busy ? (
+        <ActivityIndicator color={colors.primary} />
+      ) : (
+        <Switch
+          value={enabled}
+          onValueChange={toggle}
+          trackColor={{ true: colors.primary, false: colors.border }}
+          thumbColor="#FFFFFF"
+          accessibilityLabel={label}
         />
       )}
     </View>
