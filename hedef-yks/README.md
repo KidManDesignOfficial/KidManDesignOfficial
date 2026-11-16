@@ -1,18 +1,33 @@
 # Hedef YKS
 
 TYT ve AYT'ye hazırlanan öğrenciler ve öğretmenler için mobil uygulama (Android ve iOS, Expo / React Native).
-İnternet ve hesap gerektirmez; tüm ilerleme cihazda saklanır.
+Resmî ÖSYM ve MEB kaynaklarına internet üzerinden canlı bağlanır; konu anlatımları ve sorular internetsiz de çalışır. Hesap gerekmez.
+
+## Canlı resmî veriler
+
+| Kaynak | Ne çekiliyor | Nasıl |
+| --- | --- | --- |
+| ÖSYM — `osym.gov.tr/Sayfa/SinavTakvimi` | YKS oturum tarihleri, başvuru, sonuç | Sayfa canlı indirilip ayrıştırılır; geri sayım gelecekteki resmî TYT tarihine kendiliğinden geçer |
+| ÖSYM — `osym.gov.tr/SinavGrubu/Index/2` | YKS duyuruları (tarih, başlık, bağlantı) | Canlı; ana sayfada son duyuru, aranabilir liste |
+| ÖSYM — `osym.gov.tr/SinavGrubu/Menu/323` + `dokuman.osym.gov.tr` | 2018–2026 TYT/AYT/YDT soru kitapçıkları ve cevap anahtarları | Yıllar ve PDF bağlantıları canlı okunur, PDF ÖSYM sunucusundan açılır |
+| MEB OGM Materyal — `ogmmateryal.eba.gov.tr` | Sınıf/ders bazında konu özetleri, video konu anlatımları, MEBİ denemeleri, çıkmış soru çözümleri, puan hesaplama motoru | Her ders ve konu ekranından resmî sayfa uygulama içi tarayıcıda açılır |
+
+- Son başarılı veri cihazda saklanır; internet yoksa "Önbellek · x dk önce" etiketiyle gösterilir, hiç veri yoksa resmî sayfayı açma seçeneği çıkar. Uydurma veri gösterilmez.
+- ÖSYM açık API sunmadığı için yalnızca herkese açık sayfalar okunur. Ayrıştırıcılar gerçek sayfa kopyalarıyla test edilir (`test/osym.test.ts`).
+- Canlı doğrulama: `NODE_USE_ENV_PROXY=1 node --experimental-strip-types scripts/check-live.ts` (ÖSYM) ve `node --experimental-strip-types scripts/verify-sources.ts` (40 MEB bağlantısı, Playwright).
+- MEB ve ÖSYM içerikleri kopyalanmaz; yayın hakları kurumlarına aittir (MEB içerikleri ticari amaçla kullanılamaz).
 
 ## Özellikler
 
 | Bölüm | İçerik |
 | --- | --- |
-| **Ana Sayfa** | YKS 2027 geri sayımı, günlük hedef halkası, seri (streak), günün sorusu, kaldığın yerden devam, zayıf konular |
+| **Ana Sayfa** | ÖSYM takvimine bağlı geri sayım, son ÖSYM YKS duyurusu, günlük hedef halkası, seri (streak), günün sorusu, kaldığın yerden devam, zayıf konular |
 | **Dersler** | TYT 10 ders + AYT 10 ders, 235 konu başlığı (ÖSYM kapsamı). Konu anlatımı → konu testi akışı |
 | **Konu anlatımı** | Kademeli beliren bloklar, adım adım açılan örnek çözümler, çizilerek beliren fonksiyon grafikleri, zaman çizelgeleri, akış şemaları, formül kartları, sınav taktikleri, okuma ilerleme çubuğu |
 | **Soru çözme** | ÖSYM biçimi (A–E), alıştırma modunda anında çözüm; yanlışta sallanma, doğruda yaylanma animasyonu |
 | **Deneme** | Gerçek ders oranlarını ve soru başına süreyi koruyan mini TYT/AYT denemeleri, ders bazında net, geçmiş denemeler |
 | **Sonuç** | Animasyonlu başarı halkası, D/Y/B/net, ders bazında dağılım, soru soru inceleme, başarıda konfeti |
+| **Resmî Kaynaklar** | Canlı ÖSYM takvimi ve duyuruları, çıkmış soru kitapçıkları, MEB YKS hazırlık kaynakları, ÖSYM AİS/Sonuç bağlantıları |
 | **Öğretmen paneli** | Ders/konu/zorluk/soru sayısı seçerek çalışma kâğıdı; cevap anahtarıyla paylaşma (WhatsApp, e-posta, yazdırma); sınıfta birlikte çözme |
 | **Profil** | Haftalık soru grafiği, ders ilerlemesi, Yanlış Defteri, kaydedilen konular, 3B çevrilen bilgi kartları, net hesaplama, ayarlar |
 | **Ayarlar** | Açık/koyu/sistem tema, yazı boyutu, puan türü (SAY/EA/SÖZ/DİL), günlük hedef, sınav tarihi, titreşim |
@@ -21,11 +36,10 @@ Erişilebilirlik: tüm dokunma alanlarında ekran okuyucu etiketleri; telefonda 
 
 ## İçerik durumu (v1.0.0)
 
-- **20 ders, 235 konu** başlığının tamamı katalogda.
-- **49 konu anlatımı**, **217 özgün, çözümlü soru**, **123 bilgi kartı**. Her dersin en az 2 konusu tam anlatımlı.
-- Anlatımı henüz yazılmamış konular listede "Anlatım hazırlanıyor" olarak görünür.
-- Sorular özgündür; ÖSYM çıkmış sorusu değildir.
-- YKS 2027 tarihi ÖSYM 2027 takviminden: **TYT 19 Haziran 2027**, **AYT ve YDT 20 Haziran 2027**.
+- **20 ders, 235 konu — 235 konunun tamamında anlatım** (tablolar, formüller, adım adım örnekler, grafikler, zaman çizelgeleri, sınav taktikleri).
+- **799 özgün, çözümlü soru** (her konuda en az 3), bilgi kartları.
+- Sorular özgündür; ÖSYM çıkmış soruları ise uygulamadan ÖSYM'nin kendi PDF'leri olarak açılır.
+- 16.11.2026 itibarıyla ÖSYM takviminde yalnızca 2026 yılı var; geri sayım 2027 için **tahmini** tarih (19.06.2027) kullanır ve ekranda "tahmini" yazar. ÖSYM 2027 takvimini yayımlayınca resmî tarihe kendiliğinden geçer.
 
 ### Yeni içerik eklemek
 
