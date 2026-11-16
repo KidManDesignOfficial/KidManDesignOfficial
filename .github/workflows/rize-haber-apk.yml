@@ -82,10 +82,18 @@ jobs:
           APK=$(ls android/app/build/outputs/apk/release/*.apk | head -1)
           test -n "$APK" || { echo "::error::APK bulunamadı"; exit 1; }
           APKSIGNER=$(ls "$ANDROID_HOME"/build-tools/*/apksigner | sort -V | tail -1)
-          "$APKSIGNER" verify --print-certs "$APK" | grep -E "Signer #1 certificate (DN|SHA-256)"
-          if [ -n "$RIZE_KEYSTORE_PATH" ] && "$APKSIGNER" verify --print-certs "$APK" | grep -q "CN=Android Debug"; then
-            echo "::error::Kalıcı anahtar tanımlı ama APK hata ayıklama anahtarıyla imzalanmış."
-            exit 1
+          CERTS=$("$APKSIGNER" verify --print-certs "$APK")
+          # Çıktı biçimi araç sürümüne göre değişebildiği için yalnızca sertifika satırları gösterilir.
+          echo "$CERTS" | grep -iE "certificate (DN|SHA-256)" || echo "$CERTS"
+          if [ -n "$RIZE_KEYSTORE_PATH" ]; then
+            if echo "$CERTS" | grep -q "CN=Rize Haber"; then
+              echo "✅ APK kalıcı Rize Haber anahtarıyla imzalandı."
+            else
+              echo "::error::Kalıcı anahtar tanımlı ama APK'da Rize Haber sertifikası bulunamadı."
+              exit 1
+            fi
+          else
+            echo "⚠️ APK hata ayıklama anahtarıyla imzalandı (kalıcı anahtar tanımlı değil)."
           fi
 
       - uses: actions/upload-artifact@v4
