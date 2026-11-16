@@ -1,9 +1,12 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, FlatList, RefreshControl, StyleSheet, Text, TextInput, View } from 'react-native';
+import { FlatList, RefreshControl, StyleSheet, Text, TextInput, View } from 'react-native';
 
+import { Icon } from '../components/Icon';
 import { NewsCard } from '../components/NewsCard';
+import { NewsSkeleton } from '../components/Skeleton';
 import { Chip, ChipRow, PrimaryButton } from '../components/ui';
 import { NEWS_CATEGORIES, googleNewsRssUrl } from '../config';
+import { loadCachedNews, saveCachedNews, savedAtLabel } from '../offline';
 import { fetchRss, type NewsItem } from '../rss';
 import { useTheme } from '../theme';
 
@@ -12,6 +15,8 @@ type CategoryState = {
   loading: boolean;
   error: string | null;
   loadedAt: number | null;
+  /** Gösterilen veri önbellekten geliyorsa kaydedilme zamanı. */
+  cachedAt?: number | null;
 };
 
 const EMPTY: CategoryState = { items: [], loading: false, error: null, loadedAt: null };
@@ -46,7 +51,20 @@ export default function NewsScreen() {
         center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32, gap: 12 },
         muted: { color: colors.textMuted, fontSize: fs(15), textAlign: 'center' },
         errorText: { color: colors.error, fontSize: fs(15), textAlign: 'center' },
-        inlineError: { color: colors.error, fontSize: fs(13), marginBottom: 4 },
+        offline: {
+          flexDirection: 'row',
+          alignItems: 'center',
+          gap: 6,
+          alignSelf: 'flex-start',
+          backgroundColor: colors.card,
+          borderWidth: 1,
+          borderColor: colors.border,
+          borderRadius: 999,
+          paddingHorizontal: 10,
+          paddingVertical: 4,
+          marginBottom: 2,
+        },
+        offlineText: { color: colors.textMuted, fontSize: fs(12), fontWeight: '600' },
       }),
     [colors, fs],
   );
@@ -63,11 +81,19 @@ export default function NewsScreen() {
       ...prev,
       [id]: { ...(prev[id] ?? EMPTY), loading: true, error: null },
     }));
+    // Liste boşsa son kayıtlı haberleri hemen göster (ağ beklenirken ve çevrimdışıyken).
+    loadCachedNews(id).then((cached) => {
+      if (!cached || controller.signal.aborted) return;
+      setByCategory((prev) =>
+        prev[id]?.items.length ? prev : { ...prev, [id]: { ...(prev[id] ?? EMPTY), items: cached.items, cachedAt: cached.savedAt } },
+      );
+    });
     try {
       const items = await fetchRss(googleNewsRssUrl(category.query), controller.signal);
+      saveCachedNews(id, items);
       setByCategory((prev) => ({
         ...prev,
-        [id]: { items, loading: false, error: null, loadedAt: Date.now() },
+        [id]: { items, loading: false, error: null, loadedAt: Date.now(), cachedAt: null },
       }));
     } catch (e) {
       if (controller.signal.aborted) return;
@@ -85,6 +111,8 @@ export default function NewsScreen() {
   useEffect(() => {
     const current = byCategory[categoryId];
     const isFresh = current?.loadedAt && Date.now() - current.loadedAt < STALE_AFTER_MS;
+    // Kategori ilk açılınca / bayatlayınca haberleri indir (veri çekme deseni).
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (!isFresh && !current?.loading) load(categoryId);
     // Yalnızca kategori değişince çalışmalı.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -133,10 +161,7 @@ export default function NewsScreen() {
       </ChipRow>
 
       {showFullScreenLoader ? (
-        <View style={styles.center}>
-          <ActivityIndicator size="large" color={colors.primary} />
-          <Text style={styles.muted}>Haberler yükleniyor…</Text>
-        </View>
+        <NewsSkeleton />
       ) : (
         <FlatList
           data={visibleItems}
@@ -155,7 +180,12 @@ export default function NewsScreen() {
           }
           ListHeaderComponent={
             state.error && state.items.length > 0 ? (
-              <Text style={styles.inlineError}>{state.error}</Text>
+              <View style={styles.offline}>
+                <Icon name="cloud-offline-outline" size={16} color={colors.textMuted} />
+                <Text style={styles.offlineText}>
+                  Çevrimdışı{state.cachedAt ? ` · son güncelleme ${savedAtLabel(state.cachedAt)}` : ''}
+                </Text>
+              </View>
             ) : undefined
           }
           ListEmptyComponent={

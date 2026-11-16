@@ -41,17 +41,60 @@ jobs:
       - name: Bağımlılıkları kur
         run: npm ci
 
-      - name: Testler ve tip kontrolü
+      - name: Testler, tip kontrolü ve lint
         run: |
           npm test
           npx tsc --noEmit
+          npm run lint
 
       - name: Android projesini oluştur
         run: npx expo prebuild --platform android --no-install
 
+      # Kalıcı imza anahtarı depo Secrets'ta tanımlıysa onu kullan; değilse hata ayıklama anahtarıyla
+      # derlemeye devam et ve uyar. Şifreler hiçbir dosyaya ya da kayda yazılmaz.
+      - name: İmza anahtarını hazırla
+        env:
+          KEYSTORE_BASE64: ${{ secrets.RIZE_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.RIZE_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.RIZE_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.RIZE_KEY_PASSWORD }}
+        run: |
+          if [ -n "$KEYSTORE_BASE64" ] && [ -n "$KEYSTORE_PASSWORD" ]; then
+            echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/release.jks"
+            {
+              echo "RIZE_KEYSTORE_PATH=$RUNNER_TEMP/release.jks"
+              echo "RIZE_KEYSTORE_PASSWORD=$KEYSTORE_PASSWORD"
+              echo "RIZE_KEY_ALIAS=${KEY_ALIAS:-rizehaber}"
+              echo "RIZE_KEY_PASSWORD=${KEY_PASSWORD:-$KEYSTORE_PASSWORD}"
+            } >> "$GITHUB_ENV"
+            echo "Kalıcı imza anahtarı kullanılacak."
+          else
+            echo "::warning title=İmza anahtarı yok::RIZE_KEYSTORE_BASE64 tanımlı değil; APK hata ayıklama anahtarıyla imzalanıyor (Play Store'a yüklenemez)."
+          fi
+
       - name: APK derle
         working-directory: rize-haber/android
         run: ./gradlew assembleRelease --no-daemon
+
+      - name: İmzayı doğrula
+        run: |
+          # Bu iş akışında komutlar rize-haber/ klasöründe çalışır.
+          APK=$(ls android/app/build/outputs/apk/release/*.apk | head -1)
+          test -n "$APK" || { echo "::error::APK bulunamadı"; exit 1; }
+          APKSIGNER=$(ls "$ANDROID_HOME"/build-tools/*/apksigner | sort -V | tail -1)
+          CERTS=$("$APKSIGNER" verify --print-certs "$APK")
+          # Çıktı biçimi araç sürümüne göre değişebildiği için yalnızca sertifika satırları gösterilir.
+          echo "$CERTS" | grep -iE "certificate (DN|SHA-256)" || echo "$CERTS"
+          if [ -n "$RIZE_KEYSTORE_PATH" ]; then
+            if echo "$CERTS" | grep -q "CN=Rize Haber"; then
+              echo "✅ APK kalıcı Rize Haber anahtarıyla imzalandı."
+            else
+              echo "::error::Kalıcı anahtar tanımlı ama APK'da Rize Haber sertifikası bulunamadı."
+              exit 1
+            fi
+          else
+            echo "⚠️ APK hata ayıklama anahtarıyla imzalandı (kalıcı anahtar tanımlı değil)."
+          fi
 
       - uses: actions/upload-artifact@v4
         with:

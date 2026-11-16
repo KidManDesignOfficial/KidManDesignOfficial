@@ -13,6 +13,7 @@ const KEYS = {
   seenIds: 'rizehaber:seenIds:v1',
   settings: 'rizehaber:settings:v1',
   teaData: 'rizehaber:teaData:v1',
+  placeList: 'rizehaber:placeList:v1',
 } as const;
 
 type StoredNewsItem = Omit<NewsItem, 'publishedAt'> & { publishedAt: string | null };
@@ -90,4 +91,14 @@ export function loadCachedTeaData(): Promise<unknown> {
 
 export function saveCachedTeaData(data: unknown): Promise<void> {
   return writeJson(KEYS.teaData, data);
+}
+
+/** "Gitmek istediklerim" listesindeki yerlerin kimlikleri. */
+export async function loadPlaceList(): Promise<string[]> {
+  const ids = await readJson<unknown>(KEYS.placeList, []);
+  return Array.isArray(ids) ? ids.filter((id): id is string => typeof id === 'string') : [];
+}
+
+export function savePlaceList(ids: string[]): Promise<void> {
+  return writeJson(KEYS.placeList, ids);
 }

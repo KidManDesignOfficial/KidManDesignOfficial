@@ -7,10 +7,20 @@ Rize'deki günlük haberleri ve hava durumunu gösteren Android uygulaması (Rea
 | Sekme | İçerik |
 |---|---|
 | **Haberler** | Google Haberler üzerinden son 7 günün Rize haberleri · kategoriler · arama · Kaydet / Paylaş · başlıktaki **★ Kaydedilenler** |
+| **Rizespor** | Sıradaki maç kartı (saniye saniye geri sayım, “🍵 Çayını demle” hatırlatması) · canlı skor · son 5 maç formu, sıra ve puan · fikstür ve sonuçlar · Süper Lig puan durumu · kadro (mevki, yaş, uyruk, sakatlık) · transfer ve maç haberleri · **Maç Merkezi:** maç anları zaman çizelgesi, sahada ilk 11’ler, istatistikler, canlıda 30 sn’de bir yenileme ve gol kutlaması |
 | **Çay** | Güncel yaş çay alım fiyatı (resmî kaynak + ilan tarihi) · önceki yıla göre değişim · **tutar hesaplayıcı** · yıllara göre fiyat grafiği · çay gündemi haberleri · kaynak bağlantıları |
-| **Hava** | Anlık durum · 24 saatlik ve 7 günlük tahmin · 9 konum |
-| **Rize** | Bir bakışta Rize · 12 ilçe · adın kökeni · tarihçe zaman çizelgesi · Rize’de çayın hikâyesi · resmî kaynaklar |
-| **Ayarlar** | Tema (Sistem/Açık/Koyu) · 5 renk · yazı boyutu (Normal/Büyük/Çok büyük) · varsayılan hava konumu · bildirimler · kaydedilenleri temizle · hakkında ve veri kaynakları |
+| **Hava** | Anlık durum · 24 saatlik ve 7 günlük tahmin · 12 ilçe + Ayder |
+| **Keşfet** | **Gezi:** 15 yer (yayla, doğa, tarih, müze), haritada aç, gezi listem, paylaş · **Lezzet:** 14 coğrafi işaretli ürün ve yöresel tatlar · **Kültür:** Rize bezi, horon, kemençe, tulum, şenlikler, pratik bilgiler · **Tarihçe** |
+| **Ayarlar** (⚙️) | Tema (Sistem/Açık/Koyu) · 5 renk · yazı boyutu (Normal/Büyük/Çok büyük) · varsayılan hava konumu · bildirimler · kaydedilenleri temizle · hakkında ve veri kaynakları |
+
+Ayarlar başlıktaki ⚙️ düğmesindedir.
+
+### Rizespor verisi hakkında
+Maç, puan durumu ve kadro verisi ESPN’in herkese açık ama **belgelenmemiş** veri adreslerinden alınır
+(`src/rizespor/api.ts`). Kaynak değişirse yalnızca `src/rizespor/api.ts` ve `src/rizespor/parse.ts` güncellenir;
+gerçek yanıt örnekleriyle yazılmış testler (`test/fixtures/espn`) biçim değişikliğini hemen yakalar.
+Veri resmî kulüp/TFF verisi değildir ve gecikmeli olabilir. Maç hatırlatmaları telefonda zamanlanır;
+skor bildirimleri arka plan görevine bağlı olduğundan gecikmeli gelebilir.
 
 Haber metinleri kopyalanmaz; yalnızca başlık, kaynak ve bağlantı gösterilir.
 
@@ -35,7 +45,32 @@ gösterilmez.
 4. APK'yı telefona atıp kurun (Android "bilinmeyen kaynaklardan yükleme" izni ister).
 
 > Bu APK, Expo'nun hata ayıklama anahtarıyla imzalanır: kendi telefonunuzda denemek için uygundur.
-> Google Play'e yüklemek için kalıcı bir yükleme anahtarı (keystore) gerekir (bkz. “Sonraki adımlar”).
+> Kalıcı imza anahtarı tanımlanana kadar APK hata ayıklama anahtarıyla imzalanır (bkz. “İmza anahtarı”).
+
+## İmza anahtarı (Google Play için zorunlu)
+
+Yayın APK'sı, depo **Secrets** bölümünde tanımlı kalıcı anahtarla imzalanır (`plugins/withReleaseSigning.js`).
+Tanımlı değilse derleme yine çalışır ama hata ayıklama anahtarı kullanılır ve sayfada uyarı çıkar.
+
+GitHub → depo → **Settings → Secrets and variables → Actions → New repository secret**:
+
+| Ad | Değer |
+|---|---|
+| `RIZE_KEYSTORE_BASE64` | `rize-haber-release.jks.base64` dosyasının tüm içeriği |
+| `RIZE_KEYSTORE_PASSWORD` | `sifreler.txt` içindeki şifre |
+| `RIZE_KEY_PASSWORD` | `sifreler.txt` içindeki şifre |
+| `RIZE_KEY_ALIAS` | `rizehaber` |
+
+> **Anahtar dosyasını ve şifreyi kaybetmeyin; depoya asla eklemeyin.** Kaybedilirse Play Store'daki
+> uygulama bir daha güncellenemez. En az iki ayrı yerde (ör. şifre yöneticisi + harici disk) yedekleyin.
+
+Her derlemede "İmzayı doğrula" adımı APK'nın hangi anahtarla imzalandığını kayda yazar.
+Kalıcı anahtara geçildikten sonra telefondaki eski (hata ayıklama imzalı) sürüm **bir kez kaldırılıp**
+yenisi kurulmalıdır; Android farklı imzalı sürümün üzerine kurulumu reddeder.
+
+## Gizlilik
+
+[GIZLILIK.md](GIZLILIK.md) – uygulama içinde Ayarlar → Gizlilik politikası.
 
 ## Geliştirme
 
@@ -44,6 +79,7 @@ cd rize-haber
 npm install
 npm test            # ayrıştırıcı ve yardımcı fonksiyon testleri
 npm run typecheck   # TypeScript kontrolü
+npm run lint        # ESLint (Expo kuralları)
 npx expo start      # telefonda Expo Go ile anlık önizleme
 ```
 
@@ -56,6 +92,9 @@ src/colors.ts, src/theme.tsx Renk paletleri, tema ve kullanıcı ayarları
 src/tea.ts, src/teaData.ts  Çay fiyatı verisi: doğrulama, hesaplama, uzaktan güncelleme
 data/cay.json               Güncel çay fiyatı (uygulama buradan okur)
 src/data/rize.ts            Rize tarihçesi ve çayın hikâyesi (kaynaklarıyla)
+src/data/discover.ts        Gezilecek yerler, lezzetler, kültür (kaynaklarıyla)
+src/rizespor/                Rizespor: veri okuma (api, parse), diziliş, hatırlatmalar
+src/screens/rizespor/       Rizespor ekranları: maçlar, puan, kadro, haberler, Maç Merkezi, saha
 src/components/ui.tsx       Ortak arayüz parçaları
 src/rss.ts                  RSS okuyucu (Google Haberler + genel RSS beslemeleri)
 src/notifications.ts        Arka plan haber kontrolü ve bildirimler
@@ -78,7 +117,7 @@ test/*.test.ts              Birim testleri
 
 ## Sonraki adımlar (öneri)
 
-- Uygulama simgesi ve açılış ekranı (şu an Expo'nun varsayılanı)
 - Yerel haber sitelerinin RSS beslemelerini eklemek (`src/rss.ts` genel RSS'i destekler)
 - Anında bildirim (Firebase + küçük sunucu ile; şu anki sistem ~30 dk gecikmeli)
-- Google Play yayını: keystore oluşturma, gizlilik politikası, mağaza görselleri
+- Google Play yayını: mağaza görselleri ve açıklama metni (imza anahtarı ve gizlilik politikası hazır)
+- Hata izleme (ör. Sentry) – kullanıcı cihazlarındaki çökmeleri görmek için
