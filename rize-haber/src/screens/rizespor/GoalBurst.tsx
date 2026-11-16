@@ -1,8 +1,9 @@
 /** Gol anı: "GOOOL!" yazısı yaylanarak belirir, konfeti saçılır, telefon kısa titrer. */
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { Animated, Easing, StyleSheet, Text, Vibration, View } from 'react-native';
 
-import { useReducedMotion } from '../../components/motion';
+import { useReducedMotion, useAnimatedValue } from '../../components/motion';
+import { successFeedback } from '../../haptics';
 import { CLUB_COLORS } from '../../rizespor/names';
 
 const PARTICLES = 16;
@@ -10,12 +11,15 @@ const COLORS = [CLUB_COLORS.green, CLUB_COLORS.blue, '#FFFFFF', '#FFD447'];
 
 export default function GoalBurst({ team, us, onDone }: { team: string; us: boolean; onDone: () => void }) {
   const reduced = useReducedMotion();
-  const pop = useRef(new Animated.Value(0)).current;
-  const fly = useRef(new Animated.Value(0)).current;
-  const fade = useRef(new Animated.Value(1)).current;
+  const pop = useAnimatedValue(0);
+  const fly = useAnimatedValue(0);
+  const fade = useAnimatedValue(1);
 
   useEffect(() => {
-    if (us) Vibration.vibrate([0, 90, 70, 160]);
+    if (us) {
+      successFeedback();
+      Vibration.vibrate([0, 90, 70, 160]);
+    }
     const anim = Animated.sequence([
       Animated.parallel([
         Animated.spring(pop, { toValue: 1, useNativeDriver: true, speed: 10, bounciness: 14 }),

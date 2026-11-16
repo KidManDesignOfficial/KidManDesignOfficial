@@ -5,6 +5,8 @@ import { useFavorites } from '../favorites';
 import type { NewsItem } from '../rss';
 import { useTheme } from '../theme';
 import { timeAgo } from '../time';
+import { pressFeedback } from '../haptics';
+import { Icon } from './Icon';
 import { openUrl } from './ui';
 
 function shareArticle(item: NewsItem) {
@@ -40,6 +42,7 @@ function NewsCardBase({ item }: { item: NewsItem }) {
           borderTopColor: colors.border,
         },
         action: { flex: 1, alignItems: 'center', paddingVertical: 10 },
+        actionInner: { flexDirection: 'row', alignItems: 'center', gap: 6 },
         actionText: { fontSize: fs(14), fontWeight: '600', color: colors.textMuted },
         actionActive: { color: colors.primary },
       }),
@@ -73,16 +76,20 @@ function NewsCardBase({ item }: { item: NewsItem }) {
 
       <View style={styles.actions}>
         <Pressable
-          onPress={() => toggleFavorite(item)}
+          onPress={() => {
+            pressFeedback();
+            toggleFavorite(item);
+          }}
           style={({ pressed }) => [styles.action, pressed && styles.pressed]}
           accessibilityRole="button"
           accessibilityState={{ selected: saved }}
           accessibilityLabel={saved ? 'Kaydedilenlerden çıkar' : 'Kaydet'}
           hitSlop={6}
         >
-          <Text style={[styles.actionText, saved && styles.actionActive]}>
-            {saved ? '★ Kaydedildi' : '☆ Kaydet'}
-          </Text>
+          <View style={styles.actionInner}>
+            <Icon name={saved ? 'star' : 'star-outline'} size={17} color={saved ? colors.primary : colors.textMuted} />
+            <Text style={[styles.actionText, saved && styles.actionActive]}>{saved ? 'Kaydedildi' : 'Kaydet'}</Text>
+          </View>
         </Pressable>
         <Pressable
           onPress={() => shareArticle(item)}
@@ -91,7 +98,10 @@ function NewsCardBase({ item }: { item: NewsItem }) {
           accessibilityLabel="Paylaş"
           hitSlop={6}
         >
-          <Text style={styles.actionText}>↗ Paylaş</Text>
+          <View style={styles.actionInner}>
+            <Icon name="share-social-outline" size={17} color={colors.textMuted} />
+            <Text style={styles.actionText}>Paylaş</Text>
+          </View>
         </Pressable>
       </View>
     </View>

@@ -1,10 +1,11 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
 
 import { FadeInView } from '../components/motion';
+import { HeroSkeleton } from '../components/Skeleton';
 import { SegmentedTabs, type Segment } from '../components/SegmentedTabs';
 import { PrimaryButton } from '../components/ui';
-import { fetchClubData, loadCachedClubData, type ClubData } from '../rizespor/api';
+import { fetchClubData, loadCachedClubData, mergeClubData, type ClubData } from '../rizespor/api';
 import { CLUB_COLORS } from '../rizespor/names';
 import type { Match } from '../rizespor/parse';
 import { syncMatchReminders } from '../rizespor/reminders';
@@ -15,10 +16,10 @@ import { ClubNewsView, MatchesView, SquadView, StandingsView } from './rizespor/
 type Section = 'matches' | 'table' | 'squad' | 'news';
 
 const SECTIONS: Segment<Section>[] = [
-  { id: 'matches', label: 'Maçlar', icon: '⚽' },
-  { id: 'table', label: 'Puan', icon: '📊' },
-  { id: 'squad', label: 'Kadro', icon: '👕' },
-  { id: 'news', label: 'Haberler', icon: '📰' },
+  { id: 'matches', label: 'Maçlar', icon: 'football-outline' },
+  { id: 'table', label: 'Puan', icon: 'stats-chart-outline' },
+  { id: 'squad', label: 'Kadro', icon: 'shirt-outline' },
+  { id: 'news', label: 'Haberler', icon: 'newspaper-outline' },
 ];
 
 const EMPTY: ClubData = { results: [], fixtures: [], standings: [], roster: [] };
@@ -32,16 +33,16 @@ export default function RizesporScreen({ openMatchId }: { openMatchId?: string |
   const [state, setState] = useState<'loading' | 'ready' | 'error'>('loading');
   const [refreshing, setRefreshing] = useState(false);
   const [openMatch, setOpenMatch] = useState<Match | null>(null);
-  const dataRef = useRef(data);
-  dataRef.current = data;
+  // Bildirimden gelinen maç, kullanıcı kapatana kadar açık kalır.
+  const [dismissedId, setDismissedId] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     try {
-      const fresh = await fetchClubData(dataRef.current);
-      setData(fresh);
+      const fresh = await fetchClubData();
+      setData((prev) => mergeClubData(prev, fresh));
       setState('ready');
       // Fikstür değiştiyse maç hatırlatmalarını tazele (ayar kapalıysa bir şey yapmaz).
-      syncMatchReminders(fresh.fixtures).catch(() => {});
+      if (fresh.fixtures) syncMatchReminders(fresh.fixtures).catch(() => {});
     } catch {
       setState((s) => (s === 'ready' ? s : 'error'));
     }
@@ -54,6 +55,8 @@ export default function RizesporScreen({ openMatchId }: { openMatchId?: string |
         setState((s) => (s === 'loading' ? 'ready' : s));
       }
     });
+    // Açılışta veriyi indir (veri çekme deseni; setState await sonrasında).
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     load();
   }, [load]);
 
@@ -65,12 +68,18 @@ export default function RizesporScreen({ openMatchId }: { openMatchId?: string |
     return () => clearInterval(t);
   }, [hasLive, load]);
 
-  // Bildirimden gelinmişse ilgili maçı aç.
-  useEffect(() => {
-    if (!openMatchId) return;
-    const m = [...data.fixtures, ...data.results].find((x) => x.id === openMatchId);
-    if (m) setOpenMatch(m);
-  }, [openMatchId, data]);
+  // Bildirimden gelinmişse ilgili maç (türetilmiş; ayrıca durum tutulmaz).
+  // openMatchId = "<maçKimliği>#<bildirimKimliği>"; kapatılan istek yeniden açılmaz.
+  const requestedId = openMatchId ? openMatchId.split('#')[0] : null;
+  const fromNotification =
+    requestedId && openMatchId !== dismissedId
+      ? ([...data.fixtures, ...data.results].find((x) => x.id === requestedId) ?? null)
+      : null;
+  const shownMatch = openMatch ?? fromNotification;
+  const closeMatch = useCallback(() => {
+    setOpenMatch(null);
+    if (openMatchId) setDismissedId(openMatchId);
+  }, [openMatchId]);
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -102,10 +111,7 @@ export default function RizesporScreen({ openMatchId }: { openMatchId?: string |
       <SegmentedTabs segments={SECTIONS} value={section} onChange={select} activeColor={CLUB_COLORS.green} />
 
       {state === 'loading' ? (
-        <View style={styles.center}>
-          <ActivityIndicator size="large" color={CLUB_COLORS.green} />
-          <Text style={styles.muted}>Rizespor verileri yükleniyor…</Text>
-        </View>
+        <HeroSkeleton rows={5} />
       ) : state === 'error' ? (
         <View style={styles.center}>
           <Text style={styles.error}>Rizespor verileri alınamadı. İnternet bağlantınızı kontrol edin.</Text>
@@ -124,7 +130,7 @@ export default function RizesporScreen({ openMatchId }: { openMatchId?: string |
         )
       )}
 
-      <MatchCenter match={openMatch} onClose={() => setOpenMatch(null)} />
+      <MatchCenter match={shownMatch} onClose={closeMatch} />
     </View>
   );
 }

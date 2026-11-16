@@ -3,10 +3,10 @@
  * Ev sahibi alttan yukarı, deplasman üstten aşağı hücum eder. Oyuncular kaleden ileriye doğru
  * sırayla sahaya "çıkar"; canlı maçta orta noktada nabız atar.
  */
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Animated, Easing, StyleSheet, Text, View } from 'react-native';
 
-import { useReducedMotion } from '../../components/motion';
+import { useReducedMotion, useAnimatedValue } from '../../components/motion';
 import { shortName } from '../../rizespor/format';
 import { lineupRows } from '../../rizespor/formation';
 import { CLUB_COLORS, RIZESPOR_ID } from '../../rizespor/names';
@@ -129,7 +129,7 @@ export default function Pitch({ home, away, live }: { home: Lineup | null; away:
 }
 
 function CenterSpot({ x, y, live }: { x: number; y: number; live: boolean }) {
-  const v = useRef(new Animated.Value(0)).current;
+  const v = useAnimatedValue(0);
   useEffect(() => {
     if (!live) return;
     const loop = Animated.loop(Animated.timing(v, { toValue: 1, duration: 1600, easing: Easing.out(Easing.quad), useNativeDriver: true }));
@@ -152,7 +152,7 @@ function CenterSpot({ x, y, live }: { x: number; y: number; live: boolean }) {
 
 function PlayerDot({ p, pitchW, pitchH, reduced }: { p: Placed; pitchW: number; pitchH: number; reduced: boolean }) {
   const { fs } = useTheme();
-  const v = useRef(new Animated.Value(reduced ? 1 : 0)).current;
+  const v = useAnimatedValue(reduced ? 1 : 0);
   useEffect(() => {
     if (reduced) return;
     Animated.spring(v, { toValue: 1, delay: p.delay, useNativeDriver: true, speed: 12, bounciness: 8 }).start();

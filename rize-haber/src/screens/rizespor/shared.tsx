@@ -1,8 +1,8 @@
 /** Rizespor ekranlarında ortak parçalar: maç satırı, sonuç rozeti, canlı nabız. */
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo } from 'react';
 import { Animated, StyleSheet, Text, View } from 'react-native';
 
-import { PressableScale, useReducedMotion } from '../../components/motion';
+import { PressableScale, useReducedMotion, useAnimatedValue } from '../../components/motion';
 import { clock, dayLabel } from '../../rizespor/format';
 import { CLUB_COLORS, RIZESPOR_ID } from '../../rizespor/names';
 import type { Match } from '../../rizespor/parse';
@@ -32,7 +32,7 @@ export function ResultPill({ result, size = 22 }: { result: 'G' | 'B' | 'M'; siz
 /** Canlı maçlarda yanıp sönen kırmızı nokta. */
 export function LivePulse({ size = 10, color = '#FF3B30' }: { size?: number; color?: string }) {
   const reduced = useReducedMotion();
-  const v = useRef(new Animated.Value(0)).current;
+  const v = useAnimatedValue(0);
   useEffect(() => {
     if (reduced) return;
     const loop = Animated.loop(

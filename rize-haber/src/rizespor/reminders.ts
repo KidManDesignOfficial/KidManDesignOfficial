@@ -46,6 +46,7 @@ export async function ensureMatchChannel(): Promise<void> {
   await Notifications.setNotificationChannelAsync(MATCH_CHANNEL, {
     name: 'Rizespor maçları',
     description: 'Maç hatırlatmaları ve skor bildirimleri.',
+    // eslint-disable-next-line import/namespace -- `export *` zinciriyle çalışma anında mevcut (doğrulandı)
     importance: Notifications.AndroidImportance.HIGH,
   });
 }

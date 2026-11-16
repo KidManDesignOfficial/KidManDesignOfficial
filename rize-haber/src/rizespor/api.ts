@@ -65,7 +65,6 @@ export type ClubData = {
   roster: Player[];
 };
 
-const EMPTY: ClubData = { results: [], fixtures: [], standings: [], roster: [] };
 
 /** Önbellekteki son veriler (çevrimdışı açılış ve anında gösterim için). */
 export async function loadCachedClubData(): Promise<ClubData> {
@@ -84,10 +83,10 @@ export async function loadCachedClubData(): Promise<ClubData> {
 }
 
 /**
- * Tüm verileri paralel çeker. Bir kaynak başarısız olsa bile diğerleri gelir;
- * başarısız olan için önceki değer korunur. Hiçbiri gelmezse hata fırlatır.
+ * Tüm verileri paralel çeker. Bir kaynak başarısız olsa bile diğerleri gelir; başarısız olanlar
+ * sonuçta yer almaz (çağıran önceki değeri korur — bkz. mergeClubData). Hiçbiri gelmezse hata fırlatır.
  */
-export async function fetchClubData(previous: ClubData = EMPTY, signal?: AbortSignal): Promise<ClubData> {
+export async function fetchClubData(signal?: AbortSignal): Promise<Partial<ClubData>> {
   const settled = await Promise.allSettled([
     cached('results', RIZESPOR_URLS.results, parseSchedule, signal),
     cached('fixtures', RIZESPOR_URLS.fixtures, parseSchedule, signal),
@@ -97,16 +96,25 @@ export async function fetchClubData(previous: ClubData = EMPTY, signal?: AbortSi
   if (settled.every((s) => s.status === 'rejected')) {
     throw new Error('Rizespor verisi alınamadı. İnternet bağlantınızı kontrol edin.');
   }
-  const pick = <T,>(i: number, fallback: T): T => {
+  const pick = <T,>(i: number): T | undefined => {
     const s = settled[i];
-    return s.status === 'fulfilled' ? (s.value as T) : fallback;
+    return s.status === 'fulfilled' ? (s.value as T) : undefined;
   };
-  return {
-    results: pick(0, previous.results),
-    fixtures: pick(1, previous.fixtures),
-    standings: pick(2, previous.standings),
-    roster: pick(3, previous.roster),
-  };
+  const out: Partial<ClubData> = {};
+  const results = pick<Match[]>(0);
+  const fixtures = pick<Match[]>(1);
+  const standings = pick<StandingRow[]>(2);
+  const roster = pick<Player[]>(3);
+  if (results) out.results = results;
+  if (fixtures) out.fixtures = fixtures;
+  if (standings) out.standings = standings;
+  if (roster) out.roster = roster;
+  return out;
+}
+
+/** Yeni gelen parçaları öncekinin üzerine yazar; gelmeyenler (başarısız istekler) korunur. */
+export function mergeClubData(previous: ClubData, fresh: Partial<ClubData>): ClubData {
+  return { ...previous, ...fresh };
 }
 
 /** Yalnızca fikstür (arka plan görevi ve hatırlatmalar için hafif istek). */

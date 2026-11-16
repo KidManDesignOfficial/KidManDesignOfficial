@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
 
 import { NewsCard } from '../components/NewsCard';
+import { Icon } from '../components/Icon';
 import { useFavorites } from '../favorites';
 import { useTheme } from '../theme';
 
@@ -34,7 +35,7 @@ export default function SavedScreen() {
       }
       ListEmptyComponent={
         <View style={styles.empty}>
-          <Text style={styles.emptyIcon}>☆</Text>
+          <Icon name="star-outline" size={fs(44)} color={colors.primary} />
           <Text style={styles.emptyTitle}>Henüz kaydedilen haber yok</Text>
           <Text style={styles.emptyText}>
             Bir haberin altındaki “Kaydet” düğmesine dokunun; burada saklanır ve internet yokken de listede

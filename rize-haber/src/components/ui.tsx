@@ -6,6 +6,7 @@ import type { StyleProp, ViewStyle } from 'react-native';
 import * as WebBrowser from 'expo-web-browser';
 
 import { useTheme, type Colors } from '../theme';
+import { Icon } from './Icon';
 
 export function openUrl(url: string, colors: Colors) {
   WebBrowser.openBrowserAsync(url, {
@@ -79,7 +80,7 @@ export function LinkRow({ label, url }: { label: string; url: string }) {
       accessibilityLabel={label}
     >
       <Text style={styles.linkText}>{label}</Text>
-      <Text style={styles.linkArrow}>↗</Text>
+      <Icon name="open-outline" size={18} color={colors.primary} />
     </Pressable>
   );
 }

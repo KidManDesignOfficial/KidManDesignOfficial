@@ -1,9 +1,10 @@
 /** Rizespor bölümleri: Maçlar, Puan durumu, Kadro, Haberler. */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { NewsCard } from '../../components/NewsCard';
 import { FadeInView, PressableScale } from '../../components/motion';
+import { NewsSkeleton } from '../../components/Skeleton';
 import { Card, Chip, ChipRow, PrimaryButton, SectionTitle } from '../../components/ui';
 import { googleNewsRssUrl } from '../../config';
 import { latestResults, nextMatch, type ClubData } from '../../rizespor/api';
@@ -17,8 +18,8 @@ import { MatchRow, ResultPill } from './shared';
 
 type ViewProps = { data: ClubData; refreshing: boolean; onRefresh: () => void; onOpenMatch: (m: Match) => void };
 
-function refreshControl(refreshing: boolean, onRefresh: () => void) {
-  return <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={[CLUB_COLORS.green]} tintColor={CLUB_COLORS.green} />;
+function ClubRefresh(props: { refreshing: boolean; onRefresh: () => void }) {
+  return <RefreshControl {...props} colors={[CLUB_COLORS.green]} tintColor={CLUB_COLORS.green} />;
 }
 
 function useBaseStyles() {
@@ -65,7 +66,7 @@ export function MatchesView({ data, refreshing, onRefresh, onOpenMatch }: ViewPr
   );
 
   return (
-    <ScrollView style={base.container} contentContainerStyle={base.content} refreshControl={refreshControl(refreshing, onRefresh)}>
+    <ScrollView style={base.container} contentContainerStyle={base.content} refreshControl={<ClubRefresh refreshing={refreshing} onRefresh={onRefresh} />}>
       {hero ? <NextMatchHero match={hero} mode={mode} onOpen={() => onOpenMatch(hero)} /> : null}
 
       <View style={base.pad}>
@@ -163,7 +164,7 @@ export function StandingsView({ data, refreshing, onRefresh }: ViewProps) {
   }, [data.standings]);
 
   return (
-    <ScrollView style={base.container} contentContainerStyle={[base.content, base.pad]} refreshControl={refreshControl(refreshing, onRefresh)}>
+    <ScrollView style={base.container} contentContainerStyle={[base.content, base.pad]} refreshControl={<ClubRefresh refreshing={refreshing} onRefresh={onRefresh} />}>
       <SectionTitle hint="Trendyol Süper Lig 2026-27">Puan durumu</SectionTitle>
       {data.standings.length === 0 ? (
         <Text style={base.muted}>Puan durumu yüklenemedi.</Text>
@@ -264,7 +265,7 @@ export function SquadView({ data, refreshing, onRefresh }: ViewProps) {
   const foreign = data.roster.filter((p) => p.nationality && p.nationality !== 'TUR').length;
 
   return (
-    <ScrollView style={base.container} contentContainerStyle={[base.content, base.pad]} refreshControl={refreshControl(refreshing, onRefresh)}>
+    <ScrollView style={base.container} contentContainerStyle={[base.content, base.pad]} refreshControl={<ClubRefresh refreshing={refreshing} onRefresh={onRefresh} />}>
       <SectionTitle>Kadro</SectionTitle>
       {data.roster.length === 0 ? (
         <Text style={base.muted}>Kadro yüklenemedi.</Text>
@@ -324,7 +325,9 @@ const NEWS_FILTERS = [
 export function ClubNewsView() {
   const base = useBaseStyles();
   const [filter, setFilter] = useState<(typeof NEWS_FILTERS)[number]['id']>('all');
-  const [items, setItems] = useState<NewsItem[] | null>(null);
+  // Haberler filtreye bağlı tutulur: filtre değişince eski liste bir an bile görünmez.
+  const [entry, setEntry] = useState<{ filter: string; items: NewsItem[] } | null>(null);
+  const items = entry?.filter === filter ? entry.items : null;
   const [error, setError] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const controller = useRef<AbortController | null>(null);
@@ -337,14 +340,15 @@ export function ClubNewsView() {
     try {
       const q = NEWS_FILTERS.find((f) => f.id === filter)!.query;
       const result = await fetchRss(googleNewsRssUrl(q), c.signal);
-      if (!c.signal.aborted) setItems(result);
+      if (!c.signal.aborted) setEntry({ filter, items: result });
     } catch {
       if (!c.signal.aborted) setError(true);
     }
   }, [filter]);
 
   useEffect(() => {
-    setItems(null);
+    // Açılışta / filtre değişince haberleri indir (veri çekme deseni).
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     load();
     return () => controller.current?.abort();
   }, [load]);
@@ -356,14 +360,14 @@ export function ClubNewsView() {
   }, [load]);
 
   return (
-    <ScrollView style={base.container} contentContainerStyle={base.content} refreshControl={refreshControl(refreshing, onRefresh)}>
+    <ScrollView style={base.container} contentContainerStyle={base.content} refreshControl={<ClubRefresh refreshing={refreshing} onRefresh={onRefresh} />}>
       <ChipRow>
         {NEWS_FILTERS.map((f) => (
           <Chip key={f.id} label={f.label} selected={filter === f.id} onPress={() => setFilter(f.id)} />
         ))}
       </ChipRow>
       <View style={base.pad}>
-        {items === null && !error ? <ActivityIndicator color={CLUB_COLORS.green} style={{ marginTop: 24 }} /> : null}
+        {items === null && !error ? <NewsSkeleton count={4} /> : null}
         {error ? (
           <>
             <Text style={base.muted}>Haberler yüklenemedi. İnternet bağlantınızı kontrol edin.</Text>

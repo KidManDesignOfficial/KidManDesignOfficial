@@ -1,9 +1,11 @@
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Animated, Linking, Pressable, ScrollView, Share, StyleSheet, Text, View } from 'react-native';
+import { memo, useCallback, useEffect, useMemo, useState } from 'react';
+import { Linking, Pressable, ScrollView, Share, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 
 import { mix } from '../../colors';
-import { Chevron, Collapsible, FadeInView, PressableScale } from '../../components/motion';
+import { Icon, type IconName } from '../../components/Icon';
+import { Chevron, Collapsible, FadeInView, PressableScale, useAnimatedValue } from '../../components/motion';
+import { pressFeedback } from '../../haptics';
 import { Chip, ChipRow, openUrl } from '../../components/ui';
 import { PLACE_CATEGORIES, PLACES, mapsUrl, type Place, type PlaceCategory } from '../../data/discover';
 import { loadPlaceList, savePlaceList } from '../../storage';
@@ -30,6 +32,7 @@ export default function PlacesView() {
   }, []);
 
   const toggleList = useCallback((id: string) => {
+    pressFeedback();
     setMyList((current) => {
       const next = current.includes(id) ? current.filter((x) => x !== id) : [...current, id];
       savePlaceList(next);
@@ -96,7 +99,7 @@ export default function PlacesView() {
 
       {visible.length === 0 ? (
         <View style={styles.empty}>
-          <Text style={styles.emptyIcon}>♡</Text>
+          <Icon name="heart-outline" size={fs(40)} color={colors.textMuted} />
           <Text style={styles.emptyText}>
             Listeniz boş. Bir yerin ayrıntısını açıp “Listeme ekle”ye dokunun; gezi planınız burada birikir.
           </Text>
@@ -133,7 +136,7 @@ type CardProps = {
 
 const PlaceCard = memo(function PlaceCard({ place, open, inList, onToggleOpen, onToggleList, colors, fs }: CardProps) {
   const category = PLACE_CATEGORIES.find((c) => c.id === place.category)!;
-  const progress = useRef(new Animated.Value(open ? 1 : 0)).current;
+  const progress = useAnimatedValue(open ? 1 : 0);
   const tint = colors.isDark ? mix(CATEGORY_TINT[place.category], '#000000', 0.25) : CATEGORY_TINT[place.category];
 
   const styles = useMemo(
@@ -208,7 +211,7 @@ const PlaceCard = memo(function PlaceCard({ place, open, inList, onToggleOpen, o
                 {category.icon} {category.label}
               </Text>
             </View>
-            {inList ? <Text style={styles.heart}>♥</Text> : null}
+            {inList ? <Icon name="heart" size={fs(20)} color="#FFFFFF" /> : null}
           </View>
           <Text style={styles.name}>{place.name}</Text>
           <Text style={styles.district}>📍 {place.district}</Text>
@@ -241,7 +244,7 @@ const PlaceCard = memo(function PlaceCard({ place, open, inList, onToggleOpen, o
               containerStyle={styles.actionWrap}
               accessibilityRole="button"
             >
-              <Text style={[styles.actionText, styles.actionTextPrimary]}>🗺️ Haritada aç</Text>
+              <ActionLabel icon="map-outline" text="Haritada aç" color="#FFFFFF" style={[styles.actionText, styles.actionTextPrimary]} />
             </PressableScale>
             <PressableScale
               onPress={onToggleList}
@@ -250,10 +253,10 @@ const PlaceCard = memo(function PlaceCard({ place, open, inList, onToggleOpen, o
               accessibilityRole="button"
               accessibilityState={{ selected: inList }}
             >
-              <Text style={styles.actionText}>{inList ? '♥ Listemde' : '♡ Listeme ekle'}</Text>
+              <ActionLabel icon={inList ? 'heart' : 'heart-outline'} text={inList ? 'Listemde' : 'Listeme ekle'} color={inList ? tint : colors.text} style={styles.actionText} />
             </PressableScale>
             <PressableScale onPress={share} style={styles.action} containerStyle={styles.actionWrap} accessibilityRole="button">
-              <Text style={styles.actionText}>↗ Paylaş</Text>
+              <ActionLabel icon="share-social-outline" text="Paylaş" color={colors.text} style={styles.actionText} />
             </PressableScale>
             <PressableScale
               onPress={() => openUrl(place.sourceUrl, colors)}
@@ -261,7 +264,7 @@ const PlaceCard = memo(function PlaceCard({ place, open, inList, onToggleOpen, o
               containerStyle={styles.actionWrap}
               accessibilityRole="link"
             >
-              <Text style={styles.actionText}>📄 Kaynak</Text>
+              <ActionLabel icon="document-text-outline" text="Kaynak" color={colors.text} style={styles.actionText} />
             </PressableScale>
           </View>
           <Pressable onPress={onToggleOpen} accessibilityRole="button" hitSlop={8} style={styles.moreRow}>
@@ -273,3 +276,12 @@ const PlaceCard = memo(function PlaceCard({ place, open, inList, onToggleOpen, o
     </View>
   );
 });
+
+function ActionLabel({ icon, text, color, style }: { icon: IconName; text: string; color: string; style: object | object[] }) {
+  return (
+    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+      <Icon name={icon} size={17} color={color} />
+      <Text style={style}>{text}</Text>
+    </View>
+  );
+}

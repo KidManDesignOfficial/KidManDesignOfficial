@@ -1,25 +1,30 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 
+import { Icon } from '../components/Icon';
+import { HeroSkeleton } from '../components/Skeleton';
 import { Chip, ChipRow, PrimaryButton } from '../components/ui';
 import { WEATHER_LOCATIONS } from '../config';
+import { loadCachedWeather, saveCachedWeather, savedAtLabel } from '../offline';
 import { useTheme } from '../theme';
 import { clockTime, dayLabel } from '../time';
 import { describeWeatherCode, fetchWeather, type Weather } from '../weather';
 
 export default function WeatherScreen() {
   const { colors, fs, settings } = useTheme();
-  const [locationId, setLocationId] = useState(settings.weatherLocationId);
-  const [weather, setWeather] = useState<Weather | null>(null);
+  // Kullanıcının bu ekranda seçtiği ilçe; Ayarlar'daki varsayılan değişirse geçersiz olur.
+  const [choice, setChoice] = useState<{ base: string; id: string } | null>(null);
+  const locationId = choice && choice.base === settings.weatherLocationId ? choice.id : settings.weatherLocationId;
+  // Veri ilçeye bağlı tutulur: ilçe değişince eski ilçenin verisi bir an bile görünmez.
+  const [entry, setEntry] = useState<{ id: string; weather: Weather; cachedAt: number | null } | null>(null);
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const controller = useRef<AbortController | null>(null);
 
-  // Ayarlardan varsayılan ilçe değişirse ekran da ona geçer.
-  useEffect(() => setLocationId(settings.weatherLocationId), [settings.weatherLocationId]);
-
   const location = WEATHER_LOCATIONS.find((l) => l.id === locationId) ?? WEATHER_LOCATIONS[0];
+  const weather = entry?.id === location.id ? entry.weather : null;
+  const cachedAt = entry?.id === location.id ? entry.cachedAt : null;
 
   const load = useCallback(async () => {
     controller.current?.abort();
@@ -27,8 +32,15 @@ export default function WeatherScreen() {
     controller.current = c;
     setLoading(true);
     setError(null);
+    // Son kayıtlı veriyi hemen göster; ağdan gelince yerini alır.
+    loadCachedWeather(location.id).then((cached) => {
+      if (!cached || c.signal.aborted) return;
+      setEntry((e) => (e?.id === location.id ? e : { id: location.id, weather: cached.weather, cachedAt: cached.savedAt }));
+    });
     try {
-      setWeather(await fetchWeather(location, c.signal));
+      const fresh = await fetchWeather(location, c.signal);
+      setEntry({ id: location.id, weather: fresh, cachedAt: null });
+      saveCachedWeather(location.id, fresh);
     } catch {
       if (!c.signal.aborted) setError('Hava durumu alınamadı. İnternet bağlantınızı kontrol edin.');
     } finally {
@@ -37,7 +49,8 @@ export default function WeatherScreen() {
   }, [location]);
 
   useEffect(() => {
-    setWeather(null);
+    // Ekran açılınca / ilçe değişince veriyi indir (React'in önerdiği veri çekme deseni).
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     load();
     return () => controller.current?.abort();
   }, [load]);
@@ -55,6 +68,21 @@ export default function WeatherScreen() {
         content: { paddingBottom: 24 },
         center: { alignItems: 'center', justifyContent: 'center', padding: 48, gap: 12 },
         errorText: { color: colors.error, fontSize: fs(15), textAlign: 'center' },
+        offline: {
+          flexDirection: 'row',
+          alignItems: 'center',
+          gap: 6,
+          alignSelf: 'flex-start',
+          marginHorizontal: 16,
+          marginBottom: 8,
+          backgroundColor: colors.card,
+          borderWidth: 1,
+          borderColor: colors.border,
+          borderRadius: 999,
+          paddingHorizontal: 10,
+          paddingVertical: 4,
+        },
+        offlineText: { color: colors.textMuted, fontSize: fs(12), fontWeight: '600' },
         hero: {
           marginHorizontal: 16,
           borderRadius: 20,
@@ -146,14 +174,12 @@ export default function WeatherScreen() {
     >
       <ChipRow>
         {WEATHER_LOCATIONS.map((l) => (
-          <Chip key={l.id} label={l.name} selected={l.id === locationId} onPress={() => setLocationId(l.id)} />
+          <Chip key={l.id} label={l.name} selected={l.id === locationId} onPress={() => setChoice({ base: settings.weatherLocationId, id: l.id })} />
         ))}
       </ChipRow>
 
       {loading && !weather && !refreshing ? (
-        <View style={styles.center}>
-          <ActivityIndicator size="large" color={colors.primary} />
-        </View>
+        <HeroSkeleton rows={3} />
       ) : error && !weather ? (
         <View style={styles.center}>
           <Text style={styles.errorText}>{error}</Text>
@@ -161,6 +187,12 @@ export default function WeatherScreen() {
         </View>
       ) : current && now && weather ? (
         <>
+          {error && cachedAt ? (
+            <View style={styles.offline}>
+              <Icon name="cloud-offline-outline" size={16} color={colors.textMuted} />
+              <Text style={styles.offlineText}>Çevrimdışı · son güncelleme {savedAtLabel(cachedAt)}</Text>
+            </View>
+          ) : null}
           <View style={styles.hero}>
             <Text style={styles.heroPlace}>{location.name}</Text>
             <Text style={styles.heroIcon}>{now.icon}</Text>

@@ -1,23 +1,12 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
-import {
-  ActivityIndicator,
-  Animated,
-  AppState,
-  Easing,
-  Modal,
-  Pressable,
-  RefreshControl,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import { ActivityIndicator, Animated, AppState, Easing, Modal, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Card, PrimaryButton, SectionTitle } from '../../components/ui';
-import { useReducedMotion } from '../../components/motion';
+import { Icon } from '../../components/Icon';
+import { useReducedMotion, useAnimatedValue } from '../../components/motion';
 import { fetchMatchDetail } from '../../rizespor/api';
 import { clock, longKickoff } from '../../rizespor/format';
 import { CLUB_COLORS, RIZESPOR_ID } from '../../rizespor/names';
@@ -55,7 +44,7 @@ function MatchCenterBody({ initial, onClose }: { initial: Match; onClose: () => 
   const [updatedAt, setUpdatedAt] = useState<Date | null>(null);
   const [burst, setBurst] = useState<{ team: string; us: boolean } | null>(null);
   const lastScore = useRef<{ h: number; a: number } | null>(null);
-  const scoreBump = useRef(new Animated.Value(1)).current;
+  const scoreBump = useAnimatedValue(1);
 
   const match = detail?.match ?? initial;
   const live = match.state === 'in';
@@ -85,6 +74,8 @@ function MatchCenterBody({ initial, onClose }: { initial: Match; onClose: () => 
   }, [initial.id, scoreBump]);
 
   useEffect(() => {
+    // Açılışta maç ayrıntısını indir (veri çekme deseni; setState await sonrasında).
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     load();
   }, [load]);
 
@@ -156,7 +147,7 @@ function MatchCenterBody({ initial, onClose }: { initial: Match; onClose: () => 
         <SafeAreaView edges={['top']} style={styles.header}>
           <View style={styles.topBar}>
             <Pressable onPress={onClose} style={styles.close} accessibilityRole="button" accessibilityLabel="Kapat" hitSlop={10}>
-              <Text style={styles.closeText}>✕</Text>
+              <Icon name="close" size={22} color="#FFFFFF" />
             </Pressable>
             <Text style={styles.league}>SÜPER LİG</Text>
             <View style={{ width: 38 }} />
@@ -346,7 +337,7 @@ function Timeline({ events, match }: { events: MatchEvent[]; match: Match }) {
 
 function FadeRow({ children }: { children: ReactNode }) {
   const reduced = useReducedMotion();
-  const v = useRef(new Animated.Value(reduced ? 1 : 0)).current;
+  const v = useAnimatedValue(reduced ? 1 : 0);
   useEffect(() => {
     if (!reduced) Animated.timing(v, { toValue: 1, duration: 350, easing: Easing.out(Easing.cubic), useNativeDriver: true }).start();
   }, [reduced, v]);
@@ -357,7 +348,7 @@ function FadeRow({ children }: { children: ReactNode }) {
 function StatBars({ stats, homeIsUs, awayIsUs }: { stats: TeamStat[]; homeIsUs: boolean; awayIsUs: boolean }) {
   const { colors, fs } = useTheme();
   const reduced = useReducedMotion();
-  const grow = useRef(new Animated.Value(reduced ? 1 : 0)).current;
+  const grow = useAnimatedValue(reduced ? 1 : 0);
   useEffect(() => {
     if (!reduced) Animated.timing(grow, { toValue: 1, duration: 700, easing: Easing.out(Easing.cubic), useNativeDriver: false }).start();
   }, [grow, reduced]);

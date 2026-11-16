@@ -1,16 +1,21 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { BackHandler, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { useFonts } from 'expo-font';
+import * as SplashScreen from 'expo-splash-screen';
 import * as Notifications from 'expo-notifications';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
+import { ICON_FONT, Icon, type IconName } from './src/components/Icon';
 import { FadeInView } from './src/components/motion';
+import { tapFeedback } from './src/haptics';
 import { openUrl } from './src/components/ui';
 import { FavoritesProvider } from './src/favorites';
 import { CLUB_COLORS } from './src/rizespor/names';
 import DiscoverScreen from './src/screens/DiscoverScreen';
 import NewsScreen from './src/screens/NewsScreen';
+import Onboarding, { hasOnboarded } from './src/screens/Onboarding';
 import RizesporScreen from './src/screens/RizesporScreen';
 import SavedScreen from './src/screens/SavedScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
@@ -22,22 +27,37 @@ import { ThemeProvider, useTheme } from './src/theme';
 const useNotificationResponse =
   Platform.OS === 'web' ? () => null : Notifications.useLastNotificationResponse;
 
+// Açılış ekranı, simge yazı tipi ve ayarlar hazır olana kadar görünür kalır; sonra solarak kapanır.
+SplashScreen.preventAutoHideAsync().catch(() => {});
+SplashScreen.setOptions({ fade: true, duration: 350 });
+
 type Tab = 'news' | 'rizespor' | 'tea' | 'weather' | 'rize';
 
-const TABS: { id: Tab; label: string; icon: string; title: string }[] = [
-  { id: 'news', label: 'Haberler', icon: '📰', title: 'Rize Haber' },
-  { id: 'rizespor', label: 'Rizespor', icon: '⚽', title: 'Çaykur Rizespor' },
-  { id: 'tea', label: 'Çay', icon: '🍃', title: 'Çay Fiyatları' },
-  { id: 'weather', label: 'Hava', icon: '🌦️', title: 'Hava Durumu' },
-  { id: 'rize', label: 'Keşfet', icon: '🧭', title: 'Rize’yi Keşfet' },
+const TABS: { id: Tab; label: string; icon: IconName; iconActive: IconName; title: string }[] = [
+  { id: 'news', label: 'Haberler', icon: 'newspaper-outline', iconActive: 'newspaper', title: 'Rize Haber' },
+  { id: 'rizespor', label: 'Rizespor', icon: 'football-outline', iconActive: 'football', title: 'Çaykur Rizespor' },
+  { id: 'tea', label: 'Çay', icon: 'leaf-outline', iconActive: 'leaf', title: 'Çay Fiyatları' },
+  { id: 'weather', label: 'Hava', icon: 'partly-sunny-outline', iconActive: 'partly-sunny', title: 'Hava Durumu' },
+  { id: 'rize', label: 'Keşfet', icon: 'compass-outline', iconActive: 'compass', title: 'Rize’yi Keşfet' },
 ];
 
 export default function App() {
+  const [fontsLoaded, fontError] = useFonts(ICON_FONT);
+  const [onboarded, setOnboarded] = useState<boolean | null>(null);
+  useEffect(() => {
+    hasOnboarded().then(setOnboarded);
+  }, []);
+  const ready = (fontsLoaded || fontError !== null) && onboarded !== null;
+  useEffect(() => {
+    if (ready) SplashScreen.hideAsync().catch(() => {});
+  }, [ready]);
+  if (!ready) return null;
+
   return (
     <SafeAreaProvider>
       <ThemeProvider>
         <FavoritesProvider>
-          <Main />
+          {onboarded ? <Main /> : <Onboarding onDone={() => setOnboarded(true)} />}
         </FavoritesProvider>
       </ThemeProvider>
     </SafeAreaProvider>
@@ -50,15 +70,19 @@ function Main() {
   const [showSaved, setShowSaved] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [openMatchId, setOpenMatchId] = useState<string | null>(null);
-  // Rizespor sekmesi ilk açıldığında yüklenir (gereksiz ağ isteği yapılmaz).
-  const [rizesporMounted, setRizesporMounted] = useState(false);
+  // Her sekme ilk açıldığında yüklenir: açılış hızlanır, gereksiz ağ isteği ve pil harcanmaz.
+  const [mounted, setMounted] = useState<Set<Tab | 'settings'>>(() => new Set(['news']));
+  const mount = useCallback((t: Tab | 'settings') => {
+    setMounted((m) => (m.has(t) ? m : new Set(m).add(t)));
+  }, []);
   const activeTab = TABS.find((t) => t.id === tab)!;
 
   const goTo = useCallback((t: Tab) => {
+    tapFeedback();
     setTab(t);
     setShowSettings(false);
-    if (t === 'rizespor') setRizesporMounted(true);
-  }, []);
+    mount(t);
+  }, [mount]);
 
   useOpenNotifications(goTo, () => setShowSaved(false), setOpenMatchId);
 
@@ -108,6 +132,7 @@ function Main() {
         },
         headerButtonActive: { backgroundColor: 'rgba(255,255,255,0.32)' },
         headerButtonText: { color: '#FFFFFF', fontSize: fs(14), fontWeight: '700' },
+        headerButtonInner: { flexDirection: 'row', alignItems: 'center', gap: 5 },
         body: { flex: 1, backgroundColor: colors.background },
         screen: { flex: 1 },
         tabBar: {
@@ -118,8 +143,6 @@ function Main() {
         },
         tabButton: { flex: 1, alignItems: 'center', paddingTop: 8, paddingBottom: 6, gap: 2 },
         tabIndicator: { position: 'absolute', top: 0, height: 3, width: 28, borderRadius: 2 },
-        tabIcon: { fontSize: 22 },
-        tabInactive: { opacity: 0.45 },
         tabLabel: { fontSize: fs(11), fontWeight: '600', color: colors.textMuted },
       }),
     [colors, fs],
@@ -135,25 +158,35 @@ function Main() {
       <View style={styles.headerActions}>
         {tab === 'news' && !showSettings ? (
           <Pressable
-            onPress={() => setShowSaved((v) => !v)}
+            onPress={() => {
+              tapFeedback();
+              setShowSaved((v) => !v);
+            }}
             style={[styles.headerButton, showSaved && styles.headerButtonActive]}
             accessibilityRole="button"
             accessibilityState={{ selected: showSaved }}
             accessibilityLabel={showSaved ? 'Haberlere dön' : 'Kaydedilen haberler'}
             hitSlop={6}
           >
-            <Text style={styles.headerButtonText}>{showSaved ? '← Haberler' : '★ Kayıtlı'}</Text>
+            <View style={styles.headerButtonInner}>
+              <Icon name={showSaved ? 'arrow-back' : 'star'} size={16} color="#FFFFFF" />
+              <Text style={styles.headerButtonText}>{showSaved ? 'Haberler' : 'Kayıtlı'}</Text>
+            </View>
           </Pressable>
         ) : null}
         <Pressable
-          onPress={() => setShowSettings((v) => !v)}
+          onPress={() => {
+            tapFeedback();
+            mount('settings');
+            setShowSettings((v) => !v);
+          }}
           style={[styles.headerButton, showSettings && styles.headerButtonActive]}
           accessibilityRole="button"
           accessibilityState={{ selected: showSettings }}
           accessibilityLabel={showSettings ? 'Ayarları kapat' : 'Ayarlar'}
           hitSlop={6}
         >
-          <Text style={styles.headerButtonText}>{showSettings ? '✕' : '⚙️'}</Text>
+          <Icon name={showSettings ? 'close' : 'settings-outline'} size={20} color="#FFFFFF" />
         </Pressable>
       </View>
     </View>
@@ -179,23 +212,31 @@ function Main() {
           <FadeInView visible={!showSettings && tab === 'news' && showSaved} style={styles.screen}>
             <SavedScreen />
           </FadeInView>
-          {rizesporMounted ? (
+          {mounted.has('rizespor') ? (
             <FadeInView visible={!showSettings && tab === 'rizespor'} style={styles.screen}>
               <RizesporScreen openMatchId={openMatchId} />
             </FadeInView>
           ) : null}
-          <FadeInView visible={!showSettings && tab === 'tea'} style={styles.screen}>
-            <TeaScreen />
-          </FadeInView>
-          <FadeInView visible={!showSettings && tab === 'weather'} style={styles.screen}>
-            <WeatherScreen />
-          </FadeInView>
-          <FadeInView visible={!showSettings && tab === 'rize'} style={styles.screen}>
-            <DiscoverScreen />
-          </FadeInView>
-          <FadeInView visible={showSettings} style={styles.screen}>
-            <SettingsScreen />
-          </FadeInView>
+          {mounted.has('tea') ? (
+            <FadeInView visible={!showSettings && tab === 'tea'} style={styles.screen}>
+              <TeaScreen />
+            </FadeInView>
+          ) : null}
+          {mounted.has('weather') ? (
+            <FadeInView visible={!showSettings && tab === 'weather'} style={styles.screen}>
+              <WeatherScreen />
+            </FadeInView>
+          ) : null}
+          {mounted.has('rize') ? (
+            <FadeInView visible={!showSettings && tab === 'rize'} style={styles.screen}>
+              <DiscoverScreen />
+            </FadeInView>
+          ) : null}
+          {mounted.has('settings') ? (
+            <FadeInView visible={showSettings} style={styles.screen}>
+              <SettingsScreen />
+            </FadeInView>
+          ) : null}
         </View>
 
         <SafeAreaView edges={['bottom']} style={styles.tabBar} accessibilityRole="tablist">
@@ -212,7 +253,7 @@ function Main() {
                 accessibilityLabel={t.label}
               >
                 <View style={[styles.tabIndicator, active && { backgroundColor: accent }]} />
-                <Text style={[styles.tabIcon, !active && styles.tabInactive]}>{t.icon}</Text>
+                <Icon name={active ? t.iconActive : t.icon} size={23} color={active ? accent : colors.textMuted} />
                 <Text style={[styles.tabLabel, active && { color: accent }]} numberOfLines={1}>
                   {t.label}
                 </Text>
@@ -243,7 +284,8 @@ function useOpenNotifications(goTo: (tab: Tab) => void, closeSaved: () => void, 
     const data = response.notification.request.content.data ?? {};
     if (data.screen === 'rizespor') {
       goTo('rizespor');
-      if (typeof data.matchId === 'string') openMatch(data.matchId);
+      // Her dokunuş ayrı bir istektir: aynı maç için ikinci bildirim de maçı yeniden açar.
+      if (typeof data.matchId === 'string') openMatch(`${data.matchId}#${id}`);
       return;
     }
     goTo('news');

@@ -123,7 +123,8 @@ export async function enableNewsNotifications(): Promise<EnableResult> {
     await Notifications.setNotificationChannelAsync(CHANNEL_ID, {
       name: 'Yeni haberler',
       description: 'Rize ile ilgili yeni haberler yayımlandığında bildirir.',
-      importance: Notifications.AndroidImportance.HIGH,
+      // eslint-disable-next-line import/namespace -- `export *` zinciriyle çalışma anında mevcut (doğrulandı)
+    importance: Notifications.AndroidImportance.HIGH,
     });
   }
   if (!(await ensurePermission())) return 'permission-denied';

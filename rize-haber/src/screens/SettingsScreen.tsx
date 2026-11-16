@@ -3,16 +3,22 @@ import {
   ActivityIndicator,
   Alert,
   Linking,
+  Platform,
   Pressable,
   ScrollView,
+  Share,
   StyleSheet,
   Switch,
   Text,
   View,
 } from 'react-native';
-import Constants from 'expo-constants';
+import appConfig from '../../app.json';
 
-import { Card, Chip, ChipRow, LinkRow, SectionTitle } from '../components/ui';
+import { Icon } from '../components/Icon';
+
+import { Card, Chip, ChipRow, LinkRow, SectionTitle, openUrl } from '../components/ui';
+import { PressableScale } from '../components/motion';
+import type { IconName } from '../components/Icon';
 import { WEATHER_LOCATIONS } from '../config';
 import { useFavorites } from '../favorites';
 import { disableNewsNotifications, enableNewsNotifications, setMatchFeature } from '../notifications';
@@ -26,6 +32,18 @@ import {
   type TextSize,
   type ThemeMode,
 } from '../theme';
+
+/** Sürüm derleme anında app.json'dan alınır (önbellekten bağımsız). */
+const APP_VERSION = appConfig.expo.version;
+const REPO = 'https://github.com/KidManDesignOfficial/KidManDesignOfficial';
+const APP_PAGE = `${REPO}/tree/HEAD/rize-haber`;
+const PRIVACY_URL = `${REPO}/blob/HEAD/rize-haber/GIZLILIK.md`;
+
+function feedbackUrl(): string {
+  const version = APP_VERSION;
+  const body = `**Ne oldu / önerin nedir?**\n\n\n**Hangi ekranda?**\n\n\n---\nUygulama sürümü: ${version} · ${Platform.OS} ${Platform.Version}`;
+  return `${REPO}/issues/new?title=${encodeURIComponent('Rize Haber: ')}&body=${encodeURIComponent(body)}`;
+}
 
 const MODES: { id: ThemeMode; label: string }[] = [
   { id: 'system', label: 'Sistem' },
@@ -135,7 +153,7 @@ export default function SettingsScreen() {
                     selected && styles.swatchSelected,
                   ]}
                 >
-                  {selected ? <Text style={styles.swatchCheck}>✓</Text> : null}
+                  {selected ? <Icon name="checkmark" size={22} color="#FFFFFF" /> : null}
                 </View>
                 <Text style={styles.swatchName} numberOfLines={1}>
                   {ACCENTS[id].short}
@@ -180,14 +198,14 @@ export default function SettingsScreen() {
         <MatchSetting
           styles={styles}
           settingKey="reminders"
-          label="⚽ Maç hatırlatmaları"
+          label="Maç hatırlatmaları"
           hint={`Rizespor maçlarından ${REMINDER_MINUTES} dakika önce: “🍵 Çayını demle, maç başlıyor!”`}
         />
         <View style={styles.divider} />
         <MatchSetting
           styles={styles}
           settingKey="scoreAlerts"
-          label="🥅 Skor bildirimleri"
+          label="Skor bildirimleri"
           hint="Maç başladı, gol ve maç sonu. Arka planda en sık ~15–30 dakikada bir kontrol edildiği için gecikmeli gelebilir; anlık takip için Maç Merkezi’ni açın."
         />
       </Card>
@@ -212,9 +230,28 @@ export default function SettingsScreen() {
       <SectionTitle>Hakkında</SectionTitle>
       <Card>
         <Text style={styles.about}>
-          Rize Haber; Rize’nin güncel haberlerini, hava durumunu ve yaş çay alım fiyatlarını tek yerde toplar.
+          Rize Haber; Rize’nin haberlerini, hava durumunu, yaş çay alım fiyatını, Çaykur Rizespor’u ve gezi
+          rehberini tek yerde toplar.
         </Text>
-        <Text style={styles.version}>Sürüm {Constants.expoConfig?.version ?? '–'}</Text>
+        <Text style={styles.version}>Sürüm {APP_VERSION}</Text>
+        <View style={styles.divider} />
+        <ActionRow
+          icon="chatbubble-ellipses-outline"
+          label="Görüş bildir"
+          hint="Hata, öneri veya eksik bilgi"
+          onPress={() => openUrl(feedbackUrl(), colors)}
+        />
+        <ActionRow
+          icon="share-social-outline"
+          label="Uygulamayı paylaş"
+          hint="Rizeli dostlarına öner"
+          onPress={() =>
+            Share.share({
+              message: `Rize’nin haberleri, yaş çay fiyatı, Rizespor ve gezi rehberi tek uygulamada: Rize Haber\n${APP_PAGE}`,
+            }).catch(() => {})
+          }
+        />
+        <ActionRow icon="shield-checkmark-outline" label="Gizlilik politikası" onPress={() => openUrl(PRIVACY_URL, colors)} />
       </Card>
 
       <SectionTitle>Veri kaynakları</SectionTitle>
@@ -402,5 +439,36 @@ function MatchSetting({
         />
       )}
     </View>
+  );
+}
+
+function ActionRow({ icon, label, hint, onPress }: { icon: IconName; label: string; hint?: string; onPress: () => void }) {
+  const { colors, fs } = useTheme();
+  return (
+    <PressableScale
+      onPress={onPress}
+      scaleTo={0.98}
+      style={{ flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 12 }}
+      accessibilityRole="button"
+      accessibilityLabel={label}
+    >
+      <View
+        style={{
+          width: 36,
+          height: 36,
+          borderRadius: 10,
+          backgroundColor: colors.primarySoft,
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <Icon name={icon} size={19} color={colors.primary} />
+      </View>
+      <View style={{ flex: 1 }}>
+        <Text style={{ fontSize: fs(15), fontWeight: '700', color: colors.text }}>{label}</Text>
+        {hint ? <Text style={{ fontSize: fs(12), color: colors.textMuted, marginTop: 1 }}>{hint}</Text> : null}
+      </View>
+      <Icon name="chevron-forward" size={18} color={colors.textMuted} />
+    </PressableScale>
   );
 }

@@ -2,7 +2,9 @@ import { useEffect, useMemo, useState } from 'react';
 import { Alert, Linking, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 
+import { Icon } from '../../components/Icon';
 import { PressableScale } from '../../components/motion';
+import { pressFeedback, successFeedback } from '../../haptics';
 import { setMatchFeature } from '../../notifications';
 import { countdownParts, longKickoff } from '../../rizespor/format';
 import { CLUB_COLORS, RIZESPOR_ID } from '../../rizespor/names';
@@ -21,7 +23,7 @@ export default function NextMatchHero({
   onOpen: () => void;
 }) {
   const { fs } = useTheme();
-  const [now, setNow] = useState(Date.now());
+  const [now, setNow] = useState(() => Date.now());
   const [reminders, setReminders] = useState<boolean | null>(null);
 
   useEffect(() => {
@@ -35,11 +37,13 @@ export default function NextMatchHero({
   }, [mode]);
 
   const toggleReminder = async () => {
+    pressFeedback();
     const next = !reminders;
     const result = await setMatchFeature('reminders', next).catch(() => 'error' as const);
     if (result === 'enabled') {
       setReminders(next);
       if (next) {
+        successFeedback();
         Alert.alert(
           '🍵 Hatırlatma açıldı',
           `Rizespor maçlarından ${REMINDER_MINUTES} dakika önce “Çayını demle, maç başlıyor!” bildirimi alacaksınız.`,
@@ -108,6 +112,7 @@ export default function NextMatchHero({
         },
         btnOn: { backgroundColor: '#FFFFFF' },
         btnText: { color: '#FFFFFF', fontSize: fs(13), fontWeight: '800' },
+        btnInner: { flexDirection: 'row', alignItems: 'center', gap: 6 },
         btnTextOn: { color: CLUB_COLORS.greenDark },
       }),
     [fs],
@@ -198,13 +203,17 @@ export default function NextMatchHero({
               accessibilityRole="switch"
               accessibilityState={{ checked: reminders }}
             >
-              <Text style={[styles.btnText, reminders && styles.btnTextOn]}>
-                {reminders ? '🍵 Hatırlatma açık' : '🔔 Maçtan önce hatırlat'}
-              </Text>
+              <View style={styles.btnInner}>
+                <Icon name={reminders ? 'notifications' : 'notifications-outline'} size={16} color={reminders ? CLUB_COLORS.greenDark : '#FFFFFF'} />
+                <Text style={[styles.btnText, reminders && styles.btnTextOn]}>{reminders ? 'Hatırlatma açık' : 'Maçtan önce hatırlat'}</Text>
+              </View>
             </PressableScale>
           ) : null}
           <PressableScale onPress={onOpen} style={styles.btn} containerStyle={styles.btnWrap} accessibilityRole="button">
-            <Text style={styles.btnText}>{mode === 'live' ? '⚽ Canlı takip et' : '📊 Maç merkezi'}</Text>
+            <View style={styles.btnInner}>
+              <Icon name={mode === 'live' ? 'pulse-outline' : 'stats-chart'} size={16} color="#FFFFFF" />
+              <Text style={styles.btnText}>{mode === 'live' ? 'Canlı takip et' : 'Maç merkezi'}</Text>
+            </View>
           </PressableScale>
         </View>
       </LinearGradient>

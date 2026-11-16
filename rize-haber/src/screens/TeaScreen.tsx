@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, RefreshControl, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { RefreshControl, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { NewsCard } from '../components/NewsCard';
+import { SkeletonCard, SkeletonGroup } from '../components/Skeleton';
 import { Card, LinkRow, SectionTitle } from '../components/ui';
 import { googleNewsRssUrl } from '../config';
 import { fetchRss, type NewsItem } from '../rss';
@@ -46,6 +47,8 @@ export default function TeaScreen() {
     loadLocalTeaData().then((local) =>
       setData((current) => (local.updatedAt > current.updatedAt ? local : current)),
     );
+    // Açılışta güncel veriyi indir (veri çekme deseni).
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     refresh();
     return () => controller.current?.abort();
   }, [refresh]);
@@ -202,7 +205,11 @@ export default function TeaScreen() {
 
       <SectionTitle hint="Fiyat, prim ve ödeme duyuruları – son 30 gün">Çay gündemi</SectionTitle>
       {newsState === 'loading' ? (
-        <ActivityIndicator color={colors.primary} style={{ padding: 16 }} />
+        <SkeletonGroup style={{ gap: 10 }}>
+          <SkeletonCard />
+          <SkeletonCard />
+          <SkeletonCard />
+        </SkeletonGroup>
       ) : newsState === 'error' ? (
         <Text style={styles.muted}>Çay haberleri yüklenemedi. Aşağı çekerek yenileyin.</Text>
       ) : news.length === 0 ? (

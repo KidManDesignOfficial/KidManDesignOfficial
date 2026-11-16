@@ -4,10 +4,21 @@
  * Tek bir yerde tanımlandıkları için her ekranda aynı süre ve eğri kullanılır. Telefonda
  * "Hareketi azalt" (erişilebilirlik) açıksa animasyonlar anında tamamlanır.
  */
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 import { AccessibilityInfo, Animated, Easing, Pressable, View } from 'react-native';
 import type { PressableProps, StyleProp, ViewStyle } from 'react-native';
+
+import { Icon } from './Icon';
+
+/**
+ * Bileşen ömrü boyunca sabit kalan animasyon değeri. React Native'in `useAnimatedValue` kancasıyla
+ * aynı işi yapar ama web önizlemesi dahil her platformda çalışır ve React derleyicisiyle uyumludur.
+ */
+export function useAnimatedValue(initial: number): Animated.Value {
+  const [value] = useState(() => new Animated.Value(initial));
+  return value;
+}
 
 /** Doğal hissettiren yavaşlayan eğri (Material "emphasized decelerate"e yakın). */
 export const EASE_OUT = Easing.bezier(0.2, 0.8, 0.2, 1);
@@ -44,7 +55,7 @@ export function Collapsible({
   progress?: Animated.Value;
 }) {
   const reduced = useReducedMotion();
-  const internal = useRef(new Animated.Value(open ? 1 : 0)).current;
+  const internal = useAnimatedValue(open ? 1 : 0);
   const progress = external ?? internal;
   const [height, setHeight] = useState(0);
 
@@ -94,7 +105,7 @@ export function PressableScale({
   scaleTo?: number;
 }) {
   const reduced = useReducedMotion();
-  const scale = useRef(new Animated.Value(1)).current;
+  const scale = useAnimatedValue(1);
   const to = (value: number) =>
     Animated.spring(scale, {
       toValue: value,
@@ -135,7 +146,7 @@ export function FadeInView({
   style?: StyleProp<ViewStyle>;
 }) {
   const reduced = useReducedMotion();
-  const progress = useRef(new Animated.Value(0)).current;
+  const progress = useAnimatedValue(0);
 
   useEffect(() => {
     if (!visible) {
@@ -166,7 +177,9 @@ export function Chevron({ progress, color, size }: { progress: Animated.Value; c
   const rotate = progress.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '180deg'] });
   return (
     <View style={{ width: size, height: size, alignItems: 'center', justifyContent: 'center' }}>
-      <Animated.Text style={{ color, fontSize: size, lineHeight: size + 2, transform: [{ rotate }] }}>▾</Animated.Text>
+      <Animated.View style={{ transform: [{ rotate }] }}>
+        <Icon name="chevron-down" size={size} color={color} />
+      </Animated.View>
     </View>
   );
 }

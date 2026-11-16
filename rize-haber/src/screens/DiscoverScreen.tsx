@@ -12,10 +12,10 @@ import RizeScreen from './RizeScreen';
 type Section = 'places' | 'food' | 'culture' | 'history';
 
 const SECTIONS: Segment<Section>[] = [
-  { id: 'places', label: 'Gezi', icon: '📍' },
-  { id: 'food', label: 'Lezzet', icon: '🍲' },
-  { id: 'culture', label: 'Kültür', icon: '🎻' },
-  { id: 'history', label: 'Tarihçe', icon: '📜' },
+  { id: 'places', label: 'Gezi', icon: 'location-outline' },
+  { id: 'food', label: 'Lezzet', icon: 'restaurant-outline' },
+  { id: 'culture', label: 'Kültür', icon: 'musical-notes-outline' },
+  { id: 'history', label: 'Tarihçe', icon: 'time-outline' },
 ];
 
 export default function DiscoverScreen() {
