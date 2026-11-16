@@ -1,0 +1,54 @@
+{
+  "expo": {
+    "name": "Hedef YKS",
+    "slug": "hedef-yks",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "backgroundColor": "#F4F5FB",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.kidmandesign.hedefyks"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#5B4BF5",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false,
+      "package": "com.kidmandesign.hedefyks",
+      "versionCode": 1,
+      "softwareKeyboardLayoutMode": "pan",
+      "blockedPermissions": [
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.SYSTEM_ALERT_WINDOW",
+        "android.permission.RECORD_AUDIO"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-font",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 160,
+          "resizeMode": "contain",
+          "backgroundColor": "#5B4BF5",
+          "dark": {
+            "image": "./assets/splash-icon.png",
+            "backgroundColor": "#221A7A"
+          }
+        }
+      ],
+      "./plugins/withReleaseSigning",
+      "expo-web-browser"
+    ]
+  }
+}
