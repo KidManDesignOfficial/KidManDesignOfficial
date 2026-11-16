@@ -1,5 +1,5 @@
 /** TYT Sosyal Bilimler: Tarih, Coğrafya, Felsefe ve Din Kültürü'nün kalan konuları. */
-import { F, FLOW, H, P, TABLE, TIMELINE, TIP, UL, builder, card } from '../../build.ts';
+import { F, H, P, TABLE, TIMELINE, TIP, UL, builder, card } from '../../build.ts';
 
 // ═════════════════════════════ TARİH ═════════════════════════════
 const tr = builder('tyt-tarih', 'b');
