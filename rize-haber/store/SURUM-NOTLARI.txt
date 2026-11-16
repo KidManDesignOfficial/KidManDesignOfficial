@@ -4,7 +4,7 @@ Rize Haber’in ilk sürümü 🍃
 • Çaykur Rizespor: fikstür, puan durumu, kadro ve Maç Merkezi
 • “Çayını demle” maç hatırlatması
 • Güncel yaş çay alım fiyatı ve tutar hesaplayıcı
-• 12 ilçe için hava durumu
+• Canlı hava durumu: havaya göre değişen ekran ve isteğe bağlı yağmur sesi
 • Rize’yi keşfet: yaylalar, lezzetler, kültür ve tarih
 • Koyu tema ve büyük yazı seçenekleri
 </tr-TR>

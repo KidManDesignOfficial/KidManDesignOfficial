@@ -70,6 +70,7 @@ function Main() {
   const [showSaved, setShowSaved] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [openMatchId, setOpenMatchId] = useState<string | null>(null);
+  const [weatherHeader, setWeatherHeader] = useState<string | null>(null);
   // Her sekme ilk açıldığında yüklenir: açılış hızlanır, gereksiz ağ isteği ve pil harcanmaz.
   const [mounted, setMounted] = useState<Set<Tab | 'settings'>>(() => new Set(['news']));
   const mount = useCallback((t: Tab | 'settings') => {
@@ -107,6 +108,9 @@ function Main() {
   }, [showSaved, showSettings, tab]);
 
   const club = tab === 'rizespor' && !showSettings;
+  const weatherVisible = tab === 'weather' && !showSettings;
+  // Hava sekmesinde başlık çubuğu gökyüzünün rengini alır; sahneyle kesintisiz birleşir.
+  const sky = weatherVisible ? weatherHeader : null;
   const styles = useMemo(
     () =>
       StyleSheet.create({
@@ -195,13 +199,14 @@ function Main() {
   return (
     <>
       <StatusBar style="light" />
-      <SafeAreaView style={[styles.root, club && { backgroundColor: CLUB_COLORS.green }]} edges={['top', 'left', 'right']}>
+      <SafeAreaView
+        style={[styles.root, club && { backgroundColor: CLUB_COLORS.green }, sky ? { backgroundColor: sky } : null]} edges={['top', 'left', 'right']}>
         {club ? (
           <LinearGradient colors={[CLUB_COLORS.green, CLUB_COLORS.blue]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
             {headerContent}
           </LinearGradient>
         ) : (
-          <View style={{ backgroundColor: colors.header }}>{headerContent}</View>
+          <View style={{ backgroundColor: sky ?? colors.header }}>{headerContent}</View>
         )}
 
         {/* Ekranlar bağlı kalır; sekme değişince yüklenen veri ve kaydırma konumu korunur. */}
@@ -223,8 +228,8 @@ function Main() {
             </FadeInView>
           ) : null}
           {mounted.has('weather') ? (
-            <FadeInView visible={!showSettings && tab === 'weather'} style={styles.screen}>
-              <WeatherScreen />
+            <FadeInView visible={weatherVisible} style={styles.screen}>
+              <WeatherScreen active={weatherVisible} onHeaderColor={setWeatherHeader} />
             </FadeInView>
           ) : null}
           {mounted.has('rize') ? (

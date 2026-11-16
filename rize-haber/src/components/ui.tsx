@@ -36,20 +36,32 @@ export function Chip({
   label,
   selected,
   onPress,
+  glass = false,
 }: {
   label: string;
   selected: boolean;
   onPress: () => void;
+  /** Hava sahnesi gibi renkli arka planlar için yarı saydam (cam) görünüm. */
+  glass?: boolean;
 }) {
   const styles = useStyles();
   return (
     <Pressable
       onPress={onPress}
-      style={[styles.chip, selected && styles.chipActive]}
+      style={[styles.chip, selected && styles.chipActive, glass && styles.chipGlass, glass && selected && styles.chipGlassActive]}
       accessibilityRole="tab"
       accessibilityState={{ selected }}
     >
-      <Text style={[styles.chipText, selected && styles.chipTextActive]}>{label}</Text>
+      <Text
+        style={[
+          styles.chipText,
+          selected && styles.chipTextActive,
+          glass && styles.chipGlassText,
+          glass && selected && styles.chipGlassTextActive,
+        ]}
+      >
+        {label}
+      </Text>
     </Pressable>
   );
 }
@@ -129,6 +141,10 @@ function useStyles() {
         chipActive: { backgroundColor: colors.primary, borderColor: colors.primary },
         chipText: { fontSize: fs(14), fontWeight: '600', color: colors.text },
         chipTextActive: { color: colors.isDark ? '#0F1311' : colors.onPrimary },
+        chipGlass: { backgroundColor: 'rgba(255,255,255,0.14)', borderColor: 'rgba(255,255,255,0.28)' },
+        chipGlassActive: { backgroundColor: '#FFFFFF', borderColor: '#FFFFFF' },
+        chipGlassText: { color: '#FFFFFF' },
+        chipGlassTextActive: { color: '#1D2B3A' },
         linkRow: {
           flexDirection: 'row',
           alignItems: 'center',

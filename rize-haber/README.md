@@ -9,7 +9,7 @@ Rize'deki günlük haberleri ve hava durumunu gösteren Android uygulaması (Rea
 | **Haberler** | Google Haberler üzerinden son 7 günün Rize haberleri · kategoriler · arama · Kaydet / Paylaş · başlıktaki **★ Kaydedilenler** |
 | **Rizespor** | Sıradaki maç kartı (saniye saniye geri sayım, “🍵 Çayını demle” hatırlatması) · canlı skor · son 5 maç formu, sıra ve puan · fikstür ve sonuçlar · Süper Lig puan durumu · kadro (mevki, yaş, uyruk, sakatlık) · transfer ve maç haberleri · **Maç Merkezi:** maç anları zaman çizelgesi, sahada ilk 11’ler, istatistikler, canlıda 30 sn’de bir yenileme ve gol kutlaması |
 | **Çay** | Güncel yaş çay alım fiyatı (resmî kaynak + ilan tarihi) · önceki yıla göre değişim · **tutar hesaplayıcı** · yıllara göre fiyat grafiği · çay gündemi haberleri · kaynak bağlantıları |
-| **Hava** | Anlık durum · 24 saatlik ve 7 günlük tahmin · 12 ilçe + Ayder |
+| **Hava** | Anlık durum · 24 saatlik ve 7 günlük tahmin · 12 ilçe + Ayder · havaya göre canlanan sahne (güneş, ay/yıldız, bulut, yağmur, şimşek, kar, sis) · isteğe bağlı yağmur sesi |
 | **Keşfet** | **Gezi:** 15 yer (yayla, doğa, tarih, müze), haritada aç, gezi listem, paylaş · **Lezzet:** 14 coğrafi işaretli ürün ve yöresel tatlar · **Kültür:** Rize bezi, horon, kemençe, tulum, şenlikler, pratik bilgiler · **Tarihçe** |
 | **Ayarlar** (⚙️) | Tema (Sistem/Açık/Koyu) · 5 renk · yazı boyutu (Normal/Büyük/Çok büyük) · varsayılan hava konumu · bildirimler · kaydedilenleri temizle · hakkında ve veri kaynakları |
 
@@ -109,7 +109,11 @@ src/screens/SettingsScreen.tsx Ayarlar
 src/weather.ts              Open-Meteo istemcisi, hava kodu → Türkçe açıklama
 src/time.ts                 "5 dk önce", gün adları vb.
 src/screens/NewsScreen.tsx  Haber listesi
-src/screens/WeatherScreen.tsx Hava durumu
+src/screens/WeatherScreen.tsx Hava durumu (cam kartlar)
+src/components/WeatherScene.tsx Canlı hava sahnesi (yerel sürücüde animasyon)
+src/weatherScene.ts          Hava kodu → sahne (saf, test edilir)
+src/rainSound.ts             İsteğe bağlı yağmur sesi (varsayılan kapalı)
+design/make-rain-sound.py    Özgün yağmur sesi sentezleyici → assets/sounds/rain.m4a
 test/*.test.ts              Birim testleri
 ```
 

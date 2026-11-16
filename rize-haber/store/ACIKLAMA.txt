@@ -22,6 +22,8 @@ Rize Haber, Rize’ye dair her şeyi tek uygulamada toplar: gündem, Çaykur Riz
 
 🌦️ HAVA DURUMU
 • Rize’nin 12 ilçesi ve Ayder Yaylası için anlık, saatlik ve 7 günlük tahmin
+• Havaya göre canlanan ekran: güneş, bulut, yağmur, kar, sis ve şimşek
+• İsteğe bağlı yağmur sesi
 
 🧭 RİZE’Yİ KEŞFET
 • Gezilecek yerler: yaylalar, şelaleler, kaleler ve müzeler; haritada açın, gezi listenize ekleyin
