@@ -8,7 +8,7 @@ import { OfficialLinks } from '../components/OfficialLinks';
 import { WikiLesson } from '../components/WikiLesson';
 import { PressableScale, useAnimatedValue } from '../components/motion';
 import { Button, Card, Screen, T } from '../components/ui';
-import { LESSON_BY_TOPIC, questionsOfTopic, subjectOfTopic, topicTitle } from '../data';
+import { LESSON_BY_TOPIC, generatedSet, hasGenerator, questionsOfTopic, subjectOfTopic, topicTitle } from '../data';
 import { successFeedback, tapFeedback } from '../lib/haptics';
 import { byDifficulty } from '../lib/quiz';
 import { useNav } from '../nav';
@@ -100,6 +100,19 @@ export default function LessonScreen({ topicId }: { topicId: string }) {
                 nav.push({ name: 'quiz', config: { title: topicTitle(topicId), mode: 'practice', kind: 'topic', questionIds: byDifficulty(qs, Date.now()).map((q) => q.id) } });
               }}
             />
+          ) : null}
+          {hasGenerator(topicId) ? (
+            <>
+              <Button
+                label="Sınırsız soru · 10 yeni soru"
+                icon="refresh"
+                gradient={s.colors}
+                onPress={() => nav.push({ name: 'quiz', config: { title: `${topicTitle(topicId)} · yeni sorular`, mode: 'practice', kind: 'topic', questionIds: generatedSet(topicId, 10).map((q) => q.id) } })}
+              />
+              <T size={12} muted>
+                Her basışta sayıları farklı yeni sorular hesapla üretilir; çözümü ve doğru cevabı formülden çıkar.
+              </T>
+            </>
           ) : null}
           <Button
             label={done ? 'Konu tamamlandı' : 'Konuyu tamamladım'}

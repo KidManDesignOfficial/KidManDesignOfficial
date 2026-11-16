@@ -10,7 +10,8 @@
     "web": "expo start --web",
     "typecheck": "tsc --noEmit",
     "test": "node --experimental-strip-types --no-warnings --test \"test/*.test.ts\"",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "build-wiki": "node --experimental-strip-types scripts/build-wiki.ts"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.2",

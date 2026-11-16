@@ -1,6 +1,7 @@
 /**
  * Tüm içeriğin tek giriş noktası. Ekranlar içeriğe yalnızca buradan erişir.
  */
+import { questionFromGenId } from './generators.ts';
 import { SUBJECTS, SUBJECT_BY_ID, subjectOfTopic, topicTitle, FIELD_LABELS } from './curriculum.ts';
 import type { Lesson, Question, SubjectContent } from './types.ts';
 import tytTurkce from './subjects/tyt-turkce.ts';
@@ -21,6 +22,11 @@ export const QUESTIONS: Question[] = CONTENT.flatMap((c) => c.questions);
 export const LESSON_BY_TOPIC: Record<string, Lesson> = Object.fromEntries(LESSONS.map((l) => [l.topicId, l]));
 export const QUESTION_BY_ID: Record<string, Question> = Object.fromEntries(QUESTIONS.map((q) => [q.id, q]));
 
+/** Kimlikten soruyu bulur: elle yazılmış sorular veya üretilmiş (`g:<konu>:<tohum>`) sorular. */
+export function questionById(id: string): Question | undefined {
+  return QUESTION_BY_ID[id] ?? questionFromGenId(id) ?? undefined;
+}
+
 export function questionsOfTopic(topicId: string): Question[] {
   return QUESTIONS.filter((q) => q.topicId === topicId);
 }
@@ -35,3 +41,4 @@ export function lessonsOfSubject(subjectId: string): Lesson[] {
 
 export { SUBJECTS, SUBJECT_BY_ID, subjectOfTopic, topicTitle, FIELD_LABELS };
 export type * from './types.ts';
+export { generatedSet, hasGenerator } from './generators.ts';

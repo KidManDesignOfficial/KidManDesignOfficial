@@ -2,7 +2,7 @@ import { View } from 'react-native';
 
 import { Icon } from '../components/Icon';
 import { Button, Card, Empty, Screen, T } from '../components/ui';
-import { QUESTION_BY_ID, subjectOfTopic, topicTitle } from '../data';
+import { questionById, subjectOfTopic, topicTitle } from '../data';
 import { letter } from '../lib/quiz';
 import { useNav } from '../nav';
 import { useStore } from '../store';
@@ -12,7 +12,7 @@ export default function WrongBookScreen() {
   const { c } = useTheme();
   const { state, resolveWrong } = useStore();
   const nav = useNav();
-  const ids = state.wrongBook.filter((id) => QUESTION_BY_ID[id]);
+  const ids = state.wrongBook.filter((id) => questionById(id));
 
   return (
     <Screen
@@ -24,7 +24,7 @@ export default function WrongBookScreen() {
         <Empty icon="sparkles" title="Defterin tertemiz" text="Yanlış yaptığın her soru otomatik olarak buraya eklenir. Tekrar çözüp doğru yaptığında “Öğrendim” diyerek çıkarabilirsin." />
       ) : (
         ids.map((id) => {
-          const q = QUESTION_BY_ID[id];
+          const q = questionById(id)!;
           const s = subjectOfTopic(q.topicId)!;
           const a = state.answers[id];
           const fixed = a?.correct;

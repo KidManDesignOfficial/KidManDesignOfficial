@@ -39,8 +39,10 @@ Erişilebilirlik: tüm dokunma alanlarında ekran okuyucu etiketleri; telefonda 
 ## İçerik durumu (v1.0.0)
 
 - **20 ders, 235 konu — 235 konunun tamamında anlatım** (tablolar, formüller, adım adım örnekler, grafikler, zaman çizelgeleri, sınav taktikleri).
-- **799 özgün, çözümlü soru** (her konuda en az 3), bilgi kartları.
-- Sorular özgündür; ÖSYM çıkmış soruları ise uygulamadan ÖSYM'nin kendi PDF'leri olarak açılır.
+- **799 elle yazılmış, çözümlü soru** (her konuda en az 3), bilgi kartları.
+- **Sınırsız üretilen sorular:** 75 hesaplamalı konuda (TYT/AYT Matematik, Geometri, Fizik, Kimya) `src/data/generators.ts` her seferinde sayıları farklı yeni soru üretir; doğru cevap ve çözüm formülden hesaplanır (elle yazılmış cevap yok), yanlış şıklar tipik hatalardan türetilir. Konu ekranında "Sınırsız soru · 10 yeni soru". 2000 tohumda ~28 bin farklı soru; her konuda en az 28, çoğunda yüzlerce. Sözel derslerde üretilmez (bilgi sorularının doğruluğu hesapla doğrulanamaz).
+- **Konu anlatımı:** 20 ders, 235 konu; ayrıca 760 Vikipedi maddesi (CC BY-SA 4.0) uygulamanın içinde, internetsiz (`src/data/wiki`, `npm run build-wiki` ile yeniden üretilir).
+- ÖSYM çıkmış soruları telif nedeniyle kopyalanmaz; uygulamadan ÖSYM'nin kendi PDF'leri olarak açılır.
 - 16.11.2026 itibarıyla ÖSYM takviminde yalnızca 2026 yılı var; geri sayım 2027 için **tahmini** tarih (19.06.2027) kullanır ve ekranda "tahmini" yazar. ÖSYM 2027 takvimini yayımlayınca resmî tarihe kendiliğinden geçer.
 
 ### Yeni içerik eklemek

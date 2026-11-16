@@ -7,7 +7,7 @@ import { Icon } from '../components/Icon';
 import { Collapsible, PressableScale } from '../components/motion';
 import { ProgressRing } from '../components/ProgressRing';
 import { Button, Card, Screen, T } from '../components/ui';
-import { QUESTION_BY_ID, SUBJECT_BY_ID, topicTitle } from '../data';
+import { SUBJECT_BY_ID, questionById, topicTitle } from '../data';
 import type { Question } from '../data';
 import { successFeedback, tapFeedback } from '../lib/haptics';
 import { formatNet, net } from '../lib/net';
@@ -21,7 +21,7 @@ export default function ResultScreen({ result }: { result: QuizResult }) {
   const { c } = useTheme();
   const nav = useNav();
   const { saveExam } = useStore();
-  const qs = useMemo(() => result.config.questionIds.map((id) => QUESTION_BY_ID[id]).filter(Boolean) as Question[], [result.config.questionIds]);
+  const qs = useMemo(() => result.config.questionIds.map((id) => questionById(id)).filter(Boolean) as Question[], [result.config.questionIds]);
   const correct = qs.filter((q, i) => result.answers[i] === q.answer).length;
   const blank = result.answers.filter((a) => a === null).length;
   const wrong = qs.length - correct - blank;

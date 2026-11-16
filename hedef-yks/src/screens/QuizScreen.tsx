@@ -12,7 +12,7 @@ import { Appear } from '../components/Blocks';
 import { Icon } from '../components/Icon';
 import { EASE_OUT, PressableScale, useAnimatedValue, useReducedMotion } from '../components/motion';
 import { Button, ProgressBar, T } from '../components/ui';
-import { QUESTION_BY_ID, subjectOfTopic, topicTitle } from '../data';
+import { questionById, subjectOfTopic, topicTitle } from '../data';
 import type { Question } from '../data';
 import { errorFeedback, pressFeedback, successFeedback, tapFeedback } from '../lib/haptics';
 import { letter } from '../lib/quiz';
@@ -43,7 +43,7 @@ export default function QuizScreen({ config }: { config: QuizConfig }) {
   const nav = useNav();
   const { recordAnswer } = useStore();
   const insets = useSafeAreaInsets();
-  const questions = useMemo(() => config.questionIds.map((id) => QUESTION_BY_ID[id]).filter(Boolean) as Question[], [config.questionIds]);
+  const questions = useMemo(() => config.questionIds.map((id) => questionById(id)).filter(Boolean) as Question[], [config.questionIds]);
   const [index, setIndex] = useState(0);
   const [answers, setAnswers] = useState<(number | null)[]>(() => questions.map(() => null));
   const [seconds, setSeconds] = useState(0);
