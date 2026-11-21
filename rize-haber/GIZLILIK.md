@@ -37,6 +37,8 @@ gibi standart bağlantı bilgilerini kendi politikasına göre kaydedebilir.
 | Open-Meteo (`api.open-meteo.com`) | Hava durumu |
 | ESPN (`site.web.api.espn.com`) | Rizespor fikstür, skor, puan durumu ve kadro |
 | GitHub (`raw.githubusercontent.com`) | Güncel yaş çay alım fiyatı dosyası |
+| OpenFreeMap (`tiles.openfreemap.org`) | Keşfet → Kuşbakışı: 3B harita (OpenStreetMap verisi; yalnızca bu sekme açıldığında) |
+| jsDelivr (`cdn.jsdelivr.net`) | Keşfet → Kuşbakışı: harita çizim kütüphanesi (MapLibre; yalnızca bu sekme açıldığında) |
 
 Bir habere, kaynağa veya haritaya dokunduğunuzda ilgili sayfa telefonunuzun tarayıcısında ya da harita
 uygulamasında açılır; o sayfaların gizlilik uygulamaları kendi sahiplerinin sorumluluğundadır.

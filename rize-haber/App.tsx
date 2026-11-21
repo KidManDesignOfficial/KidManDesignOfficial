@@ -266,7 +266,7 @@ function Main() {
           ) : null}
           {mounted.has('rize') ? (
             <FadeInView visible={!showSettings && tab === 'rize'} style={styles.screen}>
-              <DiscoverScreen />
+              <DiscoverScreen active={!showSettings && tab === 'rize'} />
             </FadeInView>
           ) : null}
           {mounted.has('settings') ? (

@@ -92,7 +92,7 @@ export function SegmentedTabs<T extends string>({
               size={18}
               color={active ? (activeColor ? '#FFFFFF' : colors.isDark ? '#0F1311' : colors.onPrimary) : glass ? 'rgba(255,255,255,0.74)' : colors.textMuted}
             />
-            <Text style={[styles.label, glass && styles.labelGlass, active && styles.labelActive]} numberOfLines={1}>
+            <Text style={[styles.label, glass && styles.labelGlass, active && styles.labelActive]} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.75}>
               {s.label}
             </Text>
           </PressableScale>
