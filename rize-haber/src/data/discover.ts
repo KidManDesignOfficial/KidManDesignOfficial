@@ -30,7 +30,25 @@ export type Place = {
   /** Harita uygulamasında aranacak metin. */
   mapsQuery: string;
   sourceUrl: string;
+  /** Yaklaşık konum (kuş uçuşu uzaklık ve "en yakın" sıralaması için; yol tarifi `mapsQuery` ile yapılır). */
+  lat: number;
+  lon: number;
+  /** Kapalı alan (yağmurda da gezilebilir). */
+  indoor: boolean;
+  /** Rahat ulaşılabilen aylar [başlangıç, bitiş] (1–12). Yoksa yıl boyu. */
+  months?: readonly [number, number];
+  /** Önerilen ziyaret süresi. */
+  visit: VisitLength;
+  /** Rehberlerde en sık önerilen "mutlaka görülecek" yerlerden. */
+  popular?: boolean;
 };
+
+export type VisitLength = 'kisa' | 'yarim' | 'tam';
+
+export const VISIT_LABELS: Record<VisitLength, string> = { kisa: '1–2 saat', yarim: 'Yarım gün', tam: 'Tam gün' };
+
+/** Yaylalara yollar genellikle Haziran–Eylül arasında rahat açıktır (kar ve çamur nedeniyle). */
+const YAYLA_SEASON = [6, 9] as const;
 
 const KTB = 'https://rize.ktb.gov.tr';
 const PORTAL = 'https://www.kulturportali.gov.tr/turkiye/rize';
@@ -54,6 +72,7 @@ export const PLACES: Place[] = [
     note: 'Ayder’in Çamlıhemşin’e uzaklığı kaynaklarda 16 ve 19 km olarak farklı verilir.',
     mapsQuery: 'Ayder Yaylası, Çamlıhemşin, Rize',
     sourceUrl: `${KTB}/TR-112789/yayla-turizmi.html`,
+    lat: 40.9507, lon: 41.1031, indoor: false, months: [5, 10], visit: 'tam', popular: true,
   },
   {
     id: 'kackar',
@@ -69,6 +88,7 @@ export const PLACES: Place[] = [
     note: 'Kaçkar Dağı’nın yüksekliği Rize Valiliği’nde 3.937 m, Kültür Portalı’nda 3.992 m olarak geçer.',
     mapsQuery: 'Kaçkar Dağları Milli Parkı, Rize',
     sourceUrl: `${PORTAL}/gezilecekyer/kackar-daglari-milli-parki`,
+    lat: 40.8611, lon: 41.1011, indoor: false, months: YAYLA_SEASON, visit: 'tam', popular: true,
   },
   {
     id: 'firtina',
@@ -86,6 +106,7 @@ export const PLACES: Place[] = [
     ],
     mapsQuery: 'Fırtına Vadisi, Çamlıhemşin, Rize',
     sourceUrl: 'https://rize.goturkiye.com/tr/rize-rotalari',
+    lat: 41.0458, lon: 41.0053, indoor: false, visit: 'yarim', popular: true,
   },
   {
     id: 'zilkale',
@@ -99,6 +120,7 @@ export const PLACES: Place[] = [
     highlights: ['Rize’nin en büyük kalesi', 'Fırtına Vadisi’nin kemer köprüleriyle aynı rota'],
     mapsQuery: 'Zil Kale, Çamlıhemşin, Rize',
     sourceUrl: `${KTB}/TR-127865/kaleler.html`,
+    lat: 40.9592, lon: 40.9631, indoor: false, months: [4, 11], visit: 'yarim', popular: true,
   },
   {
     id: 'palovit',
@@ -112,6 +134,7 @@ export const PLACES: Place[] = [
     highlights: ['Bölgenin en bol sulu şelalesi', 'Kaçkar Dağları Milli Parkı içinde'],
     mapsQuery: 'Palovit Şelalesi, Çamlıhemşin, Rize',
     sourceUrl: `${KTB}/TR-112780/selaleler.html`,
+    lat: 40.9414, lon: 40.9931, indoor: false, months: YAYLA_SEASON, visit: 'tam',
   },
   {
     id: 'pokut',
@@ -127,6 +150,7 @@ export const PLACES: Place[] = [
     note: 'Pokut’un yüksekliği Kültür Portalı’nda 2.032 m, GoTürkiye’de 2.170 m olarak geçer.',
     mapsQuery: 'Pokut Yaylası, Çamlıhemşin, Rize',
     sourceUrl: `${PORTAL}/gezilecekyer/pokut-yaylasi`,
+    lat: 40.9631, lon: 41.0253, indoor: false, months: YAYLA_SEASON, visit: 'tam', popular: true,
   },
   {
     id: 'elevit',
@@ -140,6 +164,7 @@ export const PLACES: Place[] = [
     highlights: ['Ağustos şenlikleri', 'Horon', 'Çat’tan yürüyüş rotası'],
     mapsQuery: 'Elevit Yaylası, Çamlıhemşin, Rize',
     sourceUrl: `${PORTAL}/gezilecekyer/elevit-yaylasi`,
+    lat: 40.86, lon: 41.02, indoor: false, months: YAYLA_SEASON, visit: 'tam',
   },
   {
     id: 'yukarikackar',
@@ -153,6 +178,7 @@ export const PLACES: Place[] = [
     highlights: ['Vartavor Şenlikleri (Ağustos)', 'Geleneksel yayla yerleşimi'],
     mapsQuery: 'Yukarı Kaçkar Yaylası, Çamlıhemşin, Rize',
     sourceUrl: `${PORTAL}/gezilecekyer/kackar-yaylasi`,
+    lat: 40.89, lon: 41.13, indoor: false, months: YAYLA_SEASON, visit: 'tam',
   },
   {
     id: 'huser',
@@ -165,6 +191,7 @@ export const PLACES: Place[] = [
     highlights: ['Kaçkar Dağları panoraması', 'Dört vadiye birden bakış'],
     mapsQuery: 'Huser Yaylası, Çamlıhemşin, Rize',
     sourceUrl: 'https://goturkiye.com/rize/routes',
+    lat: 40.9736, lon: 41.1131, indoor: false, months: YAYLA_SEASON, visit: 'tam',
   },
   {
     id: 'anzer',
@@ -179,6 +206,7 @@ export const PLACES: Place[] = [
     note: 'Yüksekliği Rize Valiliği’nde yaklaşık 2.105 m; bazı turizm kaynaklarında 2.200–2.300 m olarak geçer.',
     mapsQuery: 'Anzer Yaylası, İkizdere, Rize',
     sourceUrl: 'https://rize.gov.tr/yaylalar',
+    lat: 40.5913, lon: 40.517, indoor: false, months: YAYLA_SEASON, visit: 'tam', popular: true,
   },
   {
     id: 'ovit',
@@ -192,6 +220,7 @@ export const PLACES: Place[] = [
     highlights: ['Kış Turizm Merkezi (2008)', 'Kış sporları', 'Yaz trekkingi'],
     mapsQuery: 'Ovit Dağı, İkizdere, Rize',
     sourceUrl: `${KTB}/TR-112809/ovit-dagi-kis-turizm-merkezi.html`,
+    lat: 40.63, lon: 40.64, indoor: false, visit: 'tam',
   },
   {
     id: 'rizekalesi',
@@ -205,6 +234,7 @@ export const PLACES: Place[] = [
     highlights: ['İç kale: 6. yüzyıl', 'Aşağı kale: 13. yüzyıl', 'Zil Kale’den sonra ilin en büyük kalesi'],
     mapsQuery: 'Rize Kalesi, Rize',
     sourceUrl: `${KTB}/TR-127865/kaleler.html`,
+    lat: 41.0275, lon: 40.5103, indoor: false, visit: 'kisa', popular: true,
   },
   {
     id: 'kizkalesi',
@@ -218,6 +248,7 @@ export const PLACES: Place[] = [
     highlights: ['Deniz üzerindeki kayalık adacık', 'Gözetleme kulesi', '13–14. yüzyıl (tahmini)'],
     mapsQuery: 'Kız Kalesi, Pazar, Rize',
     sourceUrl: `${PORTAL}/kulturenvanteri/kiz-kalesi-1`,
+    lat: 41.1828, lon: 40.8742, indoor: false, visit: 'kisa',
   },
   {
     id: 'ataturkevi',
@@ -231,6 +262,7 @@ export const PLACES: Place[] = [
     highlights: ['Atatürk’ün konakladığı ev', '1985’ten beri müze', 'Bahçeli konak'],
     mapsQuery: 'Atatürk Evi Müzesi, Rize',
     sourceUrl: `${PORTAL}/gezilecekyer/ataturkevi-muzesi-mehmet-mataraci-konagi`,
+    lat: 41.0233, lon: 40.5342, indoor: true, visit: 'kisa', popular: true,
   },
   {
     id: 'rizemuzesi',
@@ -244,6 +276,283 @@ export const PLACES: Place[] = [
     highlights: ['Etnografya', 'Sikke koleksiyonu', 'Arkeolojik eserler'],
     mapsQuery: 'Rize Müzesi, Rize',
     sourceUrl: 'https://muze.gov.tr/muze-detay?SectionId=RZM01&DistId=MRK',
+    lat: 41.024, lon: 40.5215, indoor: true, visit: 'kisa',
+  },
+  // ——— Vikipedi (tr) maddelerinden derlenen ek yerler; koordinatlar madde ve GeoNames verisinden ———
+  {
+    id: 'ziraatcay',
+    name: 'Ziraat Botanik Çay Bahçesi',
+    district: 'Merkez',
+    category: 'doga',
+    tagline: 'Şehrin üstündeki tepede, çay bahçeleri arasında manzaralı mola.',
+    description:
+      'Rize’nin eski çay plantasyonlarından biri üzerinde kurulan bahçe, şehir merkezine ve denize bakan bir ' +
+      'tepededir. Çay bitkisini yakından görmek, küçük ölçekli çay işleme örneklerini izlemek ve manzara eşliğinde ' +
+      'demli bir Rize çayı içmek için şehirde en çok önerilen duraklardandır.',
+    highlights: ['Şehir ve deniz manzarası', 'Çay bitkisini yakından görme', 'Çay bahçesinde mola'],
+    mapsQuery: 'Ziraat Botanik Çay Bahçesi, Rize',
+    sourceUrl: 'https://goturkiye.com/culturaljourneys/tea-route',
+    lat: 41.0218, lon: 40.5175, indoor: false, visit: 'kisa', popular: true,
+  },
+  {
+    id: 'islampasa',
+    name: 'İslampaşa (Kurşunlu) Camii',
+    district: 'Merkez',
+    category: 'tarih',
+    tagline: '1571’den kalma, şehrin en eski camilerinden.',
+    description:
+      'İskender Cafer Paşa tarafından 1571’de yaptırılan cami, dikdörtgen planlıdır. Moloz taştan örülen yapının ' +
+      'kubbesinde 24 pencere bulunur; kurşun kaplı kubbesi nedeniyle Kurşunlu Cami adıyla da anılır.',
+    highlights: ['1571’de yapıldı', 'Kubbede 24 pencere', 'Şehir merkezinde'],
+    mapsQuery: 'İslampaşa Camii, Rize',
+    sourceUrl: 'https://tr.wikipedia.org/wiki/%C4%B0slampa%C5%9Fa_Kur%C5%9Funlu_Cami',
+    lat: 41.0237, lon: 40.5165, indoor: true, visit: 'kisa',
+  },
+  {
+    id: 'senyuva',
+    name: 'Şenyuva (Çinçiva) Köprüsü',
+    district: 'Çamlıhemşin',
+    category: 'tarih',
+    tagline: 'Fırtına Deresi’nin en ünlü taş kemer köprüsü, 1696.',
+    description:
+      'Fırtına Deresi üzerindeki tek gözlü kemer köprü 1696’da yaptırılmıştır. Yaklaşık 40 metre uzunluğu ve ' +
+      '20 metre yüksekliğiyle vadinin en çok fotoğraflanan köprülerindendir. Çamlıhemşin’e yaklaşık 7 km ' +
+      'uzaklıktadır; çevresindeki Şenyuva köyü taş ve ahşap evleriyle dikkat çeker.',
+    highlights: ['1696 yapımı tek gözlü kemer', '40 m uzunluk, 20 m yükseklik', 'Çamlıhemşin’e ~7 km'],
+    note: 'Köprünün kitabesi 1946 selinde kaybolmuştur.',
+    mapsQuery: 'Şenyuva Köprüsü, Çamlıhemşin, Rize',
+    sourceUrl: 'https://tr.wikipedia.org/wiki/%C5%9Eenyuva_K%C3%B6pr%C3%BCs%C3%BC',
+    lat: 40.9975, lon: 40.975, indoor: false, visit: 'kisa', popular: true,
+  },
+  {
+    id: 'mikron',
+    name: 'Mikron Köprüsü',
+    district: 'Çamlıhemşin',
+    category: 'tarih',
+    tagline: 'Çamlıhemşin’in hemen yanında, 41 metrelik kesme taş kemer.',
+    description:
+      '19. yüzyılda yapıldığı tahmin edilen köprü Fırtına Deresi üzerindedir; 41 metre uzunluğunda ve 11 metre ' +
+      'yüksekliğindedir. Sele karşı geniş tutulan ayak açıklıklarıyla bilinir; 1998’de özgün biçimi korunarak onarılmıştır.',
+    highlights: ['Çamlıhemşin’e ~2 km', '41 m uzunluk', '1998’de onarıldı'],
+    mapsQuery: 'Mikron Köprüsü, Çamlıhemşin, Rize',
+    sourceUrl: 'https://tr.wikipedia.org/wiki/Mikron_K%C3%B6pr%C3%BCs%C3%BC',
+    lat: 41.0456, lon: 41.0253, indoor: false, visit: 'kisa',
+  },
+  {
+    id: 'kocakopru',
+    name: 'Koca Köprü (Dört Gözlü Köprü)',
+    district: 'Pazar',
+    category: 'tarih',
+    tagline: 'Pazar’da dört kemerli taş köprü.',
+    description:
+      'Pazar ilçesindeki dört kemerli taş köprü, kemer sayısı nedeniyle Dört Gözlü Köprü olarak da bilinir. ' +
+      'Bölgedeki tek kemerli köprülerin çoğundan farklı olarak çok gözlü yapısıyla dikkat çeker.',
+    highlights: ['Dört kemer (göz)', 'Pazar ilçesinde', 'Kısa bir mola için uygun'],
+    mapsQuery: 'Koca Köprü, Pazar, Rize',
+    sourceUrl: 'https://tr.wikipedia.org/wiki/Koca_K%C3%B6pr%C3%BC',
+    lat: 41.1314, lon: 40.9028, indoor: false, visit: 'kisa',
+  },
+  {
+    id: 'ciha',
+    name: 'Ciha Kalesi',
+    district: 'Pazar',
+    category: 'tarih',
+    tagline: 'Hemşin Deresi kıyısında, dairesel planlı gözetleme kalesi.',
+    description:
+      'Pazar’a yaklaşık 7 km uzaklıktaki kalenin haberleşme ve gözetleme amacıyla kullanıldığı, 14. yüzyılda ' +
+      'yapıldığı tahmin edilir. Dairesel planlıdır; kuzeydoğudaki giriş kapısı iki kuleyle desteklenir, ortada ' +
+      'daire planlı bir kule daha vardır.',
+    highlights: ['14. yüzyıl (tahmini)', 'Dairesel plan, merkezde kule', 'Pazar’a ~7 km'],
+    mapsQuery: 'Ciha Kalesi, Pazar, Rize',
+    sourceUrl: 'https://tr.wikipedia.org/wiki/Ciha_Kalesi_(Rize)',
+    lat: 41.1042, lon: 40.9006, indoor: false, visit: 'kisa',
+  },
+  {
+    id: 'cukurluhoca',
+    name: 'Çukurluhoca Medresesi',
+    district: 'Çayeli',
+    category: 'tarih',
+    tagline: 'Alt katı taş, üst katı ahşap: 19. yüzyıl köy medresesi.',
+    description:
+      'Eski adıyla Babik Medresesi, 1870 civarında yapıldığı düşünülen iki katlı bir yapıdır. Alt katı kesme ' +
+      'taştan, üst katı giydirme tekniğiyle ahşaptan yapılmıştır. Alt kattaki çok sayıda ocak, bu katın aşhane ' +
+      'olarak kullanıldığını düşündürür.',
+    highlights: ['1870 civarı (tahmini)', 'Taş ve ahşap bir arada', 'Bölgeye özgü giydirme tekniği'],
+    mapsQuery: 'Çukurluhoca Medresesi, Çayeli, Rize',
+    sourceUrl: 'https://tr.wikipedia.org/wiki/%C3%87ukurluhoca_Medresesi',
+    lat: 40.9447, lon: 40.7725, indoor: false, visit: 'kisa',
+  },
+  {
+    id: 'inceler',
+    name: 'İnceler Konağı',
+    district: 'Fındıklı',
+    category: 'tarih',
+    tagline: 'Çağlayan köyünde geleneksel bir Laz evi.',
+    description:
+      'Fındıklı’nın Çağlayan köyündeki konak, Doğu Karadeniz’in geleneksel Laz evi mimarisinin örneklerindendir. ' +
+      'Çağlayan Deresi vadisine yapılacak bir gezide yol üstünde görülebilir.',
+    highlights: ['Geleneksel Laz evi', 'Çağlayan vadisi', 'Fındıklı’ya yakın'],
+    mapsQuery: 'İnceler Konağı, Fındıklı, Rize',
+    sourceUrl: 'https://tr.wikipedia.org/wiki/%C4%B0nceler_Kona%C4%9F%C4%B1',
+    lat: 41.2583, lon: 41.2047, indoor: false, visit: 'kisa',
+  },
+  {
+    id: 'ardesenkilise',
+    name: 'Ardeşen Kilisesi',
+    district: 'Ardeşen',
+    category: 'tarih',
+    tagline: 'Geç Bizans döneminden kalma kilise kalıntısı.',
+    description:
+      'Ardeşen’in Çiftekavak mahallesindeki Ortodoks kilisesi kalıntısının Orta Çağ’da, Geç Bizans döneminde ' +
+      'yapıldığı düşünülür. Beş kenarlı merkez apsisi, Trabzon İmparatorluğu dönemi mimarisinin ayırt edici ' +
+      'özelliklerinden sayılır.',
+    highlights: ['Geç Bizans dönemi (tahmini)', 'Beş kenarlı apsis', 'Kalıntı; çevre düzenlemesi sınırlı'],
+    mapsQuery: 'Ardeşen Kilisesi, Çiftekavak, Ardeşen, Rize',
+    sourceUrl: 'https://tr.wikipedia.org/wiki/Arde%C5%9Fen_Kilisesi',
+    lat: 41.1958, lon: 41.0017, indoor: false, visit: 'kisa',
+  },
+  {
+    id: 'gelintulu',
+    name: 'Gelintülü Şelalesi',
+    district: 'Çamlıhemşin',
+    category: 'doga',
+    tagline: 'Ayder’in simgesi: “gelin tülü” gibi dökülen şelale.',
+    description:
+      'Ayder yakınlarında, Kavron Deresi’nden beslenen şelale yaklaşık 1.320 metre rakımdadır. Adını, ince ' +
+      'bir tül gibi dökülen suyundan alır; Ayder’e gelenlerin ilk uğrak yerlerindendir.',
+    highlights: ['Ayder’e yürüme mesafesinde', 'Kavron Deresi’nden beslenir', '~1.320 m rakım'],
+    note: 'Şelalenin yüksekliği Vikipedi’de 15 m, bazı turizm kaynaklarında ~23 m olarak geçer.',
+    mapsQuery: 'Gelintülü Şelalesi, Ayder, Çamlıhemşin, Rize',
+    sourceUrl: 'https://tr.wikipedia.org/wiki/Gelint%C3%BCl%C3%BC_%C5%9Eelalesi',
+    lat: 40.95, lon: 41.1106, indoor: false, months: [5, 10], visit: 'kisa', popular: true,
+  },
+  {
+    id: 'camlihemsinselale',
+    name: 'Çamlıhemşin Şelalesi',
+    district: 'Çamlıhemşin',
+    category: 'doga',
+    tagline: 'İlçe merkezine 200 metre, dört mevsim akan şelale.',
+    description:
+      'Çamlıhemşin merkezine yalnızca 200 metre uzaklıktaki şelale 25 metre yüksekten dökülür. Tüm mevsimlerde ' +
+      'akması sayesinde Ayder ya da Fırtına Vadisi yolunda kısa bir mola için idealdir.',
+    highlights: ['25 m yükseklik', 'Dört mevsim akar', 'Merkeze 200 m'],
+    mapsQuery: 'Çamlıhemşin Şelalesi, Çamlıhemşin, Rize',
+    sourceUrl: 'https://tr.wikipedia.org/wiki/%C3%87aml%C4%B1hem%C5%9Fin_%C5%9Eelalesi',
+    lat: 41.0461, lon: 41.0039, indoor: false, visit: 'kisa',
+  },
+  {
+    id: 'agaran',
+    name: 'Ağaran Şelalesi',
+    district: 'Çayeli',
+    category: 'doga',
+    tagline: 'Sarp kayadan bembeyaz köpüklerle dökülen şelale.',
+    description:
+      'Şairler Deresi’nden beslenen şelale, Çayeli’ne yaklaşık 12 km uzaklıktadır. Yüksek ve sarp bir kayadan ' +
+      'çevresine beyaz köpükler saçarak akmasından dolayı “Ağaran” adını almıştır.',
+    highlights: ['Çayeli’ne ~12 km', 'Şairler Deresi', 'Yağışlı günlerden sonra daha gösterişli'],
+    mapsQuery: 'Ağaran Şelalesi, Çayeli, Rize',
+    sourceUrl: 'https://tr.wikipedia.org/wiki/A%C4%9Faran_%C5%9Eelalesi',
+    lat: 41.045, lon: 40.8089, indoor: false, visit: 'yarim',
+  },
+  {
+    id: 'karaali',
+    name: 'Karaali (Avla) Şelalesi',
+    district: 'Fındıklı',
+    category: 'doga',
+    tagline: 'Arılı Deresi vadisinde, denize yakın alçak şelale.',
+    description:
+      'Fındıklı’daki Arılı Deresi vadisinde yer alan şelale yaklaşık 210 metre rakımdadır. Sahile yakın olduğu için ' +
+      'yaylalara çıkmadan, kışın da ulaşılabilecek doğa duraklarındandır.',
+    highlights: ['Arılı Deresi vadisi', '~210 m rakım', 'Kışın da ulaşılabilir'],
+    mapsQuery: 'Karaali Şelalesi, Fındıklı, Rize',
+    sourceUrl: 'https://tr.wikipedia.org/wiki/Karaali_%C5%9Eelalesi',
+    lat: 41.2133, lon: 41.1475, indoor: false, visit: 'yarim',
+  },
+  {
+    id: 'pileki',
+    name: 'Pileki Mağarası',
+    district: 'İyidere',
+    category: 'doga',
+    tagline: 'Tünelleri, kuyuları ve gölleriyle yapay bir mağara.',
+    description:
+      'İyidere’deki mağara insan eliyle oluşturulmuştur; içinde çok sayıda tünel, kuyu ve göl bulunur. İki büyük ' +
+      'girişi vardır.',
+    highlights: ['Yapay mağara', 'Tünel, kuyu ve göller', 'İki büyük giriş'],
+    note: 'Mağara içi için el feneri ve kaymayan ayakkabı önerilir; ziyaret koşullarını yerelde sorun.',
+    mapsQuery: 'Pileki Mağarası, İyidere, Rize',
+    sourceUrl: 'https://tr.wikipedia.org/wiki/Pileki_Ma%C4%9Faras%C4%B1',
+    lat: 40.99, lon: 40.375, indoor: true, visit: 'kisa',
+  },
+  {
+    id: 'amlakit',
+    name: 'Amlakit Yaylası',
+    district: 'Çamlıhemşin',
+    category: 'yayla',
+    tagline: 'Palovit vadisinde, ulaşımı en kolay yüksek yaylalardan.',
+    description:
+      'Rakımı 1.900–2.200 metre arasında değişen Amlakit, Palovit Yaylası’nın aşağısında, Zilkale’ye inen vadideki ' +
+      'çamlıklara bitişiktir. 120–130 evlik yayla, bölgedeki diğer yaylalara göre ulaşımı kolay olanlardandır; ' +
+      'Palovit Deresi yaylayı ikiye böler.',
+    highlights: ['1.900–2.200 m', 'Ulaşımı görece kolay', 'Palovit Deresi kıyısında'],
+    mapsQuery: 'Amlakit Yaylası, Çamlıhemşin, Rize',
+    sourceUrl: 'https://tr.wikipedia.org/wiki/Amlakit_Yaylas%C4%B1',
+    lat: 40.9031, lon: 41.0717, indoor: false, months: YAYLA_SEASON, visit: 'tam',
+  },
+  {
+    id: 'gito',
+    name: 'Gito Yaylası',
+    district: 'Çamlıhemşin',
+    category: 'yayla',
+    tagline: 'Çat vadisinde, 2.070 metrede sis denizi manzarası.',
+    description:
+      'Çat vadisindeki Gito, yaklaşık 2.070 metre rakımdadır ve ilçe merkezine 31 km uzaklıktadır. Sabahları ' +
+      'vadileri dolduran bulut denizi manzarası ve daha sakin yürüyüş rotalarıyla önerilir.',
+    highlights: ['~2.070 m rakım', 'Çat vadisi', 'İlçeye ~31 km'],
+    mapsQuery: 'Gito Yaylası, Çamlıhemşin, Rize',
+    sourceUrl: 'https://tr.wikipedia.org/wiki/Gito_Yaylas%C4%B1',
+    lat: 40.9028, lon: 40.9242, indoor: false, months: YAYLA_SEASON, visit: 'tam',
+  },
+  {
+    id: 'kavrun',
+    name: 'Kavrun Yaylası',
+    district: 'Çamlıhemşin',
+    category: 'yayla',
+    tagline: 'Ayder’in 10 km ötesinde, Kaçkar yürüyüşlerinin yolu üstünde.',
+    description:
+      'Aşağı ve Yukarı Kavrun olarak ikiye ayrılan yayla 1.980–2.350 metre arasındadır ve Ayder’e yaklaşık 10 km ' +
+      'uzaklıktadır. Ortasından Kavran Deresi geçer; toprak yolla ulaşılır ve Mayıs–Ekim arasında kullanılır.',
+    highlights: ['Ayder’e ~10 km', '1.980–2.350 m', 'Mayıs–Ekim arası yaylacılık'],
+    mapsQuery: 'Kavrun Yaylası, Çamlıhemşin, Rize',
+    sourceUrl: 'https://tr.wikipedia.org/wiki/Kavrun_Yaylas%C4%B1',
+    lat: 40.925, lon: 41.135, indoor: false, months: YAYLA_SEASON, visit: 'tam',
+  },
+  {
+    id: 'samistal',
+    name: 'Samistal Yaylası',
+    district: 'Çamlıhemşin',
+    category: 'yayla',
+    tagline: '2.450 metrede taş evler ve Kaçkar zirvelerine bakan manzara.',
+    description:
+      'İlçe merkezine 22 km uzaklıktaki Samistal 2.450 metre rakımdadır. Büyük taş kütleleri arasındaki taş evleriyle ' +
+      'dikkat çeker. Yaylada konaklama tesisi yoktur; günübirlik ya da çadırla gidilir.',
+    highlights: ['~2.450 m rakım', 'Taş yayla evleri', 'Konaklama tesisi yok'],
+    mapsQuery: 'Samistal Yaylası, Çamlıhemşin, Rize',
+    sourceUrl: 'https://tr.wikipedia.org/wiki/Samistal_Yaylas%C4%B1',
+    lat: 40.9115, lon: 41.101, indoor: false, months: YAYLA_SEASON, visit: 'tam',
+  },
+  {
+    id: 'cagrankaya',
+    name: 'Çağrankaya Yaylaları',
+    district: 'İkizdere',
+    category: 'yayla',
+    tagline: 'İkizdere’ye 15 km, araçla ulaşılan üç yayla.',
+    description:
+      'İkizdere’nin kuzeybatısında, yaklaşık 2.300 metre rakımdaki üç yayladan (Aşağı Yayla, Kurtlar Yaylası, Büyük ' +
+      'Yayla) oluşur. Kamp, trekking ve arazi sürüşü için elverişlidir; her türlü kara taşıtıyla ulaşılabilir.',
+    highlights: ['Üç yayla bir arada', '~2.300 m', 'Kamp ve trekking'],
+    mapsQuery: 'Çağrankaya Yaylası, İkizdere, Rize',
+    sourceUrl: 'https://tr.wikipedia.org/wiki/%C3%87a%C4%9Frankaya_Yaylalar%C4%B1',
+    lat: 40.8252, lon: 40.6479, indoor: false, months: YAYLA_SEASON, visit: 'tam',
   },
 ];
 
