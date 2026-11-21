@@ -7,34 +7,33 @@ import { PressableScale } from '../../components/motion';
 import { pressFeedback, successFeedback } from '../../haptics';
 import { setMatchFeature } from '../../notifications';
 import { countdownParts, longKickoff } from '../../rizespor/format';
+import { liveMinute, matchProgress } from '../../rizespor/live';
 import { CLUB_COLORS, RIZESPOR_ID } from '../../rizespor/names';
 import type { Match } from '../../rizespor/parse';
 import { REMINDER_MINUTES, getMatchSettings } from '../../rizespor/reminders';
 import { useTheme } from '../../theme';
-import { LivePulse, ResultPill } from './shared';
+import { LivePulse, ProgressBar, ResultPill, useNow } from './shared';
 
 export default function NextMatchHero({
   match,
   mode,
+  dataAt,
   onOpen,
 }: {
   match: Match;
   mode: 'next' | 'live' | 'last';
+  /** Verinin geldiği an: canlı dakika bundan sonra telefonda ilerletilir. */
+  dataAt: number;
   onOpen: () => void;
 }) {
   const { fs } = useTheme();
-  const [now, setNow] = useState(() => Date.now());
+  // Geri sayım ve canlı dakika saniyede bir; son maç kartı durağan.
+  const now = useNow(1000, mode === 'next' || (mode === 'live' && match.running));
   const [reminders, setReminders] = useState<boolean | null>(null);
 
   useEffect(() => {
     getMatchSettings().then((s) => setReminders(s.reminders));
   }, []);
-
-  useEffect(() => {
-    if (mode !== 'next') return;
-    const t = setInterval(() => setNow(Date.now()), 1000);
-    return () => clearInterval(t);
-  }, [mode]);
 
   const toggleReminder = async () => {
     pressFeedback();
@@ -99,6 +98,26 @@ export default function NextMatchHero({
         score: { color: '#FFFFFF', fontSize: fs(40), fontWeight: '900', letterSpacing: 1 },
         vs: { color: 'rgba(255,255,255,0.85)', fontSize: fs(15), fontWeight: '800' },
         status: { color: 'rgba(255,255,255,0.9)', fontSize: fs(13), fontWeight: '700' },
+        liveMinute: {
+          color: '#FFFFFF',
+          fontWeight: '900',
+          fontVariant: ['tabular-nums'],
+          paddingHorizontal: 10,
+          paddingVertical: 2,
+          borderRadius: 999,
+          overflow: 'hidden',
+          backgroundColor: 'rgba(255,59,48,0.9)',
+        },
+        kickoffSoon: {
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: 8,
+          paddingVertical: 10,
+          borderRadius: 12,
+          backgroundColor: 'rgba(0,0,0,0.2)',
+        },
+        kickoffSoonText: { color: '#FFFFFF', fontSize: fs(13), fontWeight: '800' },
         countdown: { flexDirection: 'row', gap: 6, justifyContent: 'center' },
         cdBox: {
           minWidth: 48,
@@ -175,7 +194,8 @@ export default function NextMatchHero({
                 {match.homeScore ?? 0} - {match.awayScore ?? 0}
               </Text>
             )}
-            {mode !== 'next' ? <Text style={styles.status}>{match.status}</Text> : null}
+            {mode === 'live' ? <Text style={[styles.status, styles.liveMinute]}>{liveMinute(match, now - dataAt)}</Text> : null}
+            {mode === 'last' ? <Text style={styles.status}>{match.status}</Text> : null}
             {mode === 'last' && match.result ? <ResultPill result={match.result} size={24} /> : null}
           </View>
           <View style={styles.team}>
@@ -187,7 +207,14 @@ export default function NextMatchHero({
           </View>
         </View>
 
-        {mode === 'next' ? (
+        {mode === 'live' ? <ProgressBar progress={matchProgress(match, now - dataAt)} /> : null}
+
+        {mode === 'next' && match.date.getTime() <= now ? (
+          <View style={styles.kickoffSoon}>
+            <LivePulse color="#FFFFFF" size={8} />
+            <Text style={styles.kickoffSoonText}>Başlama düdüğü bekleniyor · skor burada canlı akacak</Text>
+          </View>
+        ) : mode === 'next' ? (
           <View style={styles.countdown} accessibilityLabel={`Maça ${cd.days} gün ${cd.hours} saat ${cd.minutes} dakika kaldı`}>
             {[
               [cd.days, 'GÜN'],

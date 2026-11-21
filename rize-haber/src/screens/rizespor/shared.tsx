@@ -1,6 +1,6 @@
 /** Rizespor ekranlarında ortak parçalar: maç satırı, sonuç rozeti, canlı nabız. */
-import { useEffect, useMemo } from 'react';
-import { Animated, StyleSheet, Text, View } from 'react-native';
+import { useEffect, useMemo, useState } from 'react';
+import { Animated, Easing, StyleSheet, Text, View } from 'react-native';
 
 import { PressableScale, useReducedMotion, useAnimatedValue } from '../../components/motion';
 import { clock, dayLabel } from '../../rizespor/format';
@@ -8,6 +8,17 @@ import { RIZESPOR_ID } from '../../rizespor/names';
 import { GLASS } from '../../rizespor/stadium';
 import type { Match } from '../../rizespor/parse';
 import { useTheme } from '../../theme';
+
+/** Belirli aralıkla güncellenen "şimdi" (canlı dakika, geri sayım). `enabled` yanlışsa durur. */
+export function useNow(intervalMs: number, enabled = true): number {
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    if (!enabled) return;
+    const t = setInterval(() => setNow(Date.now()), intervalMs);
+    return () => clearInterval(t);
+  }, [enabled, intervalMs]);
+  return now;
+}
 
 export const RESULT_COLORS = { G: '#1E9E57', B: '#8A94A6', M: '#D64545' } as const;
 export const RESULT_LABELS = { G: 'Galibiyet', B: 'Beraberlik', M: 'Mağlubiyet' } as const;
@@ -150,3 +161,52 @@ export function MatchRow({ match, onPress }: { match: Match; onPress: () => void
     </PressableScale>
   );
 }
+
+/** 0'–90' ilerleme çubuğu; top, oynanan dakikanın üstünde yuvarlanır. */
+export function ProgressBar({ progress }: { progress: number }) {
+  const reduced = useReducedMotion();
+  const [width, setWidth] = useState(0);
+  const x = useAnimatedValue(0);
+  const spin = useAnimatedValue(0);
+  useEffect(() => {
+    if (reduced) x.setValue(progress);
+    else Animated.timing(x, { toValue: progress, duration: 900, easing: Easing.out(Easing.cubic), useNativeDriver: false }).start();
+  }, [progress, reduced, x]);
+  useEffect(() => {
+    if (reduced) return;
+    const loop = Animated.loop(Animated.timing(spin, { toValue: 1, duration: 2400, easing: Easing.linear, useNativeDriver: true }));
+    loop.start();
+    return () => loop.stop();
+  }, [reduced, spin]);
+  const fill = x.interpolate({ inputRange: [0, 1], outputRange: [0, width] });
+  const rotate = spin.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '360deg'] });
+  return (
+    <View style={pb.wrap} onLayout={(e) => setWidth(e.nativeEvent.layout.width)} accessibilityLabel={`Maçın yüzde ${Math.round(progress * 100)}'i oynandı`}>
+      <View style={pb.track}>
+        <Animated.View style={[pb.fill, { width: fill }]} />
+        <View style={[pb.half, { left: width / 2 - 1 }]} />
+      </View>
+      {width > 0 ? (
+        <Animated.View style={[pb.ball, { left: Animated.subtract(fill, 9) }]}>
+          <Animated.Text style={{ fontSize: 14, transform: [{ rotate }] }}>⚽</Animated.Text>
+        </Animated.View>
+      ) : null}
+      <View style={pb.labels}>
+        <Text style={pb.label}>{"0'"}</Text>
+        <Text style={pb.label}>İY</Text>
+        <Text style={pb.label}>{"90'"}</Text>
+      </View>
+    </View>
+  );
+}
+
+const pb = StyleSheet.create({
+  wrap: { marginTop: 14, paddingTop: 6 },
+  track: { height: 6, borderRadius: 3, backgroundColor: 'rgba(255,255,255,0.18)', overflow: 'hidden' },
+  fill: { height: '100%', backgroundColor: '#7BE0A6', borderRadius: 3 },
+  half: { position: 'absolute', top: 0, bottom: 0, width: 2, backgroundColor: 'rgba(255,255,255,0.45)' },
+  ball: { position: 'absolute', top: -2 },
+  labels: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 4 },
+  label: { color: 'rgba(255,255,255,0.6)', fontSize: 10, fontWeight: '700' },
+});
+

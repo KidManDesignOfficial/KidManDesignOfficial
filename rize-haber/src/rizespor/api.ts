@@ -5,7 +5,9 @@
  * Çaykur Rizespor = 7656). Kaynak değişirse yalnızca bu dosya ve `parse.ts` güncellenir.
  */
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Platform } from 'react-native';
 
+import { applyLive, scoreboardDate } from './live';
 import { RIZESPOR_ID } from './names';
 import { parseRoster, parseSchedule, parseStandings, parseSummary, type Match, type MatchDetail, type Player, type StandingRow } from './parse';
 
@@ -19,7 +21,12 @@ export const RIZESPOR_URLS = {
   roster: `${SITE}/teams/${RIZESPOR_ID}/roster?${QUERY}`,
   standings: `https://site.web.api.espn.com/apis/v2/sports/soccer/tur.1/standings?${QUERY}`,
   summary: (eventId: string) => `${SITE}/summary?event=${encodeURIComponent(eventId)}&${QUERY}`,
+  /** Ligin günlük skor tablosu: canlı maçlarda en hızlı güncellenen kaynak. */
+  scoreboard: (date: string) => `${SITE}/scoreboard?dates=${date}&${QUERY}`,
 };
+
+// Canlı skorun ara bellekten eski gelmemesi için (web'de bu başlık CORS ön isteği doğurur, eklenmez).
+const NO_CACHE: Record<string, string> = Platform.OS === 'web' ? {} : { 'Cache-Control': 'no-cache' };
 
 async function fetchJson(url: string, signal?: AbortSignal): Promise<unknown> {
   const controller = new AbortController();
@@ -27,7 +34,7 @@ async function fetchJson(url: string, signal?: AbortSignal): Promise<unknown> {
   const onAbort = () => controller.abort();
   signal?.addEventListener('abort', onAbort);
   try {
-    const res = await fetch(url, { signal: controller.signal, headers: { Accept: 'application/json' } });
+    const res = await fetch(url, { signal: controller.signal, headers: { Accept: 'application/json', ...NO_CACHE } });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return await res.json();
   } finally {
@@ -63,6 +70,8 @@ export type ClubData = {
   fixtures: Match[];
   standings: StandingRow[];
   roster: Player[];
+  /** Ligde bugün oynanan maçlar (skor tablosu). */
+  today: Match[];
 };
 
 
@@ -79,6 +88,8 @@ export async function loadCachedClubData(): Promise<ClubData> {
     fixtures: fixtures ?? [],
     standings: standings ?? [],
     roster: roster ?? [],
+    // Günün skorları önbellekten gösterilmez: eski günün maçları "bugün" diye görünmesin.
+    today: [],
   };
 }
 
@@ -92,6 +103,7 @@ export async function fetchClubData(signal?: AbortSignal): Promise<Partial<ClubD
     cached('fixtures', RIZESPOR_URLS.fixtures, parseSchedule, signal),
     cached('standings', RIZESPOR_URLS.standings, parseStandings, signal),
     cached('roster', RIZESPOR_URLS.roster, parseRoster, signal),
+    fetchScoreboard(signal),
   ]);
   if (settled.every((s) => s.status === 'rejected')) {
     throw new Error('Rizespor verisi alınamadı. İnternet bağlantınızı kontrol edin.');
@@ -105,16 +117,25 @@ export async function fetchClubData(signal?: AbortSignal): Promise<Partial<ClubD
   const fixtures = pick<Match[]>(1);
   const standings = pick<StandingRow[]>(2);
   const roster = pick<Player[]>(3);
+  const today = pick<Match[]>(4);
   if (results) out.results = results;
   if (fixtures) out.fixtures = fixtures;
   if (standings) out.standings = standings;
   if (roster) out.roster = roster;
+  if (today) out.today = today;
   return out;
 }
 
 /** Yeni gelen parçaları öncekinin üzerine yazar; gelmeyenler (başarısız istekler) korunur. */
 export function mergeClubData(previous: ClubData, fresh: Partial<ClubData>): ClubData {
-  return { ...previous, ...fresh };
+  const merged = { ...previous, ...fresh };
+  // Skor tablosu takım sayfalarından daha sık güncellenir: Rizespor maçının canlı durumu oradan alınır.
+  return fresh.today ? applyLive(merged, fresh.today) : merged;
+}
+
+/** Günün lig skor tablosu (hafif istek; canlı maç sırasında 20 saniyede bir). */
+export async function fetchScoreboard(signal?: AbortSignal): Promise<Match[]> {
+  return parseSchedule(await fetchJson(RIZESPOR_URLS.scoreboard(scoreboardDate()), signal));
 }
 
 /** Yalnızca fikstür (arka plan görevi ve hatırlatmalar için hafif istek). */
@@ -128,7 +149,7 @@ export async function fetchMatchDetail(eventId: string, signal?: AbortSignal): P
   return detail;
 }
 
-/** Sıradaki maç: canlı olan varsa o, yoksa başlamamış en yakın maç. */
+/** Sıradaki maç: canlı olan varsa o, yoksa başlamamış en yakın maç (başlama saati yeni geçmiş olanlar dahil). */
 export function nextMatch(data: ClubData, now = Date.now()): Match | null {
   const all = [...data.fixtures, ...data.results];
   const live = all.find((m) => m.state === 'in');

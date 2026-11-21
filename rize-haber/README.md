@@ -7,7 +7,7 @@ Rize'deki günlük haberleri ve hava durumunu gösteren Android uygulaması (Rea
 | Sekme | İçerik |
 |---|---|
 | **Haberler** | Saate göre değişen Rize manzarası (Kaçkarlar, Karadeniz, çay tepeleri) ve cam kartlar · Google Haberler üzerinden son 7 günün Rize haberleri · ekran açıkken 5 dk'da bir otomatik yenileme · manşet ve gün başlıkları · kategoriler · arama · Kaydet / Paylaş · başlıktaki **★ Kaydedilenler** |
-| **Rizespor** | Maç gecesi stadyum sahnesi (projektörler, tribün flaşları, saha) ve cam kartlar · sıradaki maç kartı (saniye saniye geri sayım, “🍵 Çayını demle” hatırlatması) · canlı skor · son 5 maç formu, sıra ve puan · fikstür ve sonuçlar · Süper Lig puan durumu · kadro (mevki, yaş, uyruk, sakatlık) · **Maç Merkezi:** maç anları zaman çizelgesi, sahada ilk 11’ler, istatistikler, canlıda 30 sn’de bir yenileme ve gol kutlaması |
+| **Rizespor** | Maç gecesi stadyum sahnesi (projektörler, tribün flaşları, saha; canlı maçta daha hareketli, Rizespor golünde havai fişek) ve cam kartlar · sıradaki maç kartı (saniye saniye geri sayım, “🍵 Çayını demle” hatırlatması) · **canlı takip:** başlama saatinden 15 dk önce açılan maç penceresinde 20 sn’de bir güncelleme, telefonda saniye saniye ilerleyen dakika ve ilerleme çubuğu · gol, devre arası, maç sonu ve kırmızı kartta ekran efekti (konfeti, flaş, bilgi şeridi) · Süper Lig’de günün skorları · son 5 maç formu, sıra ve puan · sezon özeti (iç saha / deplasman, gol ortalaması, gol yemeden biten maçlar, seri) · fikstür ve sonuçlar · Süper Lig puan durumu · kadro (mevki, yaş, uyruk, sakatlık, maç / gol / asist) ve takım liderleri · **Maç Merkezi:** Özet (maç akışı şeridi, asistli maç anları ve devre ayraçları, hakem ve seyirci), Kadro (sahada gol ve kart işaretli ilk 11’ler, öne çıkanlar, yedekler), İstatistik (hücum, pas, savunma, disiplin) ve Rekabet (puan durumu, iki takımın son 5 maçı, önceki karşılaşmalar) |
 | **Çay** | Sabah çay bahçesi sahnesi (kat kat çay tepeleri, şafak güneşi, sis, savrulan yapraklar) ve cam kartlar · buharı tüten ince belli bardak · güncel yaş çay alım fiyatı (resmî kaynak + ilan tarihi) · önceki yıla göre değişim · **tutar hesaplayıcı** · yıllara göre fiyat grafiği · kaynak bağlantıları |
 | **Ekonomi** | Piyasa ekranı sahnesi (ızgara, mum grafiği, canlı nokta, süzülen ₺ $ € £) ve cam kartlar · **kayan kur bandı** · TCMB döviz kurları (bayraklı) (USD, EUR, GBP, CHF, SAR, RUB, GEL; alış/satış) · gram ve ons altın · döviz çevirici · yaş çay fiyatı · çevrimdışı son veri · 10 dk'da bir otomatik yenileme |
 | **Hava** | Anlık durum · 24 saatlik ve 7 günlük tahmin · 12 ilçe, Ayder ve ~480 köy, belde, yayla (eski adlarıyla aranabilir, çevrimdışı) · havaya göre canlanan sahne (güneş, ay/yıldız, bulut, yağmur, şimşek, kar, sis) · isteğe bağlı yağmur sesi |
@@ -20,8 +20,10 @@ Ayarlar başlıktaki ⚙️ düğmesindedir.
 Maç, puan durumu ve kadro verisi ESPN’in herkese açık ama **belgelenmemiş** veri adreslerinden alınır
 (`src/rizespor/api.ts`). Kaynak değişirse yalnızca `src/rizespor/api.ts` ve `src/rizespor/parse.ts` güncellenir;
 gerçek yanıt örnekleriyle yazılmış testler (`test/fixtures/espn`) biçim değişikliğini hemen yakalar.
-Veri resmî kulüp/TFF verisi değildir ve gecikmeli olabilir. Maç hatırlatmaları telefonda zamanlanır;
-skor bildirimleri arka plan görevine bağlı olduğundan gecikmeli gelebilir.
+Veri resmî kulüp/TFF verisi değildir ve gecikmeli olabilir. Canlı maçta uygulama açıkken ligin günlük skor
+tablosu 20 saniyede bir okunur (`src/rizespor/live.ts`); dakika iki okuma arasında telefonda ilerletilir.
+Maç hatırlatmaları telefonda zamanlanır; uygulama kapalıyken gelen skor bildirimleri arka plan görevine bağlı
+olduğundan (Android en sık 15 dakikada bir çalıştırır) gecikmeli gelebilir.
 
 Haber metinleri kopyalanmaz; yalnızca başlık, kaynak ve bağlantı gösterilir.
 
@@ -97,8 +99,8 @@ src/tea.ts, src/teaData.ts  Çay fiyatı verisi: doğrulama, hesaplama, uzaktan 
 data/cay.json               Güncel çay fiyatı (uygulama buradan okur)
 src/data/rize.ts            Rize tarihçesi ve çayın hikâyesi (kaynaklarıyla)
 src/data/discover.ts        Gezilecek yerler, lezzetler, kültür (kaynaklarıyla)
-src/rizespor/                Rizespor: veri okuma (api, parse), diziliş, hatırlatmalar
-src/screens/rizespor/       Rizespor ekranları: maçlar, puan, kadro, Maç Merkezi, saha
+src/rizespor/                Rizespor: veri okuma (api, parse), canlı takip (live), sezon özeti (season), diziliş, hatırlatmalar
+src/screens/rizespor/       Rizespor ekranları: maçlar, puan, kadro, Maç Merkezi, saha, kutlama efektleri
 src/components/ui.tsx       Ortak arayüz parçaları
 src/rss.ts                  RSS okuyucu (Google Haberler + genel RSS beslemeleri)
 src/notifications.ts        Arka plan haber kontrolü ve bildirimler

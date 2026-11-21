@@ -109,8 +109,8 @@ test('Diziliş: oyuncular mevki koduna göre doğru satırlara yerleşir', () =>
 });
 
 test('Durum metinleri ve savunmacı okuma', () => {
-  assert.deepEqual(statusText({ type: { state: 'in', name: 'STATUS_IN_PROGRESS' }, displayClock: "67'" }), { state: 'in', text: "67'" });
-  assert.deepEqual(statusText({ type: { state: 'in', name: 'STATUS_HALFTIME' } }), { state: 'in', text: 'Devre arası' });
+  assert.deepEqual(statusText({ type: { state: 'in', name: 'STATUS_IN_PROGRESS' }, displayClock: "67'" }), { state: 'in', text: "67'", running: true });
+  assert.deepEqual(statusText({ type: { state: 'in', name: 'STATUS_HALFTIME' } }), { state: 'in', text: 'Devre arası', running: false });
   assert.equal(statusText({ type: { state: 'pre', name: 'STATUS_POSTPONED' } }).text, 'Ertelendi');
   assert.equal(parseEvent({}), null);
   assert.equal(parseEvent(null), null);

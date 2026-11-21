@@ -5,8 +5,11 @@
  *
  * Performans: tüm döngüler yerel sürücüde (native driver) yalnızca opaklık / dönüş animasyonudur.
  * `active` yanlışsa (sekme açık değil) ya da "Hareketi azalt" açıksa sahne durağandır.
+ *
+ * Canlı maçta (`live`) tribün flaşları sıklaşır, projektörler daha parlak yanar. `cheer` her arttığında
+ * (Rizespor golü) gökyüzünde yeşil-mavi havai fişekler patlar.
  */
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Animated, Easing, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 
@@ -33,7 +36,7 @@ function cycle(clock: Animated.Value, speed: number, phase: number) {
   return Animated.modulo(Animated.add(Animated.multiply(clock, speed), phase), 1);
 }
 
-export default function StadiumScene({ active }: { active: boolean }) {
+export default function StadiumScene({ active, live = false, cheer = 0 }: { active: boolean; live?: boolean; cheer?: number }) {
   const reduced = useSceneStill();
   const running = active && !reduced;
   const { width, height } = useWindowDimensions();
@@ -43,10 +46,11 @@ export default function StadiumScene({ active }: { active: boolean }) {
     <View style={[FILL, styles.clip]} pointerEvents="none" accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
       <LinearGradient colors={STADIUM_SKY} locations={STADIUM_SKY_STOPS} style={FILL} />
       <Stars width={width} height={height} />
-      <Stands width={width} height={height} running={running} />
+      {running && cheer > 0 ? <Fireworks key={cheer} width={width} height={height} /> : null}
+      <Stands width={width} height={height} running={running} live={live} />
       <Field width={width} height={height} />
-      <Floodlight side="left" width={width} height={height} running={running} />
-      <Floodlight side="right" width={width} height={height} running={running} />
+      <Floodlight side="left" width={width} height={height} running={running} live={live} />
+      <Floodlight side="right" width={width} height={height} running={running} live={live} />
       {/* Kartlardaki yazılar okunaklı kalsın: orta kısımda hafif karartma, en altta sekme çubuğuna erime. */}
       <LinearGradient colors={['rgba(3,10,20,0)', 'rgba(3,10,20,0.35)', 'rgba(3,10,20,0)']} locations={[0.15, 0.5, 0.85]} style={FILL} />
       <LinearGradient colors={[`${footer}00`, footer]} start={{ x: 0, y: 0.8 }} end={{ x: 0, y: 1 }} style={FILL} />
@@ -81,13 +85,14 @@ function Stars({ width, height }: { width: number; height: number }) {
 
 // ——— Tribünler: kademeli sıralar ve yer yer patlayan fotoğraf flaşları ———
 
-function Stands({ width, height, running }: { width: number; height: number; running: boolean }) {
+function Stands({ width, height, running, live }: { width: number; height: number; running: boolean; live: boolean }) {
   const top = height * 0.17;
   const bandHeight = height * 0.2;
-  const clock = useClock(7000, running);
+  // Canlı maçta tribün daha hareketli: iki kat sık ve daha çok flaş.
+  const clock = useClock(live ? 3600 : 7000, running);
   const flashes = useMemo(
     () =>
-      Array.from({ length: 26 }, (_, i) => {
+      Array.from({ length: live ? 44 : 26 }, (_, i) => {
         const t = cycle(clock, 1 + Math.floor(seeded(i, 21) * 3), seeded(i, 22));
         // Kısa, keskin bir parlama; döngünün geri kalanında söner.
         const peak = 0.1 + seeded(i, 23) * 0.8;
@@ -100,7 +105,7 @@ function Stands({ width, height, running }: { width: number; height: number; run
             : 0.15 + seeded(i, 27) * 0.4,
         };
       }),
-    [clock, width, top, bandHeight, running],
+    [clock, width, top, bandHeight, running, live],
   );
   return (
     <View style={[styles.abs, { left: 0, right: 0, top, height: bandHeight }]}>
@@ -154,10 +159,10 @@ function Field({ width, height }: { width: number; height: number }) {
 
 // ——— Projektör kulesi: lamba paneli, nefes alan parıltı ve sahaya inen hüzme ———
 
-function Floodlight({ side, width, height, running }: { side: 'left' | 'right'; width: number; height: number; running: boolean }) {
+function Floodlight({ side, width, height, running, live }: { side: 'left' | 'right'; width: number; height: number; running: boolean; live: boolean }) {
   const pulse = useClock(side === 'left' ? 5200 : 6100, running);
   const sway = useClock(side === 'left' ? 14000 : 17000, running);
-  const glow = pulse.interpolate({ inputRange: [0, 0.5, 1], outputRange: [0.7, 1, 0.7] });
+  const glow = pulse.interpolate({ inputRange: [0, 0.5, 1], outputRange: live ? [0.88, 1, 0.88] : [0.7, 1, 0.7] });
   const sign = side === 'left' ? 1 : -1;
   const rotate = sway.interpolate({
     inputRange: [0, 0.5, 1],
@@ -216,6 +221,60 @@ function Floodlight({ side, width, height, running }: { side: 'left' | 'right'; 
         ))}
       </View>
     </>
+  );
+}
+
+// ——— Gol havai fişekleri: gökyüzünde art arda patlayan üç demet ———
+
+const SPARKS = 14;
+const FIREWORK_COLORS = ['#7BE0A6', '#5AA9FF', '#FFFFFF'];
+
+function Fireworks({ width, height }: { width: number; height: number }) {
+  const [bursts] = useState(() =>
+    [0, 1, 2].map((i) => ({
+      x: width * (0.2 + 0.3 * i + (seeded(i, 81) - 0.5) * 0.1),
+      y: height * (0.06 + seeded(i, 82) * 0.08),
+      delay: i * 380,
+      radius: 46 + seeded(i, 83) * 30,
+      color: FIREWORK_COLORS[i % FIREWORK_COLORS.length],
+    })),
+  );
+  return (
+    <>
+      {bursts.map((b, i) => (
+        <Burst key={i} {...b} />
+      ))}
+    </>
+  );
+}
+
+function Burst({ x, y, delay, radius, color }: { x: number; y: number; delay: number; radius: number; color: string }) {
+  const t = useAnimatedValue(0);
+  useEffect(() => {
+    const anim = Animated.sequence([
+      Animated.delay(delay),
+      Animated.timing(t, { toValue: 1, duration: 1500, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
+    ]);
+    anim.start();
+    return () => anim.stop();
+  }, [delay, t]);
+  const opacity = t.interpolate({ inputRange: [0, 0.05, 0.6, 1], outputRange: [0, 1, 0.9, 0] });
+  return (
+    <View style={[styles.abs, { left: x, top: y }]}>
+      {Array.from({ length: SPARKS }, (_, i) => {
+        const a = (i / SPARKS) * Math.PI * 2;
+        const tx = t.interpolate({ inputRange: [0, 1], outputRange: [0, Math.cos(a) * radius] });
+        // Kıvılcımlar hafifçe aşağı düşer.
+        const ty = t.interpolate({ inputRange: [0, 0.7, 1], outputRange: [0, Math.sin(a) * radius, Math.sin(a) * radius + 14] });
+        return (
+          <Animated.View
+            key={i}
+            style={[styles.abs, { width: 4, height: 4, borderRadius: 2, backgroundColor: color, opacity, transform: [{ translateX: tx }, { translateY: ty }] }]}
+          />
+        );
+      })}
+      <Animated.View style={[styles.abs, { left: -10, top: -10, width: 20, height: 20, borderRadius: 10, backgroundColor: color, opacity: t.interpolate({ inputRange: [0, 0.08, 0.3], outputRange: [0, 0.8, 0], extrapolate: 'clamp' }) }]} />
+    </View>
   );
 }
 

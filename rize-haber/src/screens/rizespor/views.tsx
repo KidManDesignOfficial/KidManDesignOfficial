@@ -5,15 +5,25 @@ import { RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native
 import { FadeInView, PressableScale } from '../../components/motion';
 import { Card, SectionTitle } from '../../components/ui';
 import { latestResults, nextMatch, type ClubData } from '../../rizespor/api';
-import { signed } from '../../rizespor/format';
-import { CLUB_COLORS, POSITION_GROUPS, RIZESPOR_ID, flagEmoji } from '../../rizespor/names';
+import { clock, signed } from '../../rizespor/format';
+import { CLUB_COLORS, POSITION_GROUPS, RIZESPOR_ID, flagEmoji, shortTeamName } from '../../rizespor/names';
 import { GLASS } from '../../rizespor/stadium';
 import { recentForm, type Match } from '../../rizespor/parse';
+import { seasonSummary, streakText, teamLeaders, type Record3 } from '../../rizespor/season';
 import { useTheme } from '../../theme';
 import NextMatchHero from './NextMatchHero';
-import { MatchRow, ResultPill } from './shared';
+import { LivePulse, MatchRow, RESULT_COLORS, ResultPill } from './shared';
 
-type ViewProps = { data: ClubData; refreshing: boolean; onRefresh: () => void; onOpenMatch: (m: Match) => void };
+type ViewProps = {
+  data: ClubData;
+  /** Ekranın son "şimdi"si (dakikada bir ve her veri gelişinde güncellenir). */
+  now: number;
+  /** Verinin geldiği an (canlı dakikayı ilerletmek için). */
+  dataAt: number;
+  refreshing: boolean;
+  onRefresh: () => void;
+  onOpenMatch: (m: Match) => void;
+};
 
 function ClubRefresh(props: { refreshing: boolean; onRefresh: () => void }) {
   return <RefreshControl {...props} colors={[CLUB_COLORS.green]} tintColor={GLASS.text} progressBackgroundColor="#0B2A1C" />;
@@ -37,14 +47,19 @@ function useBaseStyles() {
   );
 }
 
-export function MatchesView({ data, refreshing, onRefresh, onOpenMatch }: ViewProps) {
+export function MatchesView({ data, now, dataAt, refreshing, onRefresh, onOpenMatch }: ViewProps) {
   const { fs } = useTheme();
   const base = useBaseStyles();
   const [showAllFixtures, setShowAllFixtures] = useState(false);
 
   const upcoming = useMemo(() => data.fixtures.filter((m) => m.state !== 'post'), [data.fixtures]);
   const results = useMemo(() => latestResults(data), [data]);
-  const featured = nextMatch(data);
+  const featured = nextMatch(data, now);
+  const season = useMemo(() => seasonSummary(results), [results]);
+  const others = useMemo(
+    () => data.today.filter((m) => m.home.id !== RIZESPOR_ID && m.away.id !== RIZESPOR_ID),
+    [data.today],
+  );
   const mode = featured?.state === 'in' ? 'live' : featured ? 'next' : 'last';
   const hero = featured ?? results[0] ?? null;
   const form = recentForm([...results].reverse());
@@ -66,7 +81,7 @@ export function MatchesView({ data, refreshing, onRefresh, onOpenMatch }: ViewPr
 
   return (
     <ScrollView style={base.container} contentContainerStyle={base.content} refreshControl={<ClubRefresh refreshing={refreshing} onRefresh={onRefresh} />}>
-      {hero ? <NextMatchHero match={hero} mode={mode} onOpen={() => onOpenMatch(hero)} /> : null}
+      {hero ? <NextMatchHero match={hero} mode={mode} dataAt={dataAt} onOpen={() => onOpenMatch(hero)} /> : null}
 
       <View style={base.pad}>
         {form.length > 0 || row ? (
@@ -99,6 +114,19 @@ export function MatchesView({ data, refreshing, onRefresh, onOpenMatch }: ViewPr
           </>
         ) : null}
 
+        {others.length > 0 ? (
+          <>
+            <SectionTitle light hint={others.some((m) => m.state === 'in') ? 'Canlı skorlar' : 'Diğer maçlar'}>
+              Süper Lig’de bugün
+            </SectionTitle>
+            <Card style={[base.glass, { gap: 10 }]}>
+              {others.map((m) => (
+                <MiniScore key={m.id} match={m} />
+              ))}
+            </Card>
+          </>
+        ) : null}
+
         <SectionTitle light hint="Süper Lig">Fikstür</SectionTitle>
         {upcoming.length === 0 ? (
           <Text style={base.muted}>Yaklaşan maç bulunamadı.</Text>
@@ -114,6 +142,15 @@ export function MatchesView({ data, refreshing, onRefresh, onOpenMatch }: ViewPr
             ) : null}
           </View>
         )}
+
+        {season.all.played > 0 ? (
+          <>
+            <SectionTitle light hint={season.streak ? streakText(season.streak) : undefined}>
+              Sezon özeti
+            </SectionTitle>
+            <SeasonCard season={season} />
+          </>
+        ) : null}
 
         <SectionTitle light hint="En yeniden eskiye">Sonuçlar</SectionTitle>
         {results.length === 0 ? (
@@ -220,6 +257,16 @@ export function StandingsView({ data, refreshing, onRefresh }: ViewProps) {
   );
 }
 
+/** "11 maç · 4 gol · 1 asist" (kaleciler için kurtarış). */
+function playerLine(p: ClubData['roster'][number]): string {
+  const parts = [`${p.stats.apps} maç`];
+  if (p.group === 'GK' && p.stats.saves) parts.push(`${p.stats.saves} kurtarış`);
+  if (p.stats.goals) parts.push(`${p.stats.goals} gol`);
+  if (p.stats.assists) parts.push(`${p.stats.assists} asist`);
+  if (p.stats.red) parts.push(`${p.stats.red} kırmızı`);
+  return parts.join(' · ');
+}
+
 export function SquadView({ data, refreshing, onRefresh }: ViewProps) {
   const { fs } = useTheme();
   const base = useBaseStyles();
@@ -274,6 +321,7 @@ export function SquadView({ data, refreshing, onRefresh }: ViewProps) {
           <Text style={styles.summary}>
             {data.roster.length} oyuncu{avgAge ? ` · yaş ortalaması ${avgAge}` : ''} · {foreign} yabancı
           </Text>
+          <LeadersCard roster={data.roster} />
           {POSITION_GROUPS.map((g) => {
             const players = data.roster.filter((p) => p.group === g.id);
             if (players.length === 0) return null;
@@ -301,6 +349,11 @@ export function SquadView({ data, refreshing, onRefresh }: ViewProps) {
                               {p.age !== null ? `${p.age} yaş` : ''}
                               {p.injured ? <Text style={styles.injured}> · Sakat</Text> : null}
                             </Text>
+                            {p.stats.apps > 0 ? (
+                              <Text style={styles.meta} numberOfLines={1}>
+                                {playerLine(p)}
+                              </Text>
+                            ) : null}
                           </View>
                         </View>
                       </View>
@@ -313,5 +366,150 @@ export function SquadView({ data, refreshing, onRefresh }: ViewProps) {
         </>
       )}
     </ScrollView>
+  );
+}
+
+/** Günün diğer lig maçlarından biri: tek satır, canlıysa dakika kırmızı. */
+function MiniScore({ match }: { match: Match }) {
+  const { fs } = useTheme();
+  const live = match.state === 'in';
+  const score = match.state === 'pre' ? clock(match.date) : `${match.homeScore ?? 0} - ${match.awayScore ?? 0}`;
+  return (
+    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }} accessibilityLabel={`${match.home.name} ${score} ${match.away.name}, ${match.status}`}>
+      <Text style={{ flex: 1, color: GLASS.text, fontSize: fs(13), textAlign: 'right' }} numberOfLines={1}>
+        {shortTeamName(match.home.name)}
+      </Text>
+      <Text style={{ width: fs(58), color: GLASS.text, fontSize: fs(14), fontWeight: '900', textAlign: 'center', fontVariant: ['tabular-nums'] }}>{score}</Text>
+      <Text style={{ flex: 1, color: GLASS.text, fontSize: fs(13) }} numberOfLines={1}>
+        {shortTeamName(match.away.name)}
+      </Text>
+      <View style={{ width: fs(52), flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', gap: 4 }}>
+        {live ? <LivePulse size={7} /> : null}
+        <Text style={{ color: live ? '#FF6B61' : GLASS.soft, fontSize: fs(11), fontWeight: '800' }} numberOfLines={1}>
+          {match.state === 'pre' ? '' : match.status}
+        </Text>
+      </View>
+    </View>
+  );
+}
+
+function SeasonCard({ season }: { season: ReturnType<typeof seasonSummary> }) {
+  const { fs } = useTheme();
+  const base = useBaseStyles();
+  const a = season.all;
+  const avg = (n: number) => (a.played ? (n / a.played).toFixed(1).replace('.', ',') : '0');
+  const tiles: [string, string][] = [
+    [`${a.won}-${a.drawn}-${a.lost}`, 'G-B-M'],
+    [`${a.goalsFor}:${a.goalsAgainst}`, 'ATTIĞI:YEDİĞİ'],
+    [avg(a.goalsFor), 'GOL / MAÇ'],
+    [String(season.cleanSheets), 'GOL YEMEDİ'],
+  ];
+  const split = (label: string, r: Record3) => (
+    <View style={{ flex: 1, gap: 4 }}>
+      <Text style={{ color: GLASS.soft, fontSize: fs(12), fontWeight: '700' }}>{label}</Text>
+      <Text style={{ color: GLASS.text, fontSize: fs(15), fontWeight: '900' }}>
+        {r.won}G {r.drawn}B {r.lost}M
+      </Text>
+      <Text style={{ color: GLASS.soft, fontSize: fs(12) }}>
+        {r.points} puan · {r.goalsFor}:{r.goalsAgainst}
+      </Text>
+      <WinBar r={r} />
+    </View>
+  );
+  return (
+    <Card style={[base.glass, { gap: 16 }]}>
+      <View style={{ flexDirection: 'row' }}>
+        {tiles.map(([v, l]) => (
+          <View key={l} style={{ flex: 1, alignItems: 'center', gap: 2 }}>
+            <Text style={{ color: GLASS.text, fontSize: fs(19), fontWeight: '900' }} adjustsFontSizeToFit numberOfLines={1}>
+              {v}
+            </Text>
+            <Text style={{ color: GLASS.soft, fontSize: fs(10), fontWeight: '800', textAlign: 'center' }}>{l}</Text>
+          </View>
+        ))}
+      </View>
+      <View style={{ height: StyleSheet.hairlineWidth, backgroundColor: GLASS.divider }} />
+      <View style={{ flexDirection: 'row', gap: 16 }}>
+        {split('🏟️ İç saha', season.home)}
+        {split('🚌 Deplasman', season.away)}
+      </View>
+      {season.biggestWin ? (
+        <Text style={{ color: GLASS.soft, fontSize: fs(12) }}>
+          En farklı galibiyet: {season.biggestWin.home.name} {season.biggestWin.homeScore}-{season.biggestWin.awayScore} {season.biggestWin.away.name}
+        </Text>
+      ) : null}
+    </Card>
+  );
+}
+
+/** Galibiyet / beraberlik / mağlubiyet oranı: üç renkli ince şerit. */
+function WinBar({ r }: { r: Record3 }) {
+  if (r.played === 0) return null;
+  return (
+    <View style={{ flexDirection: 'row', height: 6, borderRadius: 3, overflow: 'hidden', marginTop: 2, backgroundColor: GLASS.divider }}>
+      {(['G', 'B', 'M'] as const).map((k) => {
+        const n = k === 'G' ? r.won : k === 'B' ? r.drawn : r.lost;
+        return n > 0 ? <View key={k} style={{ flex: n, backgroundColor: RESULT_COLORS[k] }} /> : null;
+      })}
+    </View>
+  );
+}
+
+/** Takım liderleri: gol, asist, maç, kurtarış, kart — ilk 3'ler. */
+function LeadersCard({ roster }: { roster: ClubData['roster'] }) {
+  const { fs } = useTheme();
+  const base = useBaseStyles();
+  const boards = useMemo(() => teamLeaders(roster), [roster]);
+  const [selected, setSelected] = useState<string>('goals');
+  if (boards.length === 0) return null;
+  const board = boards.find((b) => b.id === selected) ?? boards[0];
+  const max = board.leaders[0]?.value ?? 1;
+  return (
+    <>
+      <SectionTitle light hint="Sezon, tüm maçlar">Takım liderleri</SectionTitle>
+      <Card style={[base.glass, { gap: 12 }]}>
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
+          {boards.map((b) => {
+            const on = b.id === board.id;
+            return (
+              <PressableScale
+                key={b.id}
+                onPress={() => setSelected(b.id)}
+                accessibilityRole="button"
+                accessibilityState={{ selected: on }}
+                style={{
+                  paddingHorizontal: 12,
+                  paddingVertical: 6,
+                  borderRadius: 999,
+                  backgroundColor: on ? CLUB_COLORS.green : GLASS.surfaceStrong,
+                  borderWidth: 1,
+                  borderColor: on ? CLUB_COLORS.green : GLASS.border,
+                }}
+              >
+                <Text style={{ color: GLASS.text, fontSize: fs(12), fontWeight: '800' }}>{b.label}</Text>
+              </PressableScale>
+            );
+          })}
+        </View>
+        {board.leaders.map((l, i) => (
+          <View key={l.player.id} style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+            <Text style={{ width: 22, color: i === 0 ? '#FFD447' : GLASS.soft, fontSize: fs(16), fontWeight: '900', textAlign: 'center' }}>{i + 1}</Text>
+            <View style={{ flex: 1, gap: 4 }}>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: 8 }}>
+                <Text style={{ color: GLASS.text, fontSize: fs(14), fontWeight: '800', flex: 1 }} numberOfLines={1}>
+                  {l.player.name}
+                </Text>
+                <Text style={{ color: GLASS.text, fontSize: fs(14), fontWeight: '900' }}>
+                  {l.value} <Text style={{ color: GLASS.soft, fontWeight: '600', fontSize: fs(12) }}>{board.unit}</Text>
+                </Text>
+              </View>
+              <View style={{ height: 5, borderRadius: 3, backgroundColor: GLASS.divider, overflow: 'hidden' }}>
+                <View style={{ width: `${(l.value / max) * 100}%`, height: '100%', backgroundColor: i === 0 ? GLASS.accent : 'rgba(123,224,166,0.55)' }} />
+              </View>
+            </View>
+          </View>
+        ))}
+      </Card>
+    </>
   );
 }
