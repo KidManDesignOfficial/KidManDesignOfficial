@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2f7bff"/><stop offset="1" stop-color="#0a1330"/></linearGradient></defs>
+<rect width="1024" height="1024" fill="url(#g)"/>
+<path d="M300 380h424c90 0 150 70 170 190l30 180c12 70-50 110-100 70l-110-90H380l-110 90c-50 40-112 0-100-70l30-180c20-120 80-190 100-190z" fill="#eef3ff"/>
+<rect x="330" y="450" width="40" height="130" rx="8" fill="#0a1330"/><rect x="285" y="495" width="130" height="40" rx="8" fill="#0a1330"/>
+<circle cx="680" cy="470" r="26" fill="#2ee59d"/><circle cx="740" cy="520" r="26" fill="#ff4d6d"/><circle cx="620" cy="520" r="26" fill="#00d4ff"/><circle cx="680" cy="570" r="26" fill="#ffb020"/>
+<text x="512" y="300" font-family="DejaVu Sans,Arial" font-weight="bold" font-size="130" text-anchor="middle" fill="#fff">PS SALON</text>
+</svg>

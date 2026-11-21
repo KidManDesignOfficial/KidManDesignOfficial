@@ -1,0 +1,62 @@
+# PlayStation Salonu APK + AAB derler. GitHub → Actions → "PlayStation Salonu APK" → Run workflow
+name: PlayStation Salonu APK
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'ps-salonu/**'
+      - '.github/workflows/ps-salonu-apk.yml'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      VERSION_CODE: 1
+      VERSION_NAME: 1.0.0
+    defaults:
+      run:
+        working-directory: ps-salonu
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - uses: gradle/actions/setup-gradle@v4
+      - run: npm install
+      - run: npx cap add android
+      - run: npx cap sync android
+      - run: ./scripts/patch-android.sh
+
+      - name: İmza anahtarı
+        env:
+          KS: ${{ secrets.PS_KEYSTORE_BASE64 }}
+          KP: ${{ secrets.PS_KEYSTORE_PASSWORD }}
+          KA: ${{ secrets.PS_KEY_ALIAS }}
+          KKP: ${{ secrets.PS_KEY_PASSWORD }}
+        run: |
+          if [ -n "$KS" ] && [ -n "$KP" ]; then
+            echo "$KS" | base64 -d > "$RUNNER_TEMP/release.jks"
+            { echo "PS_KEYSTORE_PATH=$RUNNER_TEMP/release.jks"; echo "PS_KEYSTORE_PASSWORD=$KP"
+              echo "PS_KEY_ALIAS=${KA:-pssalonu}"; echo "PS_KEY_PASSWORD=${KKP:-$KP}"; } >> "$GITHUB_ENV"
+          else
+            echo "::warning::Anahtar tanımlı değil; debug imzası kullanılıyor (Play Store'a yüklenemez)."
+          fi
+
+      - name: APK ve AAB derle
+        working-directory: ps-salonu/android
+        run: ./gradlew assembleRelease bundleRelease --no-daemon
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ps-salonu-apk
+          path: ps-salonu/android/app/build/outputs/apk/release/*.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ps-salonu-aab-google-play
+          path: ps-salonu/android/app/build/outputs/bundle/release/*.aab
