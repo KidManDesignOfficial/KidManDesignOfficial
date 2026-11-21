@@ -13,12 +13,11 @@ Rize Haber, Rize’ye dair her şeyi tek uygulamada toplar: gündem, Çaykur Riz
 • Fikstür, sonuçlar ve son 5 maç formu
 • Süper Lig puan durumu ve takım kadrosu
 • Maç Merkezi: maç anları, sahada ilk 11’ler ve istatistikler; canlı maçlarda otomatik yenileme
-• Transfer ve maç haberleri
 
 🍃 YAŞ ÇAY ALIM FİYATI
 • Resmî kaynaklarda ilan edilen güncel yaş çay alım fiyatı ve ilan tarihi
 • Teslim ettiğiniz miktarın tutarını hesaplayan hesaplayıcı
-• Yıllara göre fiyat karşılaştırması ve çay gündemi
+• Yıllara göre fiyat karşılaştırması
 
 🌦️ HAVA DURUMU
 • Rize’nin 12 ilçesi ve Ayder Yaylası için anlık, saatlik ve 7 günlük tahmin

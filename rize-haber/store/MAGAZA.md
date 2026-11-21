@@ -109,7 +109,7 @@ COVID-19 izleme: **Hayır** · Fotoğraf/video izni: **Kullanılmıyor**
    kullanıcılarının Gmail adreslerini ekleyin (en az 12, öneri 15–20).
 2. **Ülkeler/bölgeler:** Türkiye (isterseniz tümü).
 3. **Yeni sürüm oluştur** → Play Uygulama İmzalama’yı kabul edin → `.aab` dosyasını yükleyin →
-   Sürüm adı `1.7.0` · Sürüm notları: `SURUM-NOTLARI.txt`.
+   Sürüm adı `1.7.1` · Sürüm notları: `SURUM-NOTLARI.txt`.
 4. **İncelemeye gönder.** Onaylanınca “Katılım bağlantısı”nı testçilere gönderin (aşağıdaki mesaj).
 5. Testçiler bağlantıdan **teste katılmalı ve uygulamayı Play Store’dan indirmeli**. 14 gün boyunca
    testten ayrılmamalılar; arada uygulamayı açıp kullanmaları yeterli.

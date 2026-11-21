@@ -11,15 +11,14 @@ import type { Match } from '../rizespor/parse';
 import { syncMatchReminders } from '../rizespor/reminders';
 import { useTheme } from '../theme';
 import MatchCenter from './rizespor/MatchCenter';
-import { ClubNewsView, MatchesView, SquadView, StandingsView } from './rizespor/views';
+import { MatchesView, SquadView, StandingsView } from './rizespor/views';
 
-type Section = 'matches' | 'table' | 'squad' | 'news';
+type Section = 'matches' | 'table' | 'squad';
 
 const SECTIONS: Segment<Section>[] = [
   { id: 'matches', label: 'Maçlar', icon: 'football-outline' },
   { id: 'table', label: 'Puan', icon: 'stats-chart-outline' },
   { id: 'squad', label: 'Kadro', icon: 'shirt-outline' },
-  { id: 'news', label: 'Haberler', icon: 'newspaper-outline' },
 ];
 
 const EMPTY: ClubData = { results: [], fixtures: [], standings: [], roster: [] };
@@ -124,7 +123,6 @@ export default function RizesporScreen({ openMatchId }: { openMatchId?: string |
               {s.id === 'matches' ? <MatchesView {...props} /> : null}
               {s.id === 'table' ? <StandingsView {...props} /> : null}
               {s.id === 'squad' ? <SquadView {...props} /> : null}
-              {s.id === 'news' ? <ClubNewsView /> : null}
             </FadeInView>
           ) : null,
         )

@@ -1,17 +1,13 @@
-/** Rizespor bölümleri: Maçlar, Puan durumu, Kadro, Haberler. */
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+/** Rizespor bölümleri: Maçlar, Puan durumu, Kadro. Haberler yalnızca Haberler sekmesinde (Spor kategorisi). */
+import { useMemo, useState } from 'react';
 import { RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 
-import { NewsCard } from '../../components/NewsCard';
 import { FadeInView, PressableScale } from '../../components/motion';
-import { NewsSkeleton } from '../../components/Skeleton';
-import { Card, Chip, ChipRow, PrimaryButton, SectionTitle } from '../../components/ui';
-import { googleNewsRssUrl } from '../../config';
+import { Card, SectionTitle } from '../../components/ui';
 import { latestResults, nextMatch, type ClubData } from '../../rizespor/api';
 import { signed } from '../../rizespor/format';
 import { CLUB_COLORS, POSITION_GROUPS, RIZESPOR_ID, flagEmoji } from '../../rizespor/names';
 import { recentForm, type Match } from '../../rizespor/parse';
-import { fetchRss, type NewsItem } from '../../rss';
 import { useTheme } from '../../theme';
 import NextMatchHero from './NextMatchHero';
 import { MatchRow, ResultPill } from './shared';
@@ -312,77 +308,6 @@ export function SquadView({ data, refreshing, onRefresh }: ViewProps) {
           })}
         </>
       )}
-    </ScrollView>
-  );
-}
-
-const NEWS_FILTERS = [
-  { id: 'all', label: 'Tümü', query: '"Rizespor" when:7d' },
-  { id: 'transfer', label: '🔄 Transfer', query: '"Rizespor" (transfer OR imza OR "sözleşme" OR "anlaşma") when:30d' },
-  { id: 'match', label: '⚽ Maç', query: '"Rizespor" (maç OR gol OR "maç sonu" OR "teknik direktör") when:7d' },
-] as const;
-
-export function ClubNewsView() {
-  const base = useBaseStyles();
-  const [filter, setFilter] = useState<(typeof NEWS_FILTERS)[number]['id']>('all');
-  // Haberler filtreye bağlı tutulur: filtre değişince eski liste bir an bile görünmez.
-  const [entry, setEntry] = useState<{ filter: string; items: NewsItem[] } | null>(null);
-  const items = entry?.filter === filter ? entry.items : null;
-  const [error, setError] = useState(false);
-  const [refreshing, setRefreshing] = useState(false);
-  const controller = useRef<AbortController | null>(null);
-
-  const load = useCallback(async () => {
-    controller.current?.abort();
-    const c = new AbortController();
-    controller.current = c;
-    setError(false);
-    try {
-      const q = NEWS_FILTERS.find((f) => f.id === filter)!.query;
-      const result = await fetchRss(googleNewsRssUrl(q), c.signal);
-      if (!c.signal.aborted) setEntry({ filter, items: result });
-    } catch {
-      if (!c.signal.aborted) setError(true);
-    }
-  }, [filter]);
-
-  useEffect(() => {
-    // Açılışta / filtre değişince haberleri indir (veri çekme deseni).
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    load();
-    return () => controller.current?.abort();
-  }, [load]);
-
-  const onRefresh = useCallback(async () => {
-    setRefreshing(true);
-    await load();
-    setRefreshing(false);
-  }, [load]);
-
-  return (
-    <ScrollView style={base.container} contentContainerStyle={base.content} refreshControl={<ClubRefresh refreshing={refreshing} onRefresh={onRefresh} />}>
-      <ChipRow>
-        {NEWS_FILTERS.map((f) => (
-          <Chip key={f.id} label={f.label} selected={filter === f.id} onPress={() => setFilter(f.id)} />
-        ))}
-      </ChipRow>
-      <View style={base.pad}>
-        {items === null && !error ? <NewsSkeleton count={4} /> : null}
-        {error ? (
-          <>
-            <Text style={base.muted}>Haberler yüklenemedi. İnternet bağlantınızı kontrol edin.</Text>
-            <PrimaryButton label="Tekrar dene" onPress={load} />
-          </>
-        ) : null}
-        {items && items.length === 0 ? <Text style={base.muted}>Bu konuda yakın tarihli haber yok.</Text> : null}
-        {items && items.length > 0 ? (
-          <FadeInView key={filter} style={base.list}>
-            {items.map((item) => (
-              <NewsCard key={item.id} item={item} />
-            ))}
-          </FadeInView>
-        ) : null}
-      </View>
     </ScrollView>
   );
 }

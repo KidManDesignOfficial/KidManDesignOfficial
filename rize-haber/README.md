@@ -7,9 +7,9 @@ Rize'deki günlük haberleri ve hava durumunu gösteren Android uygulaması (Rea
 | Sekme | İçerik |
 |---|---|
 | **Haberler** | Google Haberler üzerinden son 7 günün Rize haberleri · ekran açıkken 5 dk'da bir otomatik yenileme · manşet ve gün başlıkları · kategoriler · arama · Kaydet / Paylaş · başlıktaki **★ Kaydedilenler** |
-| **Rizespor** | Sıradaki maç kartı (saniye saniye geri sayım, “🍵 Çayını demle” hatırlatması) · canlı skor · son 5 maç formu, sıra ve puan · fikstür ve sonuçlar · Süper Lig puan durumu · kadro (mevki, yaş, uyruk, sakatlık) · transfer ve maç haberleri · **Maç Merkezi:** maç anları zaman çizelgesi, sahada ilk 11’ler, istatistikler, canlıda 30 sn’de bir yenileme ve gol kutlaması |
-| **Çay** | Güncel yaş çay alım fiyatı (resmî kaynak + ilan tarihi) · önceki yıla göre değişim · **tutar hesaplayıcı** · yıllara göre fiyat grafiği · çay gündemi haberleri · kaynak bağlantıları |
-| **Ekonomi** | TCMB döviz kurları (USD, EUR, GBP, CHF, SAR, RUB, GEL; alış/satış) · gram ve ons altın · döviz çevirici · yaş çay fiyatı · Rize ekonomi haberleri · çevrimdışı son veri · 10 dk'da bir otomatik yenileme |
+| **Rizespor** | Sıradaki maç kartı (saniye saniye geri sayım, “🍵 Çayını demle” hatırlatması) · canlı skor · son 5 maç formu, sıra ve puan · fikstür ve sonuçlar · Süper Lig puan durumu · kadro (mevki, yaş, uyruk, sakatlık) · **Maç Merkezi:** maç anları zaman çizelgesi, sahada ilk 11’ler, istatistikler, canlıda 30 sn’de bir yenileme ve gol kutlaması |
+| **Çay** | Güncel yaş çay alım fiyatı (resmî kaynak + ilan tarihi) · önceki yıla göre değişim · **tutar hesaplayıcı** · yıllara göre fiyat grafiği · kaynak bağlantıları |
+| **Ekonomi** | TCMB döviz kurları (USD, EUR, GBP, CHF, SAR, RUB, GEL; alış/satış) · gram ve ons altın · döviz çevirici · yaş çay fiyatı · çevrimdışı son veri · 10 dk'da bir otomatik yenileme |
 | **Hava** | Anlık durum · 24 saatlik ve 7 günlük tahmin · 12 ilçe + Ayder · havaya göre canlanan sahne (güneş, ay/yıldız, bulut, yağmur, şimşek, kar, sis) · isteğe bağlı yağmur sesi |
 | **Keşfet** | **Gezi:** 15 yer (yayla, doğa, tarih, müze), haritada aç, gezi listem, paylaş · **Lezzet:** 14 coğrafi işaretli ürün ve yöresel tatlar · **Kültür:** Rize bezi, horon, kemençe, tulum, şenlikler, pratik bilgiler · **Tarihçe** |
 | **Ayarlar** (⚙️) | Tema (Sistem/Açık/Koyu) · 5 renk · yazı boyutu (Normal/Büyük/Çok büyük) · varsayılan hava konumu · bildirimler · kaydedilenleri temizle · hakkında ve veri kaynakları |
@@ -95,7 +95,7 @@ data/cay.json               Güncel çay fiyatı (uygulama buradan okur)
 src/data/rize.ts            Rize tarihçesi ve çayın hikâyesi (kaynaklarıyla)
 src/data/discover.ts        Gezilecek yerler, lezzetler, kültür (kaynaklarıyla)
 src/rizespor/                Rizespor: veri okuma (api, parse), diziliş, hatırlatmalar
-src/screens/rizespor/       Rizespor ekranları: maçlar, puan, kadro, haberler, Maç Merkezi, saha
+src/screens/rizespor/       Rizespor ekranları: maçlar, puan, kadro, Maç Merkezi, saha
 src/components/ui.tsx       Ortak arayüz parçaları
 src/rss.ts                  RSS okuyucu (Google Haberler + genel RSS beslemeleri)
 src/notifications.ts        Arka plan haber kontrolü ve bildirimler
@@ -106,7 +106,7 @@ src/favorites.tsx           Favori durumu
 src/components/NewsCard.tsx Haber kartı (kaydet / paylaş)
 src/screens/SavedScreen.tsx Kaydedilenler
 src/screens/TeaScreen.tsx   Çay fiyatları
-src/screens/EconomyScreen.tsx Ekonomi: döviz, altın, çevirici, ekonomi haberleri
+src/screens/EconomyScreen.tsx Ekonomi: döviz, altın, çevirici
 src/markets.ts              TCMB kur ve altın verisi (ayrıştırma, hesap; saf, test edilir)
 src/appState.ts             Uygulama ön planda mı? (otomatik yenilemeler için)
 src/screens/RizeScreen.tsx  Rize’yi tanı

@@ -2,23 +2,14 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { RefreshControl, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { HeroCard } from '../components/HeroCard';
-import { NewsCard } from '../components/NewsCard';
-import { SkeletonCard, SkeletonGroup } from '../components/Skeleton';
 import { Card, LinkRow, SectionTitle } from '../components/ui';
-import { googleNewsRssUrl } from '../config';
-import { fetchRss, type NewsItem } from '../rss';
 import { formatDateTr, formatLira, formatNumber, parseKg, yearOverYearChange, type TeaData } from '../tea';
 import { BUNDLED_TEA_DATA, fetchRemoteTeaData, loadLocalTeaData } from '../teaData';
 import { useTheme } from '../theme';
 
-const TEA_NEWS_QUERY = '("yaş çay" OR ÇAYKUR OR "çay fiyatı" OR "kuru çay" OR "çay üreticisi") when:30d';
-const TEA_NEWS_LIMIT = 6;
-
 export default function TeaScreen() {
   const { colors, fs } = useTheme();
   const [data, setData] = useState<TeaData>(BUNDLED_TEA_DATA);
-  const [news, setNews] = useState<NewsItem[]>([]);
-  const [newsState, setNewsState] = useState<'loading' | 'ready' | 'error'>('loading');
   const [refreshing, setRefreshing] = useState(false);
   const [kgInput, setKgInput] = useState('');
   const controller = useRef<AbortController | null>(null);
@@ -27,21 +18,11 @@ export default function TeaScreen() {
     controller.current?.abort();
     const c = new AbortController();
     controller.current = c;
-    setNewsState((s) => (s === 'ready' ? s : 'loading'));
 
-    const [remote, items] = await Promise.all([
-      fetchRemoteTeaData(c.signal),
-      fetchRss(googleNewsRssUrl(TEA_NEWS_QUERY), c.signal).catch(() => null),
-    ]);
+    const remote = await fetchRemoteTeaData(c.signal);
     if (c.signal.aborted) return;
 
     if (remote) setData((current) => (remote.updatedAt >= current.updatedAt ? remote : current));
-    if (items) {
-      setNews(items.slice(0, TEA_NEWS_LIMIT));
-      setNewsState('ready');
-    } else {
-      setNewsState((s) => (s === 'ready' ? s : 'error'));
-    }
   }, []);
 
   useEffect(() => {
@@ -108,8 +89,6 @@ export default function TeaScreen() {
         note: { fontSize: fs(14), color: colors.text, lineHeight: fs(21) },
         noteRow: { flexDirection: 'row', gap: 8, paddingVertical: 4 },
         bullet: { color: colors.primary, fontSize: fs(14), fontWeight: '800' },
-        newsList: { gap: 10 },
-        muted: { fontSize: fs(14), color: colors.textMuted, textAlign: 'center', padding: 12 },
         body: { fontSize: fs(14), color: colors.text, lineHeight: fs(21), marginBottom: 4 },
         updated: { fontSize: fs(12), color: colors.textMuted, textAlign: 'center', marginTop: 16 },
       }),
@@ -209,25 +188,6 @@ export default function TeaScreen() {
           </Card>
         </>
       ) : null}
-
-      <SectionTitle hint="Fiyat, prim ve ödeme duyuruları – son 30 gün">Çay gündemi</SectionTitle>
-      {newsState === 'loading' ? (
-        <SkeletonGroup style={{ gap: 10 }}>
-          <SkeletonCard />
-          <SkeletonCard />
-          <SkeletonCard />
-        </SkeletonGroup>
-      ) : newsState === 'error' ? (
-        <Text style={styles.muted}>Çay haberleri yüklenemedi. Aşağı çekerek yenileyin.</Text>
-      ) : news.length === 0 ? (
-        <Text style={styles.muted}>Son 30 günde çayla ilgili haber bulunamadı.</Text>
-      ) : (
-        <View style={styles.newsList}>
-          {news.map((item) => (
-            <NewsCard key={item.id} item={item} />
-          ))}
-        </View>
-      )}
 
       <SectionTitle>Kuru çay satış fiyatları</SectionTitle>
       <Card>

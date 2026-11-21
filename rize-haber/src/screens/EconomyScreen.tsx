@@ -1,6 +1,7 @@
 /**
- * Ekonomi: TCMB döviz kurları, altın, kur çevirici, Rize'nin yerel göstergesi (yaş çay) ve
- * Rize ekonomi haberleri. Ekran açıkken 10 dakikada bir kendiliğinden yenilenir.
+ * Ekonomi: TCMB döviz kurları, altın, kur çevirici ve Rize'nin yerel göstergesi (yaş çay).
+ * Haber listesi yoktur; haberler yalnızca Haberler sekmesindedir.
+ * Ekran açıkken 10 dakikada bir kendiliğinden yenilenir.
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
@@ -8,21 +9,16 @@ import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, TextInput, Vie
 import { useAppActive } from '../appState';
 import { HeroCard } from '../components/HeroCard';
 import { Icon } from '../components/Icon';
-import { NewsCard } from '../components/NewsCard';
-import { HeroSkeleton, SkeletonCard, SkeletonGroup } from '../components/Skeleton';
+import { HeroSkeleton } from '../components/Skeleton';
 import { Card, Chip, ChipRow, PrimaryButton, SectionTitle } from '../components/ui';
-import { NEWS_CATEGORIES, googleNewsRssUrl } from '../config';
 import { tapFeedback } from '../haptics';
 import { convert, fetchMarkets, formatRate, gramGoldTry, type Markets } from '../markets';
 import { loadCachedMarkets, saveCachedMarkets, savedAtLabel } from '../offline';
-import { fetchRss, type NewsItem } from '../rss';
 import { formatDateTr, formatLira, formatNumber, parseKg, type TeaData } from '../tea';
 import { BUNDLED_TEA_DATA, loadLocalTeaData } from '../teaData';
 import { useTheme } from '../theme';
 
 const REFRESH_MS = 10 * 60 * 1000;
-const NEWS_LIMIT = 5;
-const ECONOMY_QUERY = NEWS_CATEGORIES.find((c) => c.id === 'ekonomi')!.query;
 
 type Props = {
   /** Sekme ekranda mı? Görünürken ve uygulama ön plandayken veriler kendiliğinden yenilenir. */
@@ -37,7 +33,6 @@ export default function EconomyScreen({ active = true, onOpenTea }: Props) {
   const [markets, setMarkets] = useState<Markets | null>(null);
   const [state, setState] = useState<'loading' | 'ready' | 'error'>('loading');
   const [offline, setOffline] = useState(false);
-  const [news, setNews] = useState<NewsItem[] | null>(null);
   const [tea, setTea] = useState<TeaData>(BUNDLED_TEA_DATA);
   const [refreshing, setRefreshing] = useState(false);
   const [code, setCode] = useState('USD');
@@ -52,10 +47,7 @@ export default function EconomyScreen({ active = true, onOpenTea }: Props) {
     controller.current = c;
     lastLoad.current = Date.now();
 
-    const [m, items] = await Promise.all([
-      fetchMarkets(c.signal).catch(() => null),
-      fetchRss(googleNewsRssUrl(ECONOMY_QUERY), c.signal).catch(() => null),
-    ]);
+    const m = await fetchMarkets(c.signal).catch(() => null);
     if (c.signal.aborted) return;
 
     if (m) {
@@ -71,8 +63,6 @@ export default function EconomyScreen({ active = true, onOpenTea }: Props) {
       setOffline(true);
       setState(cached ? 'ready' : 'error');
     }
-    if (items) setNews(items.slice(0, NEWS_LIMIT));
-    else setNews((cur) => cur ?? []);
   }, []);
 
   useEffect(() => {
@@ -199,8 +189,6 @@ export default function EconomyScreen({ active = true, onOpenTea }: Props) {
         teaTitle: { fontSize: fs(14), color: colors.textMuted, fontWeight: '600' },
         teaValue: { fontSize: fs(20), color: colors.text, fontWeight: '800' },
         pressed: { opacity: 0.7 },
-        newsList: { gap: 10 },
-        muted: { fontSize: fs(14), color: colors.textMuted, textAlign: 'center', padding: 12 },
         center: { alignItems: 'center', padding: 32, gap: 12 },
         errorText: { color: colors.error, fontSize: fs(15), textAlign: 'center' },
         footer: { fontSize: fs(12), color: colors.textMuted, textAlign: 'center', marginTop: 16, lineHeight: fs(17) },
@@ -388,22 +376,6 @@ export default function EconomyScreen({ active = true, onOpenTea }: Props) {
           </View>
         </Card>
       </Pressable>
-
-      <SectionTitle hint="Çay, fındık, liman ve ticaret – son 7 gün">Ekonomi gündemi</SectionTitle>
-      {news === null ? (
-        <SkeletonGroup style={{ gap: 10 }}>
-          <SkeletonCard />
-          <SkeletonCard />
-        </SkeletonGroup>
-      ) : news.length === 0 ? (
-        <Text style={styles.muted}>Ekonomi haberleri şu an yüklenemedi.</Text>
-      ) : (
-        <View style={styles.newsList}>
-          {news.map((item) => (
-            <NewsCard key={item.id} item={item} />
-          ))}
-        </View>
-      )}
 
       <Text style={styles.footer}>
         Kaynak: TCMB, gold-api.com · {savedAtLabel(markets.fetchedAt)} itibarıyla{'\n'}Bilgi amaçlıdır, yatırım
