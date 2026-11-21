@@ -28,7 +28,7 @@ import TeaScreen from './src/screens/TeaScreen';
 import WeatherScreen from './src/screens/WeatherScreen';
 import type { SkyChrome } from './src/weatherScene';
 import { loadSettings } from './src/storage';
-import { ThemeProvider, useTheme, type Settings, type TabId } from './src/theme';
+import { DISCOVER_ENABLED, ThemeProvider, useTheme, type Settings, type TabId } from './src/theme';
 
 // Bildirim yanıtı yalnızca telefonda vardır; web önizlemesinde boş döner.
 const useNotificationResponse =
@@ -40,14 +40,16 @@ SplashScreen.setOptions({ fade: true, duration: 350 });
 
 type Tab = TabId;
 
-const TABS: { id: Tab; label: string; icon: IconName; iconActive: IconName; title: string }[] = [
+type TabDef = { id: Tab; label: string; icon: IconName; iconActive: IconName; title: string };
+
+const TABS = ([
   { id: 'news', label: 'Haberler', icon: 'newspaper-outline', iconActive: 'newspaper', title: 'Rize Haber' },
   { id: 'rizespor', label: 'Rizespor', icon: 'football-outline', iconActive: 'football', title: 'Çaykur Rizespor' },
   { id: 'tea', label: 'Çay', icon: 'leaf-outline', iconActive: 'leaf', title: 'Çay Fiyatları' },
   { id: 'economy', label: 'Ekonomi', icon: 'trending-up-outline', iconActive: 'trending-up', title: 'Ekonomi' },
   { id: 'weather', label: 'Hava', icon: 'partly-sunny-outline', iconActive: 'partly-sunny', title: 'Hava Durumu' },
   { id: 'rize', label: 'Keşfet', icon: 'compass-outline', iconActive: 'compass', title: 'Rize’yi Keşfet' },
-];
+] as TabDef[]).filter((t) => DISCOVER_ENABLED || t.id !== 'rize');
 
 export default function App() {
   const [fontsLoaded, fontError] = useFonts(ICON_FONT);
@@ -264,7 +266,7 @@ function Main() {
               <WeatherScreen active={weatherVisible} onSkyColors={setWeatherChrome} />
             </FadeInView>
           ) : null}
-          {mounted.has('rize') ? (
+          {DISCOVER_ENABLED && mounted.has('rize') ? (
             <FadeInView visible={!showSettings && tab === 'rize'} style={styles.screen}>
               <DiscoverScreen active={!showSettings && tab === 'rize'} />
             </FadeInView>

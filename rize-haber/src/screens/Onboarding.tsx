@@ -15,7 +15,7 @@ import LocationPicker from '../components/LocationPicker';
 import { DISTRICT_PLACES, placeById, pushRecent, type Place } from '../places';
 import { pressFeedback, successFeedback, tapFeedback } from '../haptics';
 import { enableNewsNotifications, setMatchFeature } from '../notifications';
-import { useTheme } from '../theme';
+import { DISCOVER_ENABLED, useTheme } from '../theme';
 
 const KEY = 'rizehaber:onboarded:v1';
 
@@ -39,7 +39,7 @@ const FEATURES: { icon: IconName; title: string; text: string }[] = [
   { icon: 'newspaper-outline', title: 'Rize’nin gündemi', text: 'İlçe ilçe güncel haberler, bildirimlerle.' },
   { icon: 'football-outline', title: 'Çaykur Rizespor', text: 'Fikstür, canlı skor, puan durumu ve kadro.' },
   { icon: 'leaf-outline', title: 'Çay ve ekonomi', text: 'Yaş çay fiyatı, döviz kurları ve altın.' },
-  { icon: 'compass-outline', title: 'Rize’yi keşfet', text: 'Yaylalar, lezzetler, kültür ve tarih.' },
+  ...(DISCOVER_ENABLED ? [{ icon: 'compass-outline' as IconName, title: 'Rize’yi keşfet', text: 'Yaylalar, lezzetler, kültür ve tarih.' }] : []),
 ];
 
 const PAGES = 3;

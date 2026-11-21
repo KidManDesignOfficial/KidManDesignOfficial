@@ -17,7 +17,14 @@ import { loadSettings, saveSettings } from './storage';
 export type ThemeMode = 'system' | 'light' | 'dark';
 /** Alt sekme çubuğundaki sekmeler (açılış ekranı seçimi için). */
 export type TabId = 'news' | 'rizespor' | 'tea' | 'economy' | 'weather' | 'rize';
-export const TAB_IDS: TabId[] = ['news', 'rizespor', 'tea', 'economy', 'weather', 'rize'];
+/**
+ * Keşfet sekmesi şimdilik kapalı: sekme çubuğunda, açılış sekmesi seçiminde ve tanıtımda görünmez.
+ * Kodu duruyor; geri açmak için `true` yapmak yeterli.
+ */
+export const DISCOVER_ENABLED = false;
+export const TAB_IDS: TabId[] = (['news', 'rizespor', 'tea', 'economy', 'weather', 'rize'] as TabId[]).filter(
+  (id) => DISCOVER_ENABLED || id !== 'rize',
+);
 export { ACCENTS, TEXT_SCALES };
 export type { AccentId, Colors, TextSize };
 

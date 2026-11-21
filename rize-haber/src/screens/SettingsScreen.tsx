@@ -28,6 +28,7 @@ import { REMINDER_MINUTES, getMatchSettings } from '../rizespor/reminders';
 import { loadNotificationsEnabled } from '../storage';
 import {
   ACCENTS,
+  DISCOVER_ENABLED,
   TEXT_SCALES,
   useTheme,
   type AccentId,
@@ -55,14 +56,14 @@ const MODES: { id: ThemeMode; label: string }[] = [
   { id: 'dark', label: 'Koyu' },
 ];
 
-const START_TABS: { id: TabId; label: string }[] = [
+const START_TABS = ([
   { id: 'news', label: 'Haberler' },
   { id: 'rizespor', label: 'Rizespor' },
   { id: 'tea', label: 'Çay' },
   { id: 'economy', label: 'Ekonomi' },
   { id: 'weather', label: 'Hava' },
   { id: 'rize', label: 'Keşfet' },
-];
+] as { id: TabId; label: string }[]).filter((t) => DISCOVER_ENABLED || t.id !== 'rize');
 
 type ToggleKey = 'uiMotion' | 'sceneMotion' | 'haptics' | 'rainSound';
 
