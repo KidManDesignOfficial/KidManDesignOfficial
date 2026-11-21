@@ -2,6 +2,7 @@ import { memo, useMemo } from 'react';
 import { Image, Pressable, Share, StyleSheet, Text, View } from 'react-native';
 
 import { useFavorites } from '../favorites';
+import { NEWS_GLASS as G } from '../rizeScene';
 import { sourceBadge } from '../newsFeed';
 import type { NewsItem } from '../rss';
 import { useTheme } from '../theme';
@@ -45,9 +46,14 @@ type Props = {
   variant?: 'default' | 'lead';
   /** Son otomatik yenilemede gelen haber: "YENİ" etiketi gösterilir. */
   isNew?: boolean;
+  /** Rize manzarası gibi koyu sahnelerin üstünde yarı saydam cam kart. */
+  glass?: boolean;
 };
 
-function NewsCardBase({ item, variant = 'default', isNew = false }: Props) {
+/** Cam manşet kartının geçişi: üstte daha belirgin, altta sahneyi gösteren saydamlık. */
+const GLASS_LEAD: readonly [string, string] = ['rgba(255,255,255,0.2)', 'rgba(255,255,255,0.05)'];
+
+function NewsCardBase({ item, variant = 'default', isNew = false, glass = false }: Props) {
   const { isFavorite, toggleFavorite } = useFavorites();
   const { colors, fs } = useTheme();
   const styles = useMemo(
@@ -94,9 +100,33 @@ function NewsCardBase({ item, variant = 'default', isNew = false }: Props) {
         actionInner: { flexDirection: 'row', alignItems: 'center', gap: 6 },
         actionText: { fontSize: fs(14), fontWeight: '600', color: colors.textMuted },
         actionActive: { color: colors.primary },
+        leadGlass: { borderWidth: 1, borderColor: 'rgba(255,255,255,0.24)' },
       }),
     [colors, fs],
   );
+  // Cam görünüm: aynı yerleşim, sahneye uygun saydam yüzey ve beyaz yazı tonları.
+  const g = useMemo(
+    () =>
+      glass
+        ? StyleSheet.create({
+            card: { backgroundColor: G.surface, borderColor: G.border },
+            pressed: { backgroundColor: G.pressed },
+            title: { color: G.text },
+            summary: { color: G.soft },
+            meta: { color: G.soft },
+            metaSource: { color: G.text },
+            newBadge: { backgroundColor: G.accent },
+            newBadgeText: { color: '#0B2A1C' },
+            image: { backgroundColor: G.border },
+            actions: { borderTopColor: G.divider },
+            actionText: { color: G.soft },
+            actionActive: { color: G.accent },
+          })
+        : null,
+    [glass],
+  );
+  const muted = glass ? G.soft : colors.textMuted;
+  const activeColor = glass ? G.accent : colors.primary;
   const saved = isFavorite(item.id);
 
   if (variant === 'lead') {
@@ -107,7 +137,13 @@ function NewsCardBase({ item, variant = 'default', isNew = false }: Props) {
         accessibilityRole="link"
         accessibilityLabel={`Manşet: ${item.title}, ${item.source}`}
       >
-        <HeroCard watermark="newspaper-outline" eyebrow={isNew ? 'YENİ · MANŞET' : 'MANŞET'} eyebrowIcon="flash-outline">
+        <HeroCard
+          watermark="newspaper-outline"
+          eyebrow={isNew ? 'YENİ · MANŞET' : 'MANŞET'}
+          eyebrowIcon="flash-outline"
+          gradient={glass ? GLASS_LEAD : undefined}
+          style={glass ? styles.leadGlass : undefined}
+        >
           <Text style={styles.leadTitle} numberOfLines={4}>
             {item.title}
           </Text>
@@ -150,66 +186,66 @@ function NewsCardBase({ item, variant = 'default', isNew = false }: Props) {
   }
 
   return (
-    <View style={styles.card}>
+    <View style={[styles.card, g?.card]}>
       <Pressable
         onPress={() => openUrl(item.link, colors)}
-        style={({ pressed }) => [styles.main, pressed && styles.pressed]}
+        style={({ pressed }) => [styles.main, pressed && styles.pressed, pressed && g?.pressed]}
         accessibilityRole="link"
         accessibilityLabel={`${item.title}, ${item.source}`}
       >
         <View style={styles.body}>
-          <Text style={styles.title} numberOfLines={3}>
+          <Text style={[styles.title, g?.title]} numberOfLines={3}>
             {item.title}
           </Text>
           {item.summary ? (
-            <Text style={styles.summary} numberOfLines={2}>
+            <Text style={[styles.summary, g?.summary]} numberOfLines={2}>
               {item.summary}
             </Text>
           ) : null}
           <View style={styles.metaRow}>
             {item.source ? <SourceBadge source={item.source} size={20} /> : null}
-            <Text style={styles.meta} numberOfLines={1}>
-              {item.source ? <Text style={styles.metaSource}>{item.source}</Text> : null}
+            <Text style={[styles.meta, g?.meta]} numberOfLines={1}>
+              {item.source ? <Text style={[styles.metaSource, g?.metaSource]}>{item.source}</Text> : null}
               {item.source && item.publishedAt ? ' · ' : ''}
               {timeAgo(item.publishedAt)}
             </Text>
             {isNew ? (
-              <View style={styles.newBadge}>
-                <Text style={styles.newBadgeText}>YENİ</Text>
+              <View style={[styles.newBadge, g?.newBadge]}>
+                <Text style={[styles.newBadgeText, g?.newBadgeText]}>YENİ</Text>
               </View>
             ) : null}
           </View>
         </View>
-        {item.imageUrl ? <Image source={{ uri: item.imageUrl }} style={styles.image} /> : null}
+        {item.imageUrl ? <Image source={{ uri: item.imageUrl }} style={[styles.image, g?.image]} /> : null}
       </Pressable>
 
-      <View style={styles.actions}>
+      <View style={[styles.actions, g?.actions]}>
         <Pressable
           onPress={() => {
             pressFeedback();
             toggleFavorite(item);
           }}
-          style={({ pressed }) => [styles.action, pressed && styles.pressed]}
+          style={({ pressed }) => [styles.action, pressed && styles.pressed, pressed && g?.pressed]}
           accessibilityRole="button"
           accessibilityState={{ selected: saved }}
           accessibilityLabel={saved ? 'Kaydedilenlerden çıkar' : 'Kaydet'}
           hitSlop={6}
         >
           <View style={styles.actionInner}>
-            <Icon name={saved ? 'star' : 'star-outline'} size={17} color={saved ? colors.primary : colors.textMuted} />
-            <Text style={[styles.actionText, saved && styles.actionActive]}>{saved ? 'Kaydedildi' : 'Kaydet'}</Text>
+            <Icon name={saved ? 'star' : 'star-outline'} size={17} color={saved ? activeColor : muted} />
+            <Text style={[styles.actionText, g?.actionText, saved && styles.actionActive, saved && g?.actionActive]}>{saved ? 'Kaydedildi' : 'Kaydet'}</Text>
           </View>
         </Pressable>
         <Pressable
           onPress={() => shareArticle(item)}
-          style={({ pressed }) => [styles.action, pressed && styles.pressed]}
+          style={({ pressed }) => [styles.action, pressed && styles.pressed, pressed && g?.pressed]}
           accessibilityRole="button"
           accessibilityLabel="Paylaş"
           hitSlop={6}
         >
           <View style={styles.actionInner}>
-            <Icon name="share-social-outline" size={17} color={colors.textMuted} />
-            <Text style={styles.actionText}>Paylaş</Text>
+            <Icon name="share-social-outline" size={17} color={muted} />
+            <Text style={[styles.actionText, g?.actionText]}>Paylaş</Text>
           </View>
         </Pressable>
       </View>

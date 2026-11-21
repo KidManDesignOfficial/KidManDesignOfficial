@@ -6,7 +6,7 @@ Rize'deki günlük haberleri ve hava durumunu gösteren Android uygulaması (Rea
 
 | Sekme | İçerik |
 |---|---|
-| **Haberler** | Google Haberler üzerinden son 7 günün Rize haberleri · ekran açıkken 5 dk'da bir otomatik yenileme · manşet ve gün başlıkları · kategoriler · arama · Kaydet / Paylaş · başlıktaki **★ Kaydedilenler** |
+| **Haberler** | Saate göre değişen Rize manzarası (Kaçkarlar, Karadeniz, çay tepeleri) ve cam kartlar · Google Haberler üzerinden son 7 günün Rize haberleri · ekran açıkken 5 dk'da bir otomatik yenileme · manşet ve gün başlıkları · kategoriler · arama · Kaydet / Paylaş · başlıktaki **★ Kaydedilenler** |
 | **Rizespor** | Maç gecesi stadyum sahnesi (projektörler, tribün flaşları, saha) ve cam kartlar · sıradaki maç kartı (saniye saniye geri sayım, “🍵 Çayını demle” hatırlatması) · canlı skor · son 5 maç formu, sıra ve puan · fikstür ve sonuçlar · Süper Lig puan durumu · kadro (mevki, yaş, uyruk, sakatlık) · **Maç Merkezi:** maç anları zaman çizelgesi, sahada ilk 11’ler, istatistikler, canlıda 30 sn’de bir yenileme ve gol kutlaması |
 | **Çay** | Güncel yaş çay alım fiyatı (resmî kaynak + ilan tarihi) · önceki yıla göre değişim · **tutar hesaplayıcı** · yıllara göre fiyat grafiği · kaynak bağlantıları |
 | **Ekonomi** | TCMB döviz kurları (USD, EUR, GBP, CHF, SAR, RUB, GEL; alış/satış) · gram ve ons altın · döviz çevirici · yaş çay fiyatı · çevrimdışı son veri · 10 dk'da bir otomatik yenileme |
@@ -116,6 +116,7 @@ src/time.ts                 "5 dk önce", gün adları vb.
 src/screens/NewsScreen.tsx  Haber listesi
 src/screens/WeatherScreen.tsx Hava durumu (cam kartlar)
 src/components/WeatherScene.tsx Canlı hava sahnesi (yerel sürücüde animasyon)
+src/components/RizeScene.tsx Haberler arka planı: Rize manzarası, saate göre renk (src/rizeScene.ts)
 src/components/StadiumScene.tsx Rizespor maç gecesi sahnesi (renkler: src/rizespor/stadium.ts)
 src/components/HeroCard.tsx  Ekran vitrin kartı (geçiş, filigran, dağ silueti)
 src/weatherScene.ts          Hava kodu → sahne (saf, test edilir)

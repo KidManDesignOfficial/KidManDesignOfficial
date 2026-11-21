@@ -17,12 +17,14 @@ import { useAppActive } from '../appState';
 import { Icon } from '../components/Icon';
 import { EASE_OUT, useAnimatedValue, useReducedMotion } from '../components/motion';
 import { NewsCard } from '../components/NewsCard';
+import RizeScene from '../components/RizeScene';
 import { NewsSkeleton } from '../components/Skeleton';
 import { Chip, ChipRow, PrimaryButton } from '../components/ui';
 import { NEWS_CATEGORIES, googleNewsRssUrl } from '../config';
 import { tapFeedback } from '../haptics';
 import { AUTO_REFRESH_MS, buildFeed, isStale, newArrivals, updatedLabel, type FeedRow } from '../newsFeed';
 import { loadCachedNews, saveCachedNews, savedAtLabel } from '../offline';
+import { NEWS_GLASS as G, rizeSkyFor, type RizeSky } from '../rizeScene';
 import { fetchRss, type NewsItem } from '../rss';
 import { useTheme } from '../theme';
 
@@ -42,11 +44,12 @@ const EMPTY: CategoryState = { items: [], loading: false, error: null, loadedAt:
 const SCROLLED_DOWN_PX = 160;
 
 /**
+ * @param sky    Arka plandaki Rize manzarasının paleti (günün saatine göre; App verir).
  * @param active Haberler sekmesi ekranda mı? Görünürken ve uygulama ön plandayken haberler
  *               kendiliğinden yenilenir: sekmeye/uygulamaya dönünce (veri 2 dk'dan eskiyse) ve
  *               açık kaldıkça 5 dakikada bir.
  */
-export default function NewsScreen({ active = true }: { active?: boolean }) {
+export default function NewsScreen({ active = true, sky = rizeSkyFor(new Date().getHours()) }: { active?: boolean; sky?: RizeSky }) {
   const [categoryId, setCategoryId] = useState(NEWS_CATEGORIES[0].id);
   const [byCategory, setByCategory] = useState<Record<string, CategoryState>>({});
   const [search, setSearch] = useState('');
@@ -71,50 +74,58 @@ export default function NewsScreen({ active = true }: { active?: boolean }) {
   const styles = useMemo(
     () =>
       StyleSheet.create({
-        container: { flex: 1, backgroundColor: colors.background },
+        // Arka plandaki Rize manzarası görünsün diye zemin sahnenin alt rengi; yüzeyler cam.
+        container: { flex: 1, backgroundColor: sky.chrome.footer },
         searchBox: { paddingHorizontal: 16, paddingTop: 12 },
-        searchInput: {
-          backgroundColor: colors.card,
-          borderRadius: 12,
+        searchField: {
+          flexDirection: 'row',
+          alignItems: 'center',
+          gap: 8,
+          backgroundColor: G.input,
+          borderRadius: 14,
           borderWidth: 1,
-          borderColor: colors.border,
-          paddingHorizontal: 14,
+          borderColor: G.border,
+          paddingLeft: 12,
+        },
+        searchInput: {
+          flex: 1,
+          paddingRight: 14,
           paddingVertical: 10,
           fontSize: fs(16),
-          color: colors.text,
+          color: G.text,
         },
         list: { paddingHorizontal: 16, paddingBottom: 24, gap: 10, flexGrow: 1 },
         center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32, gap: 12 },
-        muted: { color: colors.textMuted, fontSize: fs(15), textAlign: 'center' },
-        errorText: { color: colors.error, fontSize: fs(15), textAlign: 'center' },
+        muted: { color: G.soft, fontSize: fs(15), textAlign: 'center' },
+        errorText: { color: G.text, fontSize: fs(15), textAlign: 'center', lineHeight: fs(22) },
         offline: {
           flexDirection: 'row',
           alignItems: 'center',
           gap: 6,
           alignSelf: 'flex-start',
-          backgroundColor: colors.card,
+          backgroundColor: G.surface,
           borderWidth: 1,
-          borderColor: colors.border,
+          borderColor: G.border,
           borderRadius: 999,
           paddingHorizontal: 10,
           paddingVertical: 4,
           marginBottom: 2,
         },
-        offlineText: { color: colors.textMuted, fontSize: fs(12), fontWeight: '600' },
+        offlineText: { color: G.soft, fontSize: fs(12), fontWeight: '600' },
         status: { flexDirection: 'row', alignItems: 'center', gap: 7, paddingHorizontal: 2, paddingBottom: 2 },
-        liveDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: '#2FB36B' },
-        statusText: { color: colors.textMuted, fontSize: fs(12), fontWeight: '600' },
+        liveDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: '#3DDC84' },
+        statusText: { color: G.soft, fontSize: fs(12), fontWeight: '600' },
         sectionRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 10, marginBottom: 2 },
-        sectionTitle: { color: colors.text, fontSize: fs(13), fontWeight: '800', letterSpacing: 0.4 },
-        sectionCount: { color: colors.textMuted, fontSize: fs(12), fontWeight: '600' },
-        sectionLine: { flex: 1, height: StyleSheet.hairlineWidth, backgroundColor: colors.border },
+        sectionTitle: { color: G.text, fontSize: fs(13), fontWeight: '800', letterSpacing: 0.4 },
+        sectionCount: { color: G.faint, fontSize: fs(12), fontWeight: '600' },
+        sectionLine: { flex: 1, height: StyleSheet.hairlineWidth, backgroundColor: G.border },
         listArea: { flex: 1 },
         pillWrap: { position: 'absolute', top: 10, left: 0, right: 0, alignItems: 'center' },
         pill: {
           flexDirection: 'row',
           alignItems: 'center',
           gap: 6,
-          backgroundColor: colors.header,
+          backgroundColor: G.accent,
           borderRadius: 999,
           paddingHorizontal: 14,
           paddingVertical: 8,
@@ -124,9 +135,9 @@ export default function NewsScreen({ active = true }: { active?: boolean }) {
           shadowRadius: 8,
           shadowOffset: { width: 0, height: 3 },
         },
-        pillText: { color: '#FFFFFF', fontSize: fs(13), fontWeight: '700' },
+        pillText: { color: '#0B2A1C', fontSize: fs(13), fontWeight: '800' },
       }),
-    [colors, fs],
+    [fs, sky],
   );
 
   const load = useCallback(async (id: string) => {
@@ -254,7 +265,7 @@ export default function NewsScreen({ active = true }: { active?: boolean }) {
           </View>
         );
       }
-      return <NewsCard item={row.item} variant={row.kind === 'lead' ? 'lead' : 'default'} isNew={newSet.has(row.item.id)} />;
+      return <NewsCard item={row.item} variant={row.kind === 'lead' ? 'lead' : 'default'} isNew={newSet.has(row.item.id)} glass />;
     },
     [newSet, styles],
   );
@@ -264,28 +275,33 @@ export default function NewsScreen({ active = true }: { active?: boolean }) {
 
   return (
     <View style={styles.container}>
+      <RizeScene sky={sky} active={live} />
       <View style={styles.searchBox}>
-        <TextInput
-          value={search}
-          onChangeText={setSearch}
-          placeholder="Haberlerde ara…"
-          placeholderTextColor={colors.textMuted}
-          style={styles.searchInput}
-          returnKeyType="search"
-          clearButtonMode="while-editing"
-          accessibilityLabel="Haberlerde ara"
-        />
+        <View style={styles.searchField}>
+          <Icon name="search" size={18} color={G.faint} />
+          <TextInput
+            value={search}
+            onChangeText={setSearch}
+            placeholder="Haberlerde ara…"
+            placeholderTextColor={G.faint}
+            selectionColor={G.accent}
+            style={styles.searchInput}
+            returnKeyType="search"
+            clearButtonMode="while-editing"
+            accessibilityLabel="Haberlerde ara"
+          />
+        </View>
       </View>
 
       <ChipRow>
         {NEWS_CATEGORIES.map((c) => (
-          <Chip key={c.id} label={c.label} selected={c.id === categoryId} onPress={() => setCategoryId(c.id)} />
+          <Chip key={c.id} label={c.label} selected={c.id === categoryId} onPress={() => setCategoryId(c.id)} glass />
         ))}
       </ChipRow>
 
       <View style={styles.listArea}>
       {showFullScreenLoader ? (
-        <NewsSkeleton />
+        <NewsSkeleton glass />
       ) : (
         <FlatList
           ref={listRef}
@@ -301,14 +317,14 @@ export default function NewsScreen({ active = true }: { active?: boolean }) {
               refreshing={refreshing}
               onRefresh={onRefresh}
               colors={[colors.primary]}
-              tintColor={colors.primary}
-              progressBackgroundColor={colors.card}
+              tintColor={G.text}
+              progressBackgroundColor={sky.chrome.footer}
             />
           }
           ListHeaderComponent={
             offline ? (
               <View style={styles.offline}>
-                <Icon name="cloud-offline-outline" size={16} color={colors.textMuted} />
+                <Icon name="cloud-offline-outline" size={16} color={G.soft} />
                 <Text style={styles.offlineText}>
                   Çevrimdışı{state.cachedAt ? ` · son güncelleme ${savedAtLabel(state.cachedAt)}` : ''}
                 </Text>
@@ -316,7 +332,7 @@ export default function NewsScreen({ active = true }: { active?: boolean }) {
             ) : state.loadedAt || state.loading ? (
               <View style={styles.status} accessibilityLiveRegion="polite">
                 {state.loading ? (
-                  <ActivityIndicator size="small" color={colors.primary} />
+                  <ActivityIndicator size="small" color={G.text} />
                 ) : (
                   <View style={styles.liveDot} />
                 )}
@@ -356,7 +372,7 @@ export default function NewsScreen({ active = true }: { active?: boolean }) {
           accessibilityRole="button"
           accessibilityLabel={`${pendingNew} yeni haber, en üste git`}
         >
-          <Icon name="arrow-up" size={15} color="#FFFFFF" />
+          <Icon name="arrow-up" size={15} color="#0B2A1C" />
           <Text style={styles.pillText}>{pendingNew} yeni haber</Text>
         </Pressable>
       </Animated.View>

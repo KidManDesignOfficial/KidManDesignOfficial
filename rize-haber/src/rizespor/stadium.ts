@@ -5,7 +5,7 @@
  * Üst başlık gökyüzünün ilk rengini, alt sekme çubuğu sahnenin en alt tonunu alır; böylece ekran
  * hava durumu sayfasındaki gibi baştan sona kesintisiz görünür.
  */
-import type { SkyChrome } from '../weatherScene';
+import type { SkyChrome } from '../weatherScene.ts';
 
 /** Üstten alta arka plan geçişi ve durakları. */
 export const STADIUM_SKY = ['#050D1C', '#0A1E3C', '#0C2A33', '#0B3B27', '#08301F'] as const;

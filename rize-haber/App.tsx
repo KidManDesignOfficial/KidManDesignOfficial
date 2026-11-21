@@ -14,6 +14,7 @@ import { openUrl } from './src/components/ui';
 import { FavoritesProvider } from './src/favorites';
 import { CLUB_COLORS } from './src/rizespor/names';
 import { GLASS, STADIUM_CHROME } from './src/rizespor/stadium';
+import { useRizeSky } from './src/components/RizeScene';
 import DiscoverScreen from './src/screens/DiscoverScreen';
 import EconomyScreen from './src/screens/EconomyScreen';
 import NewsScreen from './src/screens/NewsScreen';
@@ -112,10 +113,13 @@ function Main() {
   }, [showSaved, showSettings, tab]);
 
   const club = tab === 'rizespor' && !showSettings;
+  const newsVisible = tab === 'news' && !showSettings;
+  // Haberler sekmesi: günün saatine göre Rize manzarası (gündüz / akşam üstü / gece).
+  const rizeSky = useRizeSky();
   const weatherVisible = tab === 'weather' && !showSettings;
   // Hava sekmesinde başlık ve sekme çubuğu gökyüzünün rengini alır; sahneyle kesintisiz birleşir.
   // Rizespor sekmesinde de aynısı: başlık gece göğüne, sekme çubuğu stadyumun çimine karışır.
-  const skyChrome = weatherVisible ? weatherChrome : club ? STADIUM_CHROME : null;
+  const skyChrome = weatherVisible ? weatherChrome : club ? STADIUM_CHROME : newsVisible ? rizeSky.chrome : null;
   const sky = skyChrome?.header ?? null;
   const styles = useMemo(
     () =>
@@ -214,10 +218,10 @@ function Main() {
         {/* Ekranlar bağlı kalır; sekme değişince yüklenen veri ve kaydırma konumu korunur. */}
         <View style={styles.body}>
           <FadeInView visible={!showSettings && tab === 'news' && !showSaved} style={styles.screen}>
-            <NewsScreen active={!showSettings && tab === 'news' && !showSaved} />
+            <NewsScreen active={newsVisible && !showSaved} sky={rizeSky} />
           </FadeInView>
           <FadeInView visible={!showSettings && tab === 'news' && showSaved} style={styles.screen}>
-            <SavedScreen />
+            <SavedScreen sky={rizeSky} active={newsVisible && showSaved} />
           </FadeInView>
           {mounted.has('rizespor') ? (
             <FadeInView visible={!showSettings && tab === 'rizespor'} style={styles.screen}>
