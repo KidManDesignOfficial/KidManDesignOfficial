@@ -14,7 +14,7 @@ import { Animated, Easing, StyleSheet, View, useWindowDimensions } from 'react-n
 import { LinearGradient } from 'expo-linear-gradient';
 
 import { seeded, skyChrome, type Scene } from '../weatherScene';
-import { useAnimatedValue, useReducedMotion } from './motion';
+import { useAnimatedValue, useSceneStill } from './motion';
 
 const FILL = { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 } as const;
 
@@ -39,7 +39,7 @@ function cycle(clock: Animated.Value, speed: number, phase: number) {
 }
 
 export default function WeatherScene({ scene, active }: { scene: Scene; active: boolean }) {
-  const reduced = useReducedMotion();
+  const reduced = useSceneStill();
   const running = active && !reduced;
   const { width, height } = useWindowDimensions();
   const fade = useAnimatedValue(0);

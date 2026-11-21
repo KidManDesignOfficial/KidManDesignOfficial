@@ -13,12 +13,12 @@ import { LinearGradient } from 'expo-linear-gradient';
 
 import { candleSeries, ECON_CHROME, ECON_SKY, ECON_SKY_STOPS, MARKET, segments, trendLine } from '../economyScene';
 import { seeded } from '../weatherScene';
-import { loopPhase, useLoopClock, useReducedMotion } from './motion';
+import { loopPhase, useLoopClock, useSceneStill } from './motion';
 
 const FILL = { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 } as const;
 
 export default function EconomyScene({ active }: { active: boolean }) {
-  const reduced = useReducedMotion();
+  const reduced = useSceneStill();
   const running = active && !reduced;
   const { width, height } = useWindowDimensions();
   const footer = ECON_CHROME.footer;

@@ -27,7 +27,8 @@ import SettingsScreen from './src/screens/SettingsScreen';
 import TeaScreen from './src/screens/TeaScreen';
 import WeatherScreen from './src/screens/WeatherScreen';
 import type { SkyChrome } from './src/weatherScene';
-import { ThemeProvider, useTheme } from './src/theme';
+import { loadSettings } from './src/storage';
+import { ThemeProvider, useTheme, type Settings, type TabId } from './src/theme';
 
 // Bildirim yanıtı yalnızca telefonda vardır; web önizlemesinde boş döner.
 const useNotificationResponse =
@@ -37,7 +38,7 @@ const useNotificationResponse =
 SplashScreen.preventAutoHideAsync().catch(() => {});
 SplashScreen.setOptions({ fade: true, duration: 350 });
 
-type Tab = 'news' | 'rizespor' | 'tea' | 'economy' | 'weather' | 'rize';
+type Tab = TabId;
 
 const TABS: { id: Tab; label: string; icon: IconName; iconActive: IconName; title: string }[] = [
   { id: 'news', label: 'Haberler', icon: 'newspaper-outline', iconActive: 'newspaper', title: 'Rize Haber' },
@@ -51,10 +52,13 @@ const TABS: { id: Tab; label: string; icon: IconName; iconActive: IconName; titl
 export default function App() {
   const [fontsLoaded, fontError] = useFonts(ICON_FONT);
   const [onboarded, setOnboarded] = useState<boolean | null>(null);
+  // Ayarlar açılış ekranı kapanmadan okunur: ilk karede doğru tema ve açılış sekmesi görünür.
+  const [stored, setStored] = useState<Partial<Settings> | null>(null);
   useEffect(() => {
     hasOnboarded().then(setOnboarded);
+    loadSettings().then(setStored);
   }, []);
-  const ready = (fontsLoaded || fontError !== null) && onboarded !== null;
+  const ready = (fontsLoaded || fontError !== null) && onboarded !== null && stored !== null;
   useEffect(() => {
     if (ready) SplashScreen.hideAsync().catch(() => {});
   }, [ready]);
@@ -62,7 +66,7 @@ export default function App() {
 
   return (
     <SafeAreaProvider>
-      <ThemeProvider>
+      <ThemeProvider initial={stored}>
         <FavoritesProvider>
           {onboarded ? <Main /> : <Onboarding onDone={() => setOnboarded(true)} />}
         </FavoritesProvider>
@@ -72,14 +76,15 @@ export default function App() {
 }
 
 function Main() {
-  const { colors, fs } = useTheme();
-  const [tab, setTab] = useState<Tab>('news');
+  const { colors, fs, settings } = useTheme();
+  const startTab = settings.startTab;
+  const [tab, setTab] = useState<Tab>(startTab);
   const [showSaved, setShowSaved] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [openMatchId, setOpenMatchId] = useState<string | null>(null);
   const [weatherChrome, setWeatherChrome] = useState<SkyChrome | null>(null);
   // Her sekme ilk açıldığında yüklenir: açılış hızlanır, gereksiz ağ isteği ve pil harcanmaz.
-  const [mounted, setMounted] = useState<Set<Tab | 'settings'>>(() => new Set(['news']));
+  const [mounted, setMounted] = useState<Set<Tab | 'settings'>>(() => new Set(['news', startTab]));
   const mount = useCallback((t: Tab | 'settings') => {
     setMounted((m) => (m.has(t) ? m : new Set(m).add(t)));
   }, []);
@@ -94,7 +99,7 @@ function Main() {
 
   useOpenNotifications(goTo, () => setShowSaved(false), setOpenMatchId);
 
-  // Android geri tuşu: önce Ayarlar'ı / Kaydedilenler'i kapat, sonra Haberler sekmesine dön.
+  // Android geri tuşu: önce Ayarlar'ı / Kaydedilenler'i kapat, sonra açılış sekmesine dön.
   useEffect(() => {
     const sub = BackHandler.addEventListener('hardwareBackPress', () => {
       if (showSettings) {
@@ -105,14 +110,15 @@ function Main() {
         setShowSaved(false);
         return true;
       }
-      if (tab !== 'news') {
-        setTab('news');
+      if (tab !== startTab) {
+        setTab(startTab);
+        mount(startTab);
         return true;
       }
       return false;
     });
     return () => sub.remove();
-  }, [showSaved, showSettings, tab]);
+  }, [showSaved, showSettings, tab, startTab, mount]);
 
   const club = tab === 'rizespor' && !showSettings;
   const newsVisible = tab === 'news' && !showSettings;

@@ -12,7 +12,7 @@ import { useAppActive } from '../appState';
 import EconomyScene from '../components/EconomyScene';
 import { HeroCard } from '../components/HeroCard';
 import { Icon } from '../components/Icon';
-import { useAnimatedValue, useReducedMotion } from '../components/motion';
+import { useAnimatedValue, useSceneStill } from '../components/motion';
 import { HeroSkeleton } from '../components/Skeleton';
 import { Card, Chip, ChipRow, PrimaryButton, SectionTitle } from '../components/ui';
 import { ECON_CHROME, ECON_GLASS as G, FLAGS, MARKET } from '../economyScene';
@@ -460,7 +460,7 @@ const TICKER_SPEED = 36;
 
 function Ticker({ items, running }: { items: TickerItem[]; running: boolean }) {
   const { fs } = useTheme();
-  const reduced = useReducedMotion();
+  const reduced = useSceneStill();
   const [rowWidth, setRowWidth] = useState(0);
   const x = useAnimatedValue(0);
   const moving = running && !reduced && rowWidth > 0;

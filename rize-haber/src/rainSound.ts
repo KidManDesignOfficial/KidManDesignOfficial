@@ -1,7 +1,7 @@
 /**
  * Yağmurlu havada isteğe bağlı yağmur sesi.
  *
- * - Varsayılan olarak KAPALIDIR; kullanıcı Hava ekranındaki düğmeyle açar, tercih cihazda saklanır.
+ * - Varsayılan olarak KAPALIDIR; kullanıcı Hava ekranındaki düğmeyle ya da Ayarlar'dan açar.
  * - Yalnızca Hava ekranı görünürken ve uygulama ön plandayken çalar; başka sekmeye geçince,
  *   uygulama arka plana alınınca ya da hava yağmurlu değilse durur.
  * - Diğer uygulamaların sesini (müzik, podcast) kesmez, onlarla birlikte çalar.
@@ -9,28 +9,20 @@
  */
 import { useCallback, useEffect, useState } from 'react';
 import { AppState } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { setAudioModeAsync, useAudioPlayer } from 'expo-audio';
 
-const STORAGE_KEY = 'rizehaber:rainSound:v1';
+import { useTheme } from './theme';
+
 const RAIN_SOURCE = require('../assets/sounds/rain.m4a');
 const TARGET_VOLUME = 0.7;
 const FADE_STEPS = 15;
 const FADE_STEP_MS = 100;
 
-/** Kullanıcının yağmur sesi tercihi (yüklenene kadar false). */
+/** Kullanıcının yağmur sesi tercihi; Ayarlar'da saklanır (Hava ekranı ve Ayarlar aynı değeri görür). */
 export function useRainSoundPreference(): [boolean, (on: boolean) => void] {
-  const [enabled, setEnabled] = useState(false);
-  useEffect(() => {
-    AsyncStorage.getItem(STORAGE_KEY)
-      .then((v) => setEnabled(v === '1'))
-      .catch(() => {});
-  }, []);
-  const update = useCallback((on: boolean) => {
-    setEnabled(on);
-    AsyncStorage.setItem(STORAGE_KEY, on ? '1' : '0').catch(() => {});
-  }, []);
-  return [enabled, update];
+  const { settings, updateSettings } = useTheme();
+  const update = useCallback((on: boolean) => updateSettings({ rainSound: on }), [updateSettings]);
+  return [settings.rainSound, update];
 }
 
 function useAppActive(): boolean {

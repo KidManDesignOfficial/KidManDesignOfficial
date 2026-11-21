@@ -11,7 +11,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { TEXT_SCALES, type TextSize } from '../colors';
 import { Icon, type IconName } from '../components/Icon';
 import { PressableScale, useReducedMotion, useAnimatedValue } from '../components/motion';
-import { WEATHER_LOCATIONS } from '../config';
+import LocationPicker from '../components/LocationPicker';
+import { DISTRICT_PLACES, placeById, pushRecent, type Place } from '../places';
 import { pressFeedback, successFeedback, tapFeedback } from '../haptics';
 import { enableNewsNotifications, setMatchFeature } from '../notifications';
 import { useTheme } from '../theme';
@@ -52,6 +53,10 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
   const [matchReminders, setMatchReminders] = useState(true);
   const [newsAlerts, setNewsAlerts] = useState(false);
   const [finishing, setFinishing] = useState(false);
+  const [pickerOpen, setPickerOpen] = useState(false);
+  // Köy seçildiyse ilçe düğmelerinin başında o da görünür.
+  const chosen = placeById(settings.weatherLocationId);
+  const placeChips: Place[] = chosen && !DISTRICT_PLACES.includes(chosen) ? [chosen, ...DISTRICT_PLACES] : DISTRICT_PLACES;
   const x = useAnimatedValue(0);
   const enter = useAnimatedValue(0);
 
@@ -141,6 +146,7 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
           borderColor: 'rgba(255,255,255,0.25)',
         },
         placeActive: { backgroundColor: '#FFFFFF', borderColor: '#FFFFFF' },
+        placeFind: { borderStyle: 'dashed' },
         placeText: { color: '#FFFFFF', fontSize: fs(14), fontWeight: '700' },
         placeTextActive: { color: GREEN },
         sizes: { flexDirection: 'row', gap: 8 },
@@ -221,9 +227,9 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
             <Text style={styles.h2}>Sana göre ayarlayalım</Text>
             <Text style={styles.sub}>Bunları daha sonra Ayarlar’dan değiştirebilirsin.</Text>
 
-            <Text style={styles.label}>Hava durumu için ilçen</Text>
+            <Text style={styles.label}>Hava durumu için ilçen ya da köyün</Text>
             <View style={styles.chips}>
-              {WEATHER_LOCATIONS.map((l) => {
+              {placeChips.map((l) => {
                 const active = settings.weatherLocationId === l.id;
                 return (
                   <PressableScale
@@ -242,7 +248,31 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
                   </PressableScale>
                 );
               })}
+              <PressableScale
+                onPress={() => {
+                  tapFeedback();
+                  setPickerOpen(true);
+                }}
+                style={[styles.place, styles.placeFind]}
+                accessibilityRole="button"
+                accessibilityLabel="Köyünü ara"
+              >
+                <Icon name="search" size={15} color="#FFFFFF" />
+                <Text style={styles.placeText}>Köyünü ara</Text>
+              </PressableScale>
             </View>
+            <LocationPicker
+              visible={pickerOpen}
+              selectedId={settings.weatherLocationId}
+              title="Köyünü bul"
+              onSelect={(p) =>
+                updateSettings({
+                  weatherLocationId: p.id,
+                  recentPlaces: DISTRICT_PLACES.includes(p) ? settings.recentPlaces : pushRecent(settings.recentPlaces, p.id),
+                })
+              }
+              onClose={() => setPickerOpen(false)}
+            />
 
             <Text style={styles.label}>Yazı boyutu</Text>
             <View style={styles.sizes}>

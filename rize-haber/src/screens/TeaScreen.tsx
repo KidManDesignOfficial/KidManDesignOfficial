@@ -8,7 +8,7 @@ import { Animated, RefreshControl, ScrollView, StyleSheet, Text, TextInput, View
 import { LinearGradient } from 'expo-linear-gradient';
 
 import { HeroCard } from '../components/HeroCard';
-import { loopPhase, useLoopClock, useReducedMotion } from '../components/motion';
+import { loopPhase, useLoopClock, useSceneStill } from '../components/motion';
 import TeaScene from '../components/TeaScene';
 import { Card, LinkRow, SectionTitle } from '../components/ui';
 import { formatDateTr, formatLira, formatNumber, parseKg, yearOverYearChange, type TeaData } from '../tea';
@@ -260,7 +260,7 @@ export default function TeaScreen({ active = true }: { active?: boolean }) {
 // ——— Vitrin kartındaki ince belli çay bardağı ve tüten buhar ———
 
 function TeaGlass({ running }: { running: boolean }) {
-  const reduced = useReducedMotion();
+  const reduced = useSceneStill();
   const moving = running && !reduced;
   const clock = useLoopClock(3600, moving);
   const wisps = [0, 1, 2].map((i) => {

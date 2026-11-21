@@ -7,7 +7,13 @@
 import * as Haptics from 'expo-haptics';
 import { Platform } from 'react-native';
 
-const enabled = Platform.OS === 'android' || Platform.OS === 'ios';
+const supported = Platform.OS === 'android' || Platform.OS === 'ios';
+let enabled = supported;
+
+/** Ayarlar'daki "Titreşim" anahtarı; tema sağlayıcısı ayar değişince çağırır. */
+export function setHapticsEnabled(on: boolean): void {
+  enabled = supported && on;
+}
 
 export function tapFeedback(): void {
   if (enabled) Haptics.selectionAsync().catch(() => {});

@@ -2,13 +2,15 @@
  * Uygulama genelindeki hareketler: açılır-kapanır içerik, basınca yaylanma, yumuşak beliriş.
  *
  * Tek bir yerde tanımlandıkları için her ekranda aynı süre ve eğri kullanılır. Telefonda
- * "Hareketi azalt" (erişilebilirlik) açıksa animasyonlar anında tamamlanır.
+ * "Hareketi azalt" (erişilebilirlik) açıksa ya da kullanıcı Ayarlar → Özelleştirme'den
+ * animasyonları kapattıysa animasyonlar anında tamamlanır.
  */
 import { useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 import { AccessibilityInfo, Animated, Easing, Pressable, View } from 'react-native';
 import type { PressableProps, StyleProp, ViewStyle } from 'react-native';
 
+import { useTheme } from '../theme';
 import { Icon } from './Icon';
 
 /**
@@ -45,7 +47,8 @@ export function loopPhase(clock: Animated.Value, speed: number, phase: number) {
 export const EASE_OUT = Easing.bezier(0.2, 0.8, 0.2, 1);
 export const DURATION = { short: 180, medium: 300 } as const;
 
-export function useReducedMotion(): boolean {
+/** Telefonun erişilebilirlik ayarı "Hareketi azalt" açık mı? */
+export function useSystemReducedMotion(): boolean {
   const [reduced, setReduced] = useState(false);
   useEffect(() => {
     let mounted = true;
@@ -59,6 +62,20 @@ export function useReducedMotion(): boolean {
     };
   }, []);
   return reduced;
+}
+
+/** Arayüz animasyonları (geçiş, açılır-kapanır, yaylanma) kapalı mı? */
+export function useReducedMotion(): boolean {
+  const system = useSystemReducedMotion();
+  const { settings } = useTheme();
+  return system || !settings.uiMotion;
+}
+
+/** Arka plan sahneleri durağan mı çizilmeli? (yağmur, bulut, buhar, borsa şeridi, stadyum ışıkları) */
+export function useSceneStill(): boolean {
+  const system = useSystemReducedMotion();
+  const { settings } = useTheme();
+  return system || !settings.sceneMotion;
 }
 
 /**

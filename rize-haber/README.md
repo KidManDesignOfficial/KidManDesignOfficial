@@ -10,9 +10,9 @@ Rize'deki günlük haberleri ve hava durumunu gösteren Android uygulaması (Rea
 | **Rizespor** | Maç gecesi stadyum sahnesi (projektörler, tribün flaşları, saha) ve cam kartlar · sıradaki maç kartı (saniye saniye geri sayım, “🍵 Çayını demle” hatırlatması) · canlı skor · son 5 maç formu, sıra ve puan · fikstür ve sonuçlar · Süper Lig puan durumu · kadro (mevki, yaş, uyruk, sakatlık) · **Maç Merkezi:** maç anları zaman çizelgesi, sahada ilk 11’ler, istatistikler, canlıda 30 sn’de bir yenileme ve gol kutlaması |
 | **Çay** | Sabah çay bahçesi sahnesi (kat kat çay tepeleri, şafak güneşi, sis, savrulan yapraklar) ve cam kartlar · buharı tüten ince belli bardak · güncel yaş çay alım fiyatı (resmî kaynak + ilan tarihi) · önceki yıla göre değişim · **tutar hesaplayıcı** · yıllara göre fiyat grafiği · kaynak bağlantıları |
 | **Ekonomi** | Piyasa ekranı sahnesi (ızgara, mum grafiği, canlı nokta, süzülen ₺ $ € £) ve cam kartlar · **kayan kur bandı** · TCMB döviz kurları (bayraklı) (USD, EUR, GBP, CHF, SAR, RUB, GEL; alış/satış) · gram ve ons altın · döviz çevirici · yaş çay fiyatı · çevrimdışı son veri · 10 dk'da bir otomatik yenileme |
-| **Hava** | Anlık durum · 24 saatlik ve 7 günlük tahmin · 12 ilçe + Ayder · havaya göre canlanan sahne (güneş, ay/yıldız, bulut, yağmur, şimşek, kar, sis) · isteğe bağlı yağmur sesi |
+| **Hava** | Anlık durum · 24 saatlik ve 7 günlük tahmin · 12 ilçe, Ayder ve ~480 köy, belde, yayla (eski adlarıyla aranabilir, çevrimdışı) · havaya göre canlanan sahne (güneş, ay/yıldız, bulut, yağmur, şimşek, kar, sis) · isteğe bağlı yağmur sesi |
 | **Keşfet** | **Gezi:** 15 yer (yayla, doğa, tarih, müze), haritada aç, gezi listem, paylaş · **Lezzet:** 14 coğrafi işaretli ürün ve yöresel tatlar · **Kültür:** Rize bezi, horon, kemençe, tulum, şenlikler, pratik bilgiler · **Tarihçe** |
-| **Ayarlar** (⚙️) | Tema (Sistem/Açık/Koyu) · 5 renk · yazı boyutu (Normal/Büyük/Çok büyük) · varsayılan hava konumu · bildirimler · kaydedilenleri temizle · hakkında ve veri kaynakları |
+| **Ayarlar** (⚙️) | Tema (Sistem/Açık/Koyu) · 5 renk · yazı boyutu (Normal/Büyük/Çok büyük) · özelleştirme (arayüz animasyonları, hareketli arka planlar, titreşim, yağmur sesi, açılış ekranı) · varsayılan hava konumu (ilçe veya köy) · bildirimler · kaydedilenleri temizle · hakkında ve veri kaynakları |
 
 Ayarlar başlıktaki ⚙️ düğmesindedir.
 
@@ -89,6 +89,9 @@ npx expo start      # telefonda Expo Go ile anlık önizleme
 ```
 App.tsx                     Ana yerleşim: başlık + alt sekme çubuğu
 src/config.ts               Haber kategorileri (arama sorguları), ilçe koordinatları
+src/places.ts               İlçe + köy/belde/yayla listesi, Türkçe duyarsız arama (saf, test edilir)
+src/data/rizePlaces.ts      Köy ve yayla konumları — GeoNames (CC BY 4.0), scripts/rize-places.py üretir
+src/components/LocationPicker.tsx Konum seçici (arama, ilçeye göre köyler)
 src/colors.ts, src/theme.tsx Renk paletleri, tema ve kullanıcı ayarları
 src/tea.ts, src/teaData.ts  Çay fiyatı verisi: doğrulama, hesaplama, uzaktan güncelleme
 data/cay.json               Güncel çay fiyatı (uygulama buradan okur)

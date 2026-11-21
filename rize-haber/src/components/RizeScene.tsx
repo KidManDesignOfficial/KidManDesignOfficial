@@ -13,7 +13,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 
 import { rizeSkyFor, type RizeSky } from '../rizeScene';
 import { seeded } from '../weatherScene';
-import { useAnimatedValue, useReducedMotion } from './motion';
+import { useAnimatedValue, useSceneStill } from './motion';
 
 const FILL = { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 } as const;
 
@@ -47,7 +47,7 @@ function cycle(clock: Animated.Value, speed: number, phase: number) {
 type Peak = { x: number; peakY: number; size: number; snow?: boolean };
 
 export default function RizeScene({ sky, active }: { sky: RizeSky; active: boolean }) {
-  const reduced = useReducedMotion();
+  const reduced = useSceneStill();
   const running = active && !reduced;
   const { width, height } = useWindowDimensions();
   const horizon = height * 0.4;

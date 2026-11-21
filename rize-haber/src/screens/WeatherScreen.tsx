@@ -3,11 +3,13 @@ import { RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native
 import { LinearGradient } from 'expo-linear-gradient';
 
 import { Icon, type IconName } from '../components/Icon';
+import LocationPicker from '../components/LocationPicker';
 import { PressableScale } from '../components/motion';
 import { HeroSkeleton } from '../components/Skeleton';
 import { Chip, ChipRow, PrimaryButton } from '../components/ui';
 import WeatherScene from '../components/WeatherScene';
 import { WEATHER_LOCATIONS } from '../config';
+import { DISTRICT_PLACES, districtName, placeById, pushRecent, type Place } from '../places';
 import { pressFeedback } from '../haptics';
 import { loadCachedWeather, saveCachedWeather, savedAtLabel } from '../offline';
 import { useRainSound, useRainSoundPreference } from '../rainSound';
@@ -36,7 +38,8 @@ export default function WeatherScreen({
   /** Üst başlık ve alt sekme çubuğunu gökyüzüne uydurmak için renkler; veri yokken null. */
   onSkyColors?: (colors: SkyChrome | null) => void;
 }) {
-  const { colors, fs, settings } = useTheme();
+  const { colors, fs, settings, updateSettings } = useTheme();
+  const [pickerOpen, setPickerOpen] = useState(false);
   // Kullanıcının bu ekranda seçtiği ilçe; Ayarlar'daki varsayılan değişirse geçersiz olur.
   const [choice, setChoice] = useState<{ base: string; id: string } | null>(null);
   const locationId = choice && choice.base === settings.weatherLocationId ? choice.id : settings.weatherLocationId;
@@ -47,7 +50,25 @@ export default function WeatherScreen({
   const [error, setError] = useState<string | null>(null);
   const controller = useRef<AbortController | null>(null);
 
-  const location = WEATHER_LOCATIONS.find((l) => l.id === locationId) ?? WEATHER_LOCATIONS[0];
+  const location: Place = placeById(locationId) ?? placeById(WEATHER_LOCATIONS[0].id)!;
+  // Şeritte: önce son seçilen köy/yaylalar, sonra 12 ilçe ve Ayder.
+  // Seçili köy (ör. Ayarlar'da varsayılan yapılmışsa) son seçilenlerde olmasa da şeridin başında görünür.
+  const strip = useMemo(() => {
+    const list: Place[] = [location, ...settings.recentPlaces.map(placeById), ...DISTRICT_PLACES].filter(
+      (p): p is Place => !!p,
+    );
+    const villages = list.filter((p) => !DISTRICT_PLACES.includes(p));
+    return [...villages, ...DISTRICT_PLACES].filter((p, i, all) => all.findIndex((x) => x.id === p.id) === i);
+  }, [location, settings.recentPlaces]);
+  const choose = useCallback(
+    (place: Place) => {
+      setChoice({ base: settings.weatherLocationId, id: place.id });
+      if (!DISTRICT_PLACES.includes(place)) {
+        updateSettings({ recentPlaces: pushRecent(settings.recentPlaces, place.id) });
+      }
+    },
+    [settings.weatherLocationId, settings.recentPlaces, updateSettings],
+  );
   const weather = entry?.id === location.id ? entry.weather : null;
   const cachedAt = entry?.id === location.id ? entry.cachedAt : null;
 
@@ -128,6 +149,21 @@ export default function WeatherScreen({
         hero: { alignItems: 'center', paddingTop: 18, paddingBottom: 22, paddingHorizontal: 16 },
         placeRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
         place: { color: WHITE, fontSize: fs(20), fontWeight: '700', ...SHADOW },
+        placeSub: { color: 'rgba(255,255,255,0.85)', fontSize: fs(13), fontWeight: '600', marginTop: 2, ...SHADOW },
+        findChip: {
+          minHeight: 38,
+          flexDirection: 'row',
+          alignItems: 'center',
+          gap: 5,
+          paddingHorizontal: 13,
+          paddingVertical: 8,
+          borderRadius: 999,
+          backgroundColor: 'rgba(255,255,255,0.22)',
+          borderWidth: 1,
+          borderColor: 'rgba(255,255,255,0.45)',
+        },
+        findChipPlain: { backgroundColor: colors.primarySoft, borderColor: colors.primary },
+        findChipText: { color: WHITE, fontSize: fs(14), fontWeight: '700' },
         temp: {
           color: WHITE,
           fontSize: fs(96),
@@ -205,16 +241,30 @@ export default function WeatherScreen({
         }
       >
         <ChipRow>
-          {WEATHER_LOCATIONS.map((l) => (
-            <Chip
-              key={l.id}
-              label={l.name}
-              glass={!!scene}
-              selected={l.id === locationId}
-              onPress={() => setChoice({ base: settings.weatherLocationId, id: l.id })}
-            />
+          <PressableScale
+            onPress={() => {
+              pressFeedback();
+              setPickerOpen(true);
+            }}
+            style={[styles.findChip, !scene && styles.findChipPlain]}
+            accessibilityRole="button"
+            accessibilityLabel="Köy, yayla veya ilçe ara"
+          >
+            <Icon name="search" size={15} color={scene ? WHITE : colors.primary} />
+            <Text style={[styles.findChipText, !scene && { color: colors.primary }]}>Köy ara</Text>
+          </PressableScale>
+          {strip.map((l) => (
+            <Chip key={l.id} label={l.name} glass={!!scene} selected={l.id === locationId} onPress={() => choose(l)} />
           ))}
         </ChipRow>
+        <LocationPicker
+          visible={pickerOpen}
+          selectedId={locationId}
+          recentIds={settings.recentPlaces}
+          title="Hava durumu konumu"
+          onSelect={choose}
+          onClose={() => setPickerOpen(false)}
+        />
 
         {loading && !weather && !refreshing ? (
           <HeroSkeleton rows={3} />
@@ -230,6 +280,12 @@ export default function WeatherScreen({
                 <Icon name="location-sharp" size={fs(16)} color={WHITE} />
                 <Text style={styles.place}>{location.name}</Text>
               </View>
+              {location.kind !== 'ilce' && location.id !== 'ayder' ? (
+                <Text style={styles.placeSub}>
+                  {districtName(location.district)}
+                  {location.elevation != null ? ` · ${location.elevation.toLocaleString('tr-TR')} m` : ''}
+                </Text>
+              ) : null}
               <Text style={styles.temp}>{Math.round(current.temperature)}°</Text>
               <Text style={styles.label}>{now.label}</Text>
               {today ? (

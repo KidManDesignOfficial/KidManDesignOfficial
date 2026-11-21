@@ -12,7 +12,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 
 import { FLOODLIGHT, GRASS, STADIUM_CHROME, STADIUM_SKY, STADIUM_SKY_STOPS } from '../rizespor/stadium';
 import { seeded } from '../weatherScene';
-import { useAnimatedValue, useReducedMotion } from './motion';
+import { useAnimatedValue, useSceneStill } from './motion';
 
 const FILL = { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 } as const;
 const LINE = 'rgba(255,255,255,0.30)';
@@ -34,7 +34,7 @@ function cycle(clock: Animated.Value, speed: number, phase: number) {
 }
 
 export default function StadiumScene({ active }: { active: boolean }) {
-  const reduced = useReducedMotion();
+  const reduced = useSceneStill();
   const running = active && !reduced;
   const { width, height } = useWindowDimensions();
   const footer = STADIUM_CHROME.footer;

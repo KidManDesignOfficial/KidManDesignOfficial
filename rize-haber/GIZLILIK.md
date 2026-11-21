@@ -10,7 +10,7 @@ nasıl kullandığını açıklar.
 
 - **Hesap yok, kayıt yok.** Uygulama ad, e-posta, telefon numarası gibi kişisel bilgi istemez.
 - **Reklam ve analitik yok.** Kullanım takibi, reklam kimliği veya üçüncü taraf analitik aracı kullanılmaz.
-- **Konum izni istenmez.** Hava durumu için ilçeyi siz seçersiniz.
+- **Konum izni istenmez.** Hava durumu için ilçeyi veya köyü listeden siz seçersiniz; köy listesi uygulamanın içindedir, arama internete gönderilmez.
 - **Verileriniz telefonunuzda kalır.** Ayarlarınız ve kaydettikleriniz yalnızca cihazınızda saklanır.
 
 ## Cihazınızda saklanan bilgiler
