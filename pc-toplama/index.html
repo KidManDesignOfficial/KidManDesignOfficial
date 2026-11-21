@@ -1,0 +1,771 @@
+<!doctype html>
+<html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0c0f13">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);box-sizing:border-box;height:100%}body{margin:0;font-size:14px}[hidden]{display:none!important}</style></head><body>
+<title>PC Atölyesi 3D</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oxanium:wght@500;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Düzen: üstte 3D tezgah sahnesi, altta (masaüstünde sağda) parça seçim paneli; sonuçlar alttan açılan sayfa */
+:root{
+  --bg:#0c0f13; --surface:#141920; --surface-2:#1b222b; --line:#2a3440;
+  --fg:#e8edf3; --muted:#8b97a7; --accent:#ff8a3d; --perf:#5cc8ff;
+  --good:#4fd18b; --warn:#f2c14e; --bad:#ff5d5d; --elite:#b48cff;
+  --display:"Oxanium","Segoe UI",system-ui,sans-serif;
+  --body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  color-scheme:dark;
+}
+html,body{height:100%}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);overflow:hidden;-webkit-tap-highlight-color:transparent}
+button{font:inherit;color:inherit}
+button:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.app{height:100%;display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr) auto}
+.app>*{min-width:0}
+header{display:flex;align-items:center;gap:12px;padding-block:10px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));border-bottom:1px solid var(--line);background:var(--bg);z-index:3}
+.brand{font-family:var(--display);font-weight:700;font-size:1.1rem;letter-spacing:.04em;white-space:nowrap}
+.brand b{color:var(--accent)}
+.hstats{margin-left:auto;display:flex;gap:14px;font-family:var(--mono);font-size:.78rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.hstats strong{color:var(--fg);font-weight:700}
+.stage{position:relative;min-height:0;overflow:hidden;background:radial-gradient(120% 90% at 50% 30%,#1a222c 0%,var(--bg) 70%)}
+.stage canvas{position:absolute;inset:0;width:100%!important;height:100%!important;display:block;touch-action:none}
+.hint{max-width:calc(100% - 130px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;position:absolute;left:max(12px,env(safe-area-inset-left,0px));top:10px;font-size:.72rem;color:var(--muted);background:rgba(12,15,19,.6);padding:5px 9px;border-radius:6px;pointer-events:none;backdrop-filter:blur(6px)}
+.progress{position:absolute;right:max(12px,env(safe-area-inset-right,0px));top:10px;font-family:var(--mono);font-size:.72rem;background:rgba(12,15,19,.6);padding:5px 9px;border-radius:6px;pointer-events:none}
+.loading{position:absolute;inset:0;display:grid;place-items:center;color:var(--muted);font-size:.85rem}
+.panel{background:var(--surface);border-top:1px solid var(--line);display:flex;flex-direction:column;max-height:48vh;min-height:0;z-index:2}
+.quick,.tabs,.foot{flex-shrink:0}
+.quick{white-space:nowrap;display:flex;gap:8px;align-items:center;padding-block:10px 4px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));font-size:.75rem;color:var(--muted);overflow-x:auto;scrollbar-width:none}
+.quick::-webkit-scrollbar,.tabs::-webkit-scrollbar{display:none}
+.chip{border:1px solid var(--line);background:var(--surface-2);border-radius:999px;padding:5px 11px;font-size:.75rem;cursor:pointer;white-space:nowrap}
+.chip:hover{border-color:var(--accent)}
+.tabs{position:relative;display:flex;gap:6px;overflow-x:auto;padding-block:8px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));scrollbar-width:none;border-bottom:1px solid var(--line)}
+.tab{flex:0 0 auto;display:flex;flex-direction:column;align-items:flex-start;gap:1px;min-width:86px;border:1px solid var(--line);background:var(--surface-2);border-radius:10px;padding:6px 10px;cursor:pointer;text-align:left}
+.tab .n{font-family:var(--mono);font-size:.62rem;color:var(--muted)}
+.tab .t{font-family:var(--display);font-weight:500;font-size:.85rem}
+.tab .s{font-size:.66rem;color:var(--muted);max-width:110px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tab.done .n{color:var(--good)}
+.tab.active{border-color:var(--accent);background:#231a14}
+.list{overflow-y:auto;min-height:0;padding-block:10px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:8px;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));align-content:start;overscroll-behavior:contain}
+.listhead{grid-column:1/-1;display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+.listhead h2{margin:0;font-family:var(--display);font-size:1rem;font-weight:700;letter-spacing:.02em}
+.req{font-size:.72rem;color:var(--warn)}
+.card{display:grid;grid-template-columns:1fr auto;gap:2px 10px;text-align:left;border:1px solid var(--line);background:var(--surface-2);border-radius:12px;padding:10px 12px;cursor:pointer;transition:border-color .15s,transform .15s}
+.card:hover:not(:disabled){border-color:#4a5868}
+.card:active:not(:disabled){transform:scale(.985)}
+.card.sel{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.card:disabled{opacity:.42;cursor:not-allowed}
+.card .nm{font-weight:600;font-size:.88rem;min-width:0}
+.card .pr{font-family:var(--mono);font-weight:700;font-size:.85rem;color:var(--accent);font-variant-numeric:tabular-nums}
+.card .sp{grid-column:1/-1;font-size:.72rem;color:var(--muted)}
+.card .why{grid-column:1/-1;font-size:.7rem;color:var(--bad)}
+.card .warnl{grid-column:1/-1;font-size:.7rem;color:var(--warn)}
+.meter{grid-column:1/-1;display:flex;align-items:center;gap:8px;margin-top:4px;font-family:var(--mono);font-size:.66rem;color:var(--muted)}
+.meter i{flex:1;height:5px;border-radius:3px;background:var(--line);overflow:hidden;position:relative}
+.meter i::after{content:"";position:absolute;inset:0;width:var(--w);background:linear-gradient(90deg,var(--perf),var(--elite));border-radius:3px}
+.foot{display:flex;align-items:center;gap:12px;padding-block:10px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));border-top:1px solid var(--line)}
+.foot .tot{font-family:var(--mono);font-size:.75rem;color:var(--muted);line-height:1.35;font-variant-numeric:tabular-nums}
+.foot .tot strong{font-size:1.05rem;color:var(--fg)}
+.power{white-space:nowrap;margin-left:auto;border:0;border-radius:12px;padding:12px 18px;font-family:var(--display);font-weight:700;letter-spacing:.04em;background:var(--accent);color:#1a0e05;cursor:pointer;display:flex;align-items:center;gap:8px}
+.power:disabled{background:var(--surface-2);color:var(--muted);cursor:not-allowed}
+.power svg{width:18px;height:18px}
+.power.shake{animation:shake .45s}
+@keyframes shake{20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.toast{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 62px);transform:translate(-50%,-20px);opacity:0;background:var(--surface-2);border:1px solid var(--line);padding:9px 14px;border-radius:10px;font-size:.8rem;z-index:20;transition:.25s;max-width:calc(100% - 32px);pointer-events:none}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.toast.err{border-color:var(--bad)}
+/* Sonuç sayfası */
+.results{position:fixed;inset:0;z-index:10;display:flex;align-items:flex-end;justify-content:center;background:rgba(5,7,10,.55);opacity:0;pointer-events:none;transition:opacity .3s}
+.results.open{opacity:1;pointer-events:auto}
+.sheet{width:min(860px,100%);max-height:92%;overflow-y:auto;background:var(--surface);border:1px solid var(--line);border-bottom:0;border-radius:20px 20px 0 0;padding-block:18px calc(18px + env(safe-area-inset-bottom,0px));padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));transform:translateY(40px);transition:transform .4s cubic-bezier(.2,.9,.3,1);overscroll-behavior:contain}
+.results.open .sheet{transform:none}
+.sheet h2{font-family:var(--display);margin:0;font-size:1.4rem;text-wrap:balance}
+.sys{color:var(--muted);font-size:.8rem;margin:4px 0 14px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-bottom:14px}
+.kpi{background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.kpi .l{font-size:.66rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.kpi .v{font-family:var(--mono);font-weight:700;font-size:1.25rem;font-variant-numeric:tabular-nums;margin-top:2px}
+.kpi .d{font-size:.7rem;color:var(--muted)}
+.controls{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:12px}
+.seg{display:inline-flex;background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:3px}
+.seg button{border:0;background:none;padding:6px 12px;border-radius:7px;font-size:.8rem;cursor:pointer;color:var(--muted)}
+.seg button.on{background:var(--accent);color:#1a0e05;font-weight:600}
+.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:.7rem;color:var(--muted);margin-bottom:8px}
+.legend span::before{content:"";display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px;background:var(--c);vertical-align:-1px}
+.games{display:grid;gap:7px}
+.game{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 10px;align-items:center;background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:9px 12px}
+.game .gn{font-weight:600;font-size:.85rem;min-width:0}
+.game .gs{font-size:.68rem;color:var(--muted);font-weight:400;margin-left:6px}
+.game .fps{font-family:var(--mono);font-weight:700;font-size:1.05rem;text-align:right;font-variant-numeric:tabular-nums}
+.game .fps small{font-size:.62rem;color:var(--muted);font-weight:500}
+.bar{grid-column:1/-1;position:relative;height:8px;border-radius:4px;background:var(--line)}
+.bar>b{position:absolute;inset:0 auto 0 0;border-radius:4px;background:var(--c);width:0;transition:width .9s cubic-bezier(.2,.9,.3,1)}
+.bar>u{position:absolute;top:-3px;bottom:-3px;width:1px;background:rgba(232,237,243,.28)}
+.gmeta{grid-column:1/-1;display:flex;justify-content:space-between;font-size:.66rem;color:var(--muted);font-family:var(--mono)}
+.lim{color:var(--perf)}
+.lim.cpu{color:var(--warn)}
+.warns{margin:14px 0 0;padding:0;list-style:none;display:grid;gap:6px}
+.warns li{font-size:.78rem;padding:8px 10px;border-radius:8px;background:#2a2113;border:1px solid #4d3a17;color:#f6dca0}
+.warns li.ok{background:#12261c;border-color:#1f4a33;color:#bfeccf}
+.src{font-size:.68rem;color:var(--muted);margin-top:14px;line-height:1.5}
+.src a{color:var(--perf)}
+.sheetbtns{display:flex;gap:10px;margin-top:14px}
+.btn2{flex:1;border:1px solid var(--line);background:var(--surface-2);border-radius:12px;padding:12px;font-family:var(--display);font-weight:700;cursor:pointer}
+.btn2.pri{background:var(--accent);color:#1a0e05;border-color:var(--accent)}
+@media (min-width:900px){
+  .app{grid-template-columns:minmax(0,1fr) 420px;grid-template-rows:auto minmax(0,1fr)}
+  header{grid-column:1/-1}
+  .panel{grid-column:2;grid-row:2;max-height:none;border-top:0;border-left:1px solid var(--line)}
+  .list{grid-template-columns:1fr}
+  .results{align-items:center}
+  .sheet{border-radius:20px;border-bottom:1px solid var(--line)}
+}
+@media (max-width:420px){.hstats .w{display:none}}
+@media (prefers-reduced-motion:reduce){*{transition-duration:.01ms!important;animation-duration:.01ms!important}}
+</style>
+
+<div class="app" id="app">
+  <header>
+    <div class="brand">PC <b>ATÖLYESİ</b></div>
+    <div class="hstats">
+      <span>Fiyat <strong id="hPrice">$0</strong></span>
+      <span class="w">Çekim <strong id="hWatt">0 W</strong></span>
+    </div>
+  </header>
+  <div class="stage" id="stage">
+    <div class="loading" id="loading">3D tezgah yükleniyor…</div>
+    <div class="hint">Sürükle: döndür · iki parmak: yakınlaştır</div>
+    <div class="progress" id="prog">0/8 parça</div>
+  </div>
+  <section class="panel" aria-label="Parça seçimi">
+    <div class="quick"><span>Hazır sistem:</span>
+      <button class="chip" data-preset="budget">Bütçe ~$800</button>
+      <button class="chip" data-preset="mid">Dengeli ~$1700</button>
+      <button class="chip" data-preset="beast">Canavar ~$3900</button>
+      <button class="chip" data-preset="clear">Temizle</button>
+    </div>
+    <nav class="tabs" id="tabs"></nav>
+    <div class="list" id="list"></div>
+    <div class="foot">
+      <div class="tot">Toplam <strong id="fPrice">$0</strong><br><span id="fWatt">Çekim 0 W</span></div>
+      <button class="power" id="powerBtn" disabled>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 3v8"/><path d="M6.3 6.8a8 8 0 1 0 11.4 0"/></svg>
+        <span>Güç Ver &amp; Test Et</span>
+      </button>
+    </div>
+  </section>
+</div>
+
+<div class="toast" id="toast" role="status"></div>
+
+<div class="results" id="results" aria-hidden="true">
+  <div class="sheet" role="dialog" aria-labelledby="resTitle">
+    <h2 id="resTitle">Test Sonuçları</h2>
+    <div class="sys" id="resSys"></div>
+    <div class="kpis" id="kpis"></div>
+    <div class="controls">
+      <div class="seg" id="segRes"><button data-v="0">1080p</button><button data-v="1" class="on">1440p</button><button data-v="2">4K</button></div>
+      <div class="seg" id="segPre"><button data-v="2">Orta</button><button data-v="1">Yüksek</button><button data-v="0" class="on">Ultra</button></div>
+    </div>
+    <div class="legend">
+      <span style="--c:var(--bad)">30 altı · oynanamaz</span>
+      <span style="--c:var(--warn)">30–60 · oynanabilir</span>
+      <span style="--c:var(--good)">60–144 · akıcı</span>
+      <span style="--c:var(--perf)">144+ · rekabetçi</span>
+    </div>
+    <div class="games" id="games"></div>
+    <ul class="warns" id="warns"></ul>
+    <div class="src">
+      Tahminler, ekran kartı ve işlemci için yayımlanmış 2026 test ortalamalarına dayanır (yerel çözünürlük, upscaling/kare üretimi kapalı). Gerçek sonuçlar sürücü, oyun yaması ve sahneye göre ±%15 değişebilir.
+      Kaynaklar: <a href="https://www.tomshardware.com/reviews/gpu-hierarchy,4388.html" target="_blank" rel="noopener">Tom's Hardware GPU Hierarchy 2026</a> ·
+      <a href="https://www.tomshardware.com/reviews/cpu-hierarchy,4312.html" target="_blank" rel="noopener">Tom's Hardware CPU Hierarchy 2026</a> ·
+      <a href="https://www.tomshardware.com/reviews/best-performance-cpus,5683.html" target="_blank" rel="noopener">Best CPU for Gaming 2026</a>.
+      Fiyatlar yaklaşık ABD liste fiyatıdır.
+    </div>
+    <div class="sheetbtns">
+      <button class="btn2" id="btnEdit">Sistemi Düzenle</button>
+      <button class="btn2 pri" id="btnSpin">Kasayı Döndür</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+(function(){
+"use strict";
+/* ============================ VERİ ============================ */
+// GPU skorları: RTX 5090 = 100, çözünürlük başına [1080p,1440p,4K] göreli performans (Tom's Hardware 2026 hiyerarşisinden türetildi)
+const DATA = {
+case:[
+ {id:'k1',name:'Lian Li Lancool 216',spec:'ATX Mid-Tower · mesh ön panel · 4 fan',price:99,color:0x1c2027,front:'mesh',air:1.0,ring:0x2b3038},
+ {id:'k2',name:'NZXT H6 Flow (Beyaz)',spec:'ATX · çift cam panel · 3 ARGB fan',price:115,color:0xe4e7ec,front:'glass',air:0.95,ring:0xd6dae0},
+ {id:'k3',name:'Fractal Design Meshify 2 XL',spec:'E-ATX Full-Tower · 6 fan · en iyi hava akışı',price:189,color:0x2a2622,front:'mesh',air:1.07,ring:0x3a342e}
+],
+mobo:[
+ {id:'m1',name:'MSI B550 Tomahawk',spec:'AM4 · DDR4 · PCIe 4.0',socket:'AM4',mem:'DDR4',price:139,pcb:0x1a1c20,acc:0x5b6470},
+ {id:'m2',name:'ASUS TUF Gaming B650-Plus',spec:'AM5 · DDR5 · PCIe 5.0 M.2',socket:'AM5',mem:'DDR5',price:189,pcb:0x23221c,acc:0x8a7a52},
+ {id:'m3',name:'MSI MAG X870 Tomahawk WiFi',spec:'AM5 · DDR5 · Wi-Fi 7 · USB4',socket:'AM5',mem:'DDR5',price:299,pcb:0x17191d,acc:0x3c4450},
+ {id:'m4',name:'MSI PRO B760-P DDR4',spec:'LGA1700 · DDR4 · PCIe 4.0',socket:'LGA1700',mem:'DDR4',price:129,pcb:0x1b1e24,acc:0x6c7682},
+ {id:'m5',name:'ASUS ROG Strix Z790-E',spec:'LGA1700 · DDR5 · hız aşırtma',socket:'LGA1700',mem:'DDR5',price:399,pcb:0x141518,acc:0x9a1f2c},
+ {id:'m6',name:'Gigabyte Z890 Aorus Elite',spec:'LGA1851 · DDR5 · Wi-Fi 7',socket:'LGA1851',mem:'DDR5',price:279,pcb:0x16181b,acc:0x6f7780}
+],
+cpu:[
+ {id:'c9850',name:'AMD Ryzen 7 9850X3D',spec:'8C/16T · 5.6 GHz · 3D V-Cache',socket:'AM5',s:100,tdp:120,price:499,x3d:1,brand:'AMD'},
+ {id:'c9800',name:'AMD Ryzen 7 9800X3D',spec:'8C/16T · 5.2 GHz · 3D V-Cache',socket:'AM5',s:97,tdp:120,price:449,x3d:1,brand:'AMD'},
+ {id:'c9950',name:'AMD Ryzen 9 9950X3D',spec:'16C/32T · 5.7 GHz · 3D V-Cache',socket:'AM5',s:96,tdp:170,price:669,x3d:1,brand:'AMD'},
+ {id:'c7800',name:'AMD Ryzen 7 7800X3D',spec:'8C/16T · 5.0 GHz · 3D V-Cache',socket:'AM5',s:88,tdp:120,price:359,x3d:1,brand:'AMD'},
+ {id:'c9700',name:'AMD Ryzen 7 9700X',spec:'8C/16T · 5.5 GHz',socket:'AM5',s:77,tdp:65,price:299,brand:'AMD'},
+ {id:'c9600',name:'AMD Ryzen 5 9600X',spec:'6C/12T · 5.4 GHz',socket:'AM5',s:74,tdp:65,price:209,brand:'AMD'},
+ {id:'c7600',name:'AMD Ryzen 5 7600',spec:'6C/12T · 5.1 GHz',socket:'AM5',s:69,tdp:65,price:179,brand:'AMD'},
+ {id:'c5700',name:'AMD Ryzen 7 5700X3D',spec:'8C/16T · 4.1 GHz · 3D V-Cache',socket:'AM4',s:66,tdp:105,price:229,x3d:1,brand:'AMD'},
+ {id:'c5600',name:'AMD Ryzen 5 5600',spec:'6C/12T · 4.4 GHz',socket:'AM4',s:52,tdp:65,price:109,brand:'AMD'},
+ {id:'c14900',name:'Intel Core i9-14900K',spec:'24C/32T · 6.0 GHz',socket:'LGA1700',s:75,tdp:253,price:439,brand:'INTEL'},
+ {id:'c14600',name:'Intel Core i5-14600K',spec:'14C/20T · 5.3 GHz',socket:'LGA1700',s:70,tdp:181,price:229,brand:'INTEL'},
+ {id:'c12400',name:'Intel Core i5-12400F',spec:'6C/12T · 4.4 GHz',socket:'LGA1700',s:55,tdp:117,price:109,brand:'INTEL'},
+ {id:'c285',name:'Intel Core Ultra 9 285K',spec:'24C/24T · 5.7 GHz',socket:'LGA1851',s:72,tdp:250,price:549,brand:'INTEL'},
+ {id:'c265',name:'Intel Core Ultra 7 265K',spec:'20C/20T · 5.5 GHz',socket:'LGA1851',s:71,tdp:250,price:279,brand:'INTEL'},
+ {id:'c245',name:'Intel Core Ultra 5 245K',spec:'14C/14T · 5.2 GHz',socket:'LGA1851',s:66,tdp:159,price:229,brand:'INTEL'}
+],
+cooler:[
+ {id:'o1',name:'Thermalright Assassin X 120',spec:'Tek kule · 120 mm fan · ~170 W',type:'air1',cap:170,price:22,fin:0xc9ced6,fan:0x15171a},
+ {id:'o2',name:'Thermalright Peerless Assassin 120 SE',spec:'Çift kule · 2×120 mm · ~240 W',type:'air2',cap:240,price:39,fin:0xc9ced6,fan:0x15171a},
+ {id:'o3',name:'Noctua NH-D15 G2',spec:'Çift kule · 2×140 mm · ~270 W',type:'air2',cap:270,price:149,fin:0xd6d9de,fan:0x6b4a3a},
+ {id:'o4',name:'Arctic Liquid Freezer III 360',spec:'360 mm sıvı soğutma · ~320 W',type:'aio',cap:320,price:99,fin:0x1a1c20,fan:0x15171a}
+],
+ram:[
+ {id:'r1',name:'Corsair Vengeance LPX 16 GB',spec:'DDR4-3200 CL16 · 2×8 GB',mem:'DDR4',gb:16,f:.94,price:35,color:0x1a1a1a,rgb:0},
+ {id:'r2',name:'G.Skill Ripjaws V 32 GB',spec:'DDR4-3600 CL18 · 2×16 GB',mem:'DDR4',gb:32,f:.97,price:59,color:0xa3262f,rgb:0},
+ {id:'r3',name:'Kingston Fury Beast 16 GB',spec:'DDR5-5600 CL40 · 2×8 GB',mem:'DDR5',gb:16,f:.95,price:49,color:0x202226,rgb:0},
+ {id:'r4',name:'G.Skill Trident Z5 RGB 32 GB',spec:'DDR5-6000 CL30 · 2×16 GB',mem:'DDR5',gb:32,f:1,price:99,color:0xb9bec6,rgb:1},
+ {id:'r5',name:'Corsair Dominator Titanium 64 GB',spec:'DDR5-6000 CL30 · 2×32 GB',mem:'DDR5',gb:64,f:1,price:209,color:0x2a2c30,rgb:1},
+ {id:'r6',name:'Kingston Fury Renegade 32 GB',spec:'DDR5-8000 CL38 · 2×16 GB',mem:'DDR5',gb:32,f:1.02,price:159,color:0x1d1f22,rgb:1}
+],
+gpu:[
+ {id:'g5090',name:'GeForce RTX 5090',spec:'32 GB GDDR7 · 575 W',vram:32,w:575,price:1999,s:[100,100,100],len:2.62,th:.72,fans:3,col:0x2d3036},
+ {id:'g4090',name:'GeForce RTX 4090',spec:'24 GB GDDR6X · 450 W',vram:24,w:450,price:1599,s:[88,82,77],len:2.6,th:.7,fans:3,col:0x34363b},
+ {id:'g5080',name:'GeForce RTX 5080',spec:'16 GB GDDR7 · 360 W',vram:16,w:360,price:999,s:[83,77,70],len:2.5,th:.62,fans:3,col:0x2d3036},
+ {id:'g7900',name:'Radeon RX 7900 XTX',spec:'24 GB GDDR6 · 355 W',vram:24,w:355,price:899,s:[80,72,65],len:2.45,th:.6,fans:3,col:0x1d1f23},
+ {id:'g5070t',name:'GeForce RTX 5070 Ti',spec:'16 GB GDDR7 · 300 W',vram:16,w:300,price:749,s:[76,69,61],len:2.4,th:.58,fans:3,col:0x3a3e45},
+ {id:'g9070x',name:'Radeon RX 9070 XT',spec:'16 GB GDDR6 · 304 W',vram:16,w:304,price:599,s:[74,66,58],len:2.4,th:.58,fans:3,col:0x232529},
+ {id:'g9070',name:'Radeon RX 9070',spec:'16 GB GDDR6 · 220 W',vram:16,w:220,price:549,s:[67,59,51],len:2.25,th:.5,fans:3,col:0x26282c},
+ {id:'g5070',name:'GeForce RTX 5070',spec:'12 GB GDDR7 · 250 W',vram:12,w:250,price:549,s:[64,56,47],len:2.1,th:.5,fans:2,col:0x34373d},
+ {id:'g4070s',name:'GeForce RTX 4070 Super',spec:'12 GB GDDR6X · 220 W',vram:12,w:220,price:599,s:[61,53,44],len:2.05,th:.48,fans:2,col:0x3a3d42},
+ {id:'g9060',name:'Radeon RX 9060 XT 16 GB',spec:'16 GB GDDR6 · 160 W',vram:16,w:160,price:349,s:[47,40,32],len:1.9,th:.45,fans:2,col:0x222428},
+ {id:'g5060t',name:'GeForce RTX 5060 Ti 16 GB',spec:'16 GB GDDR7 · 180 W',vram:16,w:180,price:429,s:[47,40,32],len:1.9,th:.45,fans:2,col:0x33363b},
+ {id:'g5060',name:'GeForce RTX 5060',spec:'8 GB GDDR7 · 145 W',vram:8,w:145,price:299,s:[40,34,26],len:1.75,th:.42,fans:2,col:0x33363b},
+ {id:'gb580',name:'Intel Arc B580',spec:'12 GB GDDR6 · 190 W',vram:12,w:190,price:249,s:[38,33,26],len:1.8,th:.45,fans:2,col:0x2a2d33},
+ {id:'g3060',name:'GeForce RTX 3060 12 GB',spec:'12 GB GDDR6 · 170 W',vram:12,w:170,price:279,s:[29,24,18],len:1.8,th:.45,fans:2,col:0x2e3035},
+ {id:'g6600',name:'Radeon RX 6600',spec:'8 GB GDDR6 · 132 W',vram:8,w:132,price:199,s:[26,21,14],len:1.6,th:.42,fans:2,col:0x1f2125}
+],
+ssd:[
+ {id:'s1',name:'Crucial MX500 1 TB',spec:'SATA 2.5" · 560 MB/s',type:'sata',load:19,price:65},
+ {id:'s2',name:'WD Blue SN580 1 TB',spec:'NVMe PCIe 4.0 · 4150 MB/s',type:'m2',load:10,price:69},
+ {id:'s3',name:'Samsung 990 Pro 2 TB',spec:'NVMe PCIe 4.0 · 7450 MB/s',type:'m2h',load:8,price:169},
+ {id:'s4',name:'Crucial T705 2 TB',spec:'NVMe PCIe 5.0 · 14500 MB/s',type:'m2h',load:7,price:259}
+],
+psu:[
+ {id:'p1',name:'MSI MAG A550BN',spec:'550 W · 80+ Bronze',w:550,rate:'80+ BRONZE',price:49},
+ {id:'p2',name:'Corsair RM650e',spec:'650 W · 80+ Gold · modüler',w:650,rate:'80+ GOLD',price:89},
+ {id:'p3',name:'Corsair RM850x',spec:'850 W · 80+ Gold · ATX 3.1',w:850,rate:'80+ GOLD',price:129},
+ {id:'p4',name:'Seasonic Focus GX-1000',spec:'1000 W · 80+ Gold · ATX 3.1',w:1000,rate:'80+ GOLD',price:179},
+ {id:'p5',name:'Corsair HX1200i',spec:'1200 W · 80+ Platinum · ATX 3.1',w:1200,rate:'80+ PLATINUM',price:259}
+]};
+const CATS=[
+ {id:'case',name:'Kasa'},{id:'mobo',name:'Anakart'},{id:'cpu',name:'İşlemci'},{id:'cooler',name:'Soğutucu'},
+ {id:'ram',name:'Bellek'},{id:'gpu',name:'Ekran Kartı'},{id:'ssd',name:'Depolama'},{id:'psu',name:'Güç Kaynağı'}];
+// b: RTX 5090 + en hızlı işlemci ile Ultra ortalama FPS [1080p,1440p,4K]; cap: en hızlı işlemcinin (skor 100) çıkarabildiği FPS tavanı
+const GAMES=[
+ {n:'Cyberpunk 2077',set:'Ultra · RT kapalı',b:[215,160,84],cap:235,heavy:1},
+ {n:'Black Myth: Wukong',set:'Çok Yüksek',b:[140,108,63],cap:200,heavy:1},
+ {n:'Battlefield 6',set:'Ultra',b:[275,215,128],cap:265},
+ {n:'Call of Duty: Black Ops 6',set:'Ekstrem',b:[262,208,126],cap:300},
+ {n:'Red Dead Redemption 2',set:'Ultra',b:[188,158,98],cap:205,heavy:1},
+ {n:'GTA V Enhanced',set:'Çok Yüksek',b:[232,198,128],cap:215},
+ {n:'Forza Horizon 5',set:'Ekstrem',b:[250,218,148],cap:262},
+ {n:"Baldur's Gate 3",set:'Ultra',b:[205,182,118],cap:172,cache:1},
+ {n:'Fortnite',set:'Epik · DX12',b:[240,188,108],cap:285},
+ {n:'Counter-Strike 2',set:'En Yüksek',b:[690,560,330],cap:620,cache:1},
+ {n:'Valorant',set:'Yüksek',b:[880,780,540],cap:840},
+ {n:'Flight Simulator 2024',set:'Ultra',b:[118,108,78],cap:96,cache:1,heavy:1}
+];
+const PRESETS=[{n:'Ultra',g:1,c:1},{n:'Yüksek',g:1.27,c:1.04},{n:'Orta',g:1.62,c:1.08}];
+const READY={
+ budget:{case:'k1',mobo:'m1',cpu:'c5600',cooler:'o1',ram:'r1',gpu:'g9060',ssd:'s2',psu:'p2'},
+ mid:{case:'k2',mobo:'m2',cpu:'c7800',cooler:'o2',ram:'r4',gpu:'g9070x',ssd:'s3',psu:'p3'},
+ beast:{case:'k3',mobo:'m3',cpu:'c9850',cooler:'o4',ram:'r5',gpu:'g5090',ssd:'s4',psu:'p5'}
+};
+const byId=(cat,id)=>DATA[cat].find(p=>p.id===id)||null;
+
+/* ============================ DURUM ============================ */
+const sel={}; CATS.forEach(c=>sel[c.id]=null);
+let activeCat='mobo', powered=false, resIdx=1, preIdx=0;
+const $=s=>document.querySelector(s);
+const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const fmt=n=>'$'+Math.round(n).toLocaleString('en-US');
+
+function compat(cat,p){
+  const m=sel.mobo;
+  if(cat==='cpu'&&m&&p.socket!==m.socket) return {ok:false,why:`Soket uyumsuz: anakart ${m.socket}, işlemci ${p.socket}`};
+  if(cat==='ram'&&m&&p.mem!==m.mem) return {ok:false,why:`Bellek tipi uyumsuz: anakart ${m.mem} ister`};
+  return {ok:true};
+}
+function softWarn(cat,p){
+  if(cat==='cooler'&&sel.cpu&&p.cap<sel.cpu.tdp) return `${sel.cpu.name.split(' ').slice(-1)} için yetersiz, ısıl kısıtlama yapar`;
+  if(cat==='psu'){const d=draw(); if(d&&p.w<d) return `Yetersiz: sistem ~${d} W çekiyor`; if(d&&p.w<d*1.2) return 'Sınırda, %20 pay önerilir';}
+  if(cat==='gpu'&&p.vram<=8) return '8 GB VRAM yüksek çözünürlükte takılma yapar';
+  return '';
+}
+function draw(){
+  if(!sel.cpu&&!sel.gpu) return 0;
+  return Math.round((sel.cpu?sel.cpu.tdp:0)+(sel.gpu?sel.gpu.w:0)+85);
+}
+function total(){return CATS.reduce((a,c)=>a+(sel[c.id]?sel[c.id].price:0),0)}
+function count(){return CATS.filter(c=>sel[c.id]).length}
+
+/* ============================ ARAYÜZ ============================ */
+function renderTabs(){
+  $('#tabs').innerHTML=CATS.map((c,i)=>`<button class="tab ${sel[c.id]?'done':''} ${activeCat===c.id?'active':''}" data-cat="${c.id}">
+   <span class="n">${sel[c.id]?'✓':String(i+1).padStart(2,'0')}</span><span class="t">${c.name}</span>
+   <span class="s">${sel[c.id]?sel[c.id].name:'Seçilmedi'}</span></button>`).join('');
+  const a=$('#tabs .active'), T=$('#tabs'); if(a) T.scrollTo({left:a.offsetLeft-(T.clientWidth-a.offsetWidth)/2,behavior:reduced?'auto':'smooth'});
+}
+function reqText(cat){
+  const m=sel.mobo;
+  if(cat==='cpu') return m?`Anakart soketi: ${m.socket}`:'Önce anakart seçmen önerilir';
+  if(cat==='ram') return m?`Anakart bellek tipi: ${m.mem}`:'';
+  if(cat==='cooler') return sel.cpu?`İşlemci ısısı: ${sel.cpu.tdp} W`:'';
+  if(cat==='psu'){const d=draw(); return d?`Önerilen ≥ ${Math.ceil(d*1.2/50)*50} W`:'';}
+  if(cat==='mobo') return 'Değiştirirsen uyumsuz işlemci/bellek çıkarılır';
+  return '';
+}
+function renderList(){
+  const cat=activeCat, c=CATS.find(x=>x.id===cat);
+  let h=`<div class="listhead"><h2>${c.name}</h2><span class="req">${reqText(cat)}</span></div>`;
+  h+=DATA[cat].map(p=>{
+    const cp=compat(cat,p), w=cp.ok?softWarn(cat,p):'', s=sel[cat]&&sel[cat].id===p.id;
+    let meter='';
+    if(cat==='cpu') meter=`<span class="meter">Oyun <i style="--w:${p.s}%"></i>${p.s}</span>`;
+    if(cat==='gpu') meter=`<span class="meter">1440p <i style="--w:${p.s[1]}%"></i>${p.s[1]}</span>`;
+    return `<button class="card ${s?'sel':''}" data-id="${p.id}" ${cp.ok?'':'disabled'} aria-pressed="${s}">
+      <span class="nm">${p.name}</span><span class="pr">${fmt(p.price)}</span>
+      <span class="sp">${p.spec}</span>${meter}
+      ${cp.ok?'':`<span class="why">${cp.why}</span>`}${w?`<span class="warnl">${w}</span>`:''}</button>`;
+  }).join('');
+  const L=$('#list'); L.innerHTML=h; L.scrollTop=0;
+}
+function renderTotals(){
+  const t=fmt(total()), d=draw();
+  $('#hPrice').textContent=t; $('#fPrice').textContent=t;
+  $('#hWatt').textContent=d+' W'; $('#fWatt').textContent=`Çekim ${d}`+(sel.psu?` / ${sel.psu.w}`:'')+' W';
+  $('#prog').textContent=`${count()}/8 parça`;
+  $('#powerBtn').disabled=count()<8;
+}
+function renderAll(){renderTabs();renderList();renderTotals()}
+
+let toastT;
+function toast(msg,err){const t=$('#toast');t.textContent=msg;t.className='toast show'+(err?' err':'');clearTimeout(toastT);toastT=setTimeout(()=>t.className='toast',2600)}
+
+function choose(cat,id,{advance=true,silent=false}={}){
+  if(powered) powerOff();
+  const p=byId(cat,id);
+  if(sel[cat]&&sel[cat].id===id){ if(advance) nextCat(cat); return; }
+  sel[cat]=p; place(cat,p);
+  if(cat==='mobo'){
+    const removed=[];
+    if(sel.cpu&&sel.cpu.socket!==p.socket){removed.push('işlemci');sel.cpu=null;place('cpu',null)}
+    if(sel.ram&&sel.ram.mem!==p.mem){removed.push('bellek');sel.ram=null;place('ram',null)}
+    if(removed.length&&!silent) toast(`Uyumsuz ${removed.join(' ve ')} çıkarıldı`);
+  }
+  if(cat==='cpu'&&!sel.cooler&&!silent){}
+  if(advance) nextCat(cat); else renderAll();
+  if(!silent) focusCat(cat);
+}
+function nextCat(cat){
+  const i=CATS.findIndex(c=>c.id===cat);
+  const nx=CATS.slice(i+1).concat(CATS.slice(0,i+1)).find(c=>!sel[c.id]);
+  activeCat=nx?nx.id:cat; renderAll();
+}
+$('#tabs').addEventListener('click',e=>{const b=e.target.closest('.tab');if(!b)return;activeCat=b.dataset.cat;renderAll();if(sel[activeCat])focusCat(activeCat)});
+$('#list').addEventListener('click',e=>{const b=e.target.closest('.card');if(!b||b.disabled)return;choose(activeCat,b.dataset.id)});
+document.querySelectorAll('[data-preset]').forEach(b=>b.addEventListener('click',()=>applyPreset(b.dataset.preset)));
+let presetTimers=[];
+function applyPreset(k){
+  presetTimers.forEach(clearTimeout); presetTimers=[];
+  if(powered) powerOff();
+  if(k==='clear'){CATS.forEach(c=>{if(c.id!=='case'&&sel[c.id]){sel[c.id]=null;place(c.id,null)}});activeCat='mobo';renderAll();focusHome();return}
+  const r=READY[k];
+  CATS.forEach(c=>{if(c.id!=='case'&&sel[c.id]&&sel[c.id].id!==r[c.id]){sel[c.id]=null;place(c.id,null)}});
+  focusHome();
+  CATS.forEach((c,i)=>presetTimers.push(setTimeout(()=>{choose(c.id,r[c.id],{advance:false,silent:true});activeCat=c.id;renderAll()},(reduced?60:330)*i+150)));
+}
+$('#powerBtn').addEventListener('click',powerOn);
+$('#btnEdit').addEventListener('click',()=>{closeResults();powerOff()});
+$('#btnSpin').addEventListener('click',()=>{closeResults();if(controls)controls.autoRotate=!reduced});
+$('#segRes').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;resIdx=+b.dataset.v;segOn('#segRes',b);renderResults(false)});
+$('#segPre').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;preIdx=+b.dataset.v;segOn('#segPre',b);renderResults(false)});
+function segOn(s,b){document.querySelectorAll(s+' button').forEach(x=>x.classList.toggle('on',x===b))}
+
+/* ============================ PERFORMANS MODELİ ============================ */
+function cpuEff(){
+  const c=sel.cpu, o=sel.cooler, k=sel.case;
+  let s=c.s; const head=o.cap*k.air/c.tdp;
+  if(head<1) s*=0.9+0.1*Math.max(0,head-0.6)/0.4; // ısıl kısıtlama
+  return s;
+}
+function gameFps(g,ri,pi){
+  const G=sel.gpu, C=sel.cpu, R=sel.ram, P=PRESETS[pi];
+  let gf=g.b[ri]*G.s[ri]/100*P.g;
+  if(G.vram<=8&&g.heavy) gf*=[.96,.88,.7][ri];
+  else if(G.vram<=12&&g.heavy&&ri===2) gf*=.93;
+  let cs=cpuEff(); if(g.cache&&C.x3d) cs*=1.08;
+  let cf=g.cap*cs/100*P.c*R.f; if(R.gb<=16&&g.heavy) cf*=.92;
+  const k=4, fps=Math.pow(Math.pow(gf,-k)+Math.pow(cf,-k),-1/k);
+  const low=fps*(C.x3d?.8:.73)*(R.gb<=16?.93:1)*(G.vram<=8&&ri>0&&g.heavy?.85:1);
+  return {fps,low,lim:gf<=cf?'gpu':'cpu',gf,cf};
+}
+function tierColor(f){return f<30?'var(--bad)':f<60?'var(--warn)':f<144?'var(--good)':'var(--perf)'}
+function renderResults(first){
+  const rs=GAMES.map(g=>({g,r:gameFps(g,resIdx,preIdx)}));
+  const avg=Math.exp(rs.reduce((a,x)=>a+Math.log(x.r.fps),0)/rs.length);
+  const cpuLim=rs.filter(x=>x.r.lim==='cpu').length;
+  const ratio=rs.reduce((a,x)=>a+x.r.cf/x.r.gf,0)/rs.length;
+  const score=Math.round((sel.gpu.s[1]*0.72+cpuEff()*0.28)*sel.ram.f*215);
+  const d=draw(), load=d/sel.psu.w;
+  const temp=Math.round(Math.min(98,34+sel.cpu.tdp/(sel.cooler.cap*sel.case.air)*52));
+  let bn,bd;
+  if(ratio<0.9){bn='İşlemci';bd=`${cpuLim}/12 oyunda CPU sınırı`}
+  else if(ratio>2.2){bn='Ekran kartı';bd='İşlemci kartın çok üstünde'}
+  else {bn='Dengeli';bd=`${cpuLim}/12 oyunda CPU sınırı`}
+  $('#resSys').textContent=`${sel.cpu.name} · ${sel.gpu.name} · ${sel.ram.gb} GB ${sel.ram.mem} · ${PRESETS[preIdx].n} ayarlar`;
+  const kp=[
+    ['Ortalama FPS',Math.round(avg),`${['1080p','1440p','4K'][resIdx]} · 12 oyun`],
+    ['Sistem puanı',score.toLocaleString('tr-TR'),'Oyun skoru'],
+    ['Darboğaz',bn,bd],
+    ['Güç yükü','%'+Math.round(load*100),`${d} W / ${sel.psu.w} W`],
+    ['CPU sıcaklığı',temp+'°C',sel.cooler.name.split(' ').slice(0,2).join(' ')],
+    ['Oyun yükleme',sel.ssd.load+' sn',sel.ssd.spec.split(' · ')[0]]
+  ];
+  $('#kpis').innerHTML=kp.map(k=>`<div class="kpi"><div class="l">${k[0]}</div><div class="v">${k[1]}</div><div class="d">${k[2]}</div></div>`).join('');
+  const SC=240, ticks=[30,60,144].map(t=>`<u style="left:${t/SC*100}%"></u>`).join('');
+  const box=$('#games');
+  if(first||!box.children.length){
+    box.innerHTML=rs.map((x,i)=>`<div class="game"><span class="gn">${x.g.n}<span class="gs">${x.g.set}</span></span>
+      <span class="fps"><span data-i="${i}">0</span> <small>FPS</small></span>
+      <div class="bar">${ticks}<b></b></div><div class="gmeta"><span>1% low <span class="lw">0</span></span><span class="lim"></span></div></div>`).join('');
+  }
+  [...box.children].forEach((el,i)=>{
+    const r=rs[i].r, b=el.querySelector('.bar>b'), num=el.querySelector('[data-i]'), lw=el.querySelector('.lw'), lm=el.querySelector('.lim');
+    b.style.setProperty('--c',tierColor(r.fps));
+    const from=+num.textContent||0, to=Math.round(r.fps), lt=Math.round(r.low);
+    requestAnimationFrame(()=>{b.style.width=Math.min(100,r.fps/SC*100)+'%'});
+    lm.textContent=r.lim==='gpu'?'GPU sınırı':'CPU sınırı'; lm.className='lim '+r.lim;
+    tween(reduced?1:900,e=>{num.textContent=Math.round(from+(to-from)*e);lw.textContent=Math.round(lt*e)},{delay:first?i*70:0});
+  });
+  const W=[];
+  if(sel.cooler.cap*sel.case.air<sel.cpu.tdp) W.push(`Soğutucu ${sel.cpu.tdp} W ısıyı taşımakta zorlanıyor; işlemci yaklaşık %${Math.round(100-cpuEff()/sel.cpu.s*100)} yavaşlıyor. Daha güçlü soğutucu seç.`);
+  if(load>0.83) W.push(`Güç kaynağı %${Math.round(load*100)} yükte çalışıyor. Ani yüklenmelerde kapanma riski var; ${Math.ceil(d*1.25/50)*50} W önerilir.`);
+  if(sel.gpu.vram<=8) W.push('8 GB VRAM: ağır oyunlarda 1440p ve 4K dokularda takılma (düşük 1% low) görülür.');
+  if(sel.ram.gb<=16) W.push('16 GB bellek: yeni oyunlarda arka plan uygulamalarıyla birlikte darlık yapar, 32 GB önerilir.');
+  if(ratio<0.9) W.push('İşlemci ekran kartını tam besleyemiyor. Daha hızlı (tercihen X3D) bir işlemci FPS’i artırır.');
+  if(!W.length) W.push('Uyumlu, dengeli bir sistem. Soğutma ve güç payı yeterli.');
+  $('#warns').innerHTML=W.map(w=>`<li class="${W.length===1&&w.startsWith('Uyumlu')?'ok':''}">${w}</li>`).join('');
+}
+function openResults(){const r=$('#results');r.querySelector('.sheet').scrollTop=0;r.classList.add('open');r.setAttribute('aria-hidden','false');renderResults(true)}
+function closeResults(){const r=$('#results');r.classList.remove('open');r.setAttribute('aria-hidden','true')}
+
+/* ============================ 3D SAHNE ============================ */
+let renderer,scene,camera,controls,caseRoot,innerLight,floorMat;
+const tweens=[], placed={};
+const ease={out:p=>1-Math.pow(1-p,3),inn:p=>p*p*p,back:p=>{const c1=1.5,c3=c1+1;return 1+c3*Math.pow(p-1,3)+c1*Math.pow(p-1,2)},lin:p=>p,io:p=>p<.5?4*p*p*p:1-Math.pow(-2*p+2,3)/2};
+function tween(dur,fn,o={}){const t={start:performance.now()+(o.delay||0),dur:Math.max(1,reduced?Math.min(dur,120):dur),fn,ease:o.ease||ease.out,done:o.done};tweens.push(t);return t}
+function killTween(t){const i=tweens.indexOf(t);if(i>=0)tweens.splice(i,1)}
+function runTweens(now){for(let i=tweens.length-1;i>=0;i--){const t=tweens[i];if(now<t.start)continue;const p=Math.min(1,(now-t.start)/t.dur);t.fn(t.ease(p));if(p>=1){tweens.splice(i,1);t.done&&t.done()}}}
+
+let cur=null; // şu an inşa edilen parça grubu
+function grp(){const g=new THREE.Group();g.userData.rotors=[];g.userData.rgb=[];return g}
+function std(color,metal=.4,rough=.55,extra={}){return new THREE.MeshStandardMaterial(Object.assign({color,metalness:metal,roughness:rough},extra))}
+function rgbMat(){const m=new THREE.MeshStandardMaterial({color:0x111111,emissive:0x2a2a2a,roughness:.4});cur.userData.rgb.push(m);return m}
+function box(parent,size,pos,mat){const m=new THREE.Mesh(new THREE.BoxGeometry(size[0],size[1],size[2]),mat);m.position.set(pos[0],pos[1],pos[2]);m.castShadow=m.receiveShadow=true;parent.add(m);return m}
+function texCanvas(w,h,draw){const c=document.createElement('canvas');c.width=w;c.height=h;draw(c.getContext('2d'),w,h);const t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;t.anisotropy=4;return t}
+function labelMat(w,h,bg,lines){
+  return new THREE.MeshStandardMaterial({roughness:.5,metalness:.3,map:texCanvas(w,h,(x,W,H)=>{
+    x.fillStyle=bg;x.fillRect(0,0,W,H);
+    lines.forEach(l=>{x.fillStyle=l.c;x.font=`${l.w||700} ${l.s*H}px Oxanium, sans-serif`;x.textAlign=l.a||'left';x.textBaseline='middle';x.fillText(l.t,l.x*W,l.y*H)});
+  })});
+}
+function hex(n){return '#'+n.toString(16).padStart(6,'0')}
+function makeFan(r,{frame=0x16181c,blade=0x24282f,rgb=false}={}){
+  const g=new THREE.Group(), fm=std(frame,.2,.7), t=.09;
+  box(g,[r*2.1,r*.12,t],[0,r*1.0,0],fm);box(g,[r*2.1,r*.12,t],[0,-r*1.0,0],fm);
+  box(g,[r*.12,r*2.1,t],[r*1.0,0,0],fm);box(g,[r*.12,r*2.1,t],[-r*1.0,0,0],fm);
+  const ring=new THREE.Mesh(new THREE.TorusGeometry(r*.96,r*.06,8,40),rgb?rgbMat():fm);g.add(ring);
+  const rotor=new THREE.Group();g.add(rotor);
+  const hub=new THREE.Mesh(new THREE.CylinderGeometry(r*.3,r*.3,t*.9,24),std(blade,.2,.6));hub.rotation.x=Math.PI/2;rotor.add(hub);
+  const bm=std(blade,.1,.6,rgb?{transparent:true,opacity:.92}:{});
+  for(let i=0;i<7;i++){const pv=new THREE.Group();pv.rotation.z=i*Math.PI*2/7;const b=new THREE.Mesh(new THREE.BoxGeometry(r*.66,r*.34,.012),bm);b.position.x=r*.6;b.rotation.x=.55;pv.add(b);rotor.add(pv)}
+  cur.userData.rotors.push({r:rotor,v:14+Math.random()*4});
+  return g;
+}
+function tube(parent,pts,rad,mat){const c=new THREE.CatmullRomCurve3(pts.map(p=>new THREE.Vector3(p[0],p[1],p[2])));const m=new THREE.Mesh(new THREE.TubeGeometry(c,40,rad,8,false),mat);m.castShadow=true;parent.add(m);return m}
+
+const BUILD={
+case(p){
+  const g=grp();cur=g;
+  const metal=std(p.color,.55,.42), inner=std(new THREE.Color(p.color).multiplyScalar(.75).getHex(),.5,.6);
+  box(g,[.06,4.6,4.6],[-1.1,0,0],metal);
+  box(g,[2.26,.06,4.6],[0,2.3,0],metal); box(g,[2.26,.06,4.6],[0,-2.3,0],metal);
+  box(g,[2.26,4.6,.06],[0,0,-2.3],inner);
+  let front;
+  if(p.front==='mesh'){
+    front=new THREE.MeshStandardMaterial({color:p.color,metalness:.5,roughness:.6,map:texCanvas(256,256,(x,W,H)=>{x.fillStyle=hex(p.color);x.fillRect(0,0,W,H);x.fillStyle='rgba(0,0,0,.55)';for(let i=0;i<W;i+=8)for(let j=0;j<H;j+=8){x.beginPath();x.arc(i+((j/8)%2?4:0),j,2.4,0,7);x.fill()}})});
+  } else front=new THREE.MeshStandardMaterial({color:0x9fcfff,transparent:true,opacity:.16,roughness:.05,metalness:.1,depthWrite:false});
+  const fp=box(g,[2.26,4.6,.05],[0,0,2.3],front); if(p.front==='glass') fp.castShadow=false;
+  // cam kenar çerçevesi
+  box(g,[.07,.09,4.6],[1.1,2.27,0],metal);box(g,[.07,.09,4.6],[1.1,-2.27,0],metal);
+  box(g,[.07,4.6,.09],[1.1,0,2.27],metal);box(g,[.07,4.6,.09],[1.1,0,-2.27],metal);
+  box(g,[2.12,.05,4.5],[.03,-1.42,0],inner); // PSU örtüsü
+  box(g,[.4,.05,.6],[.55,-1.4,1.55],std(0x0e0f11,.2,.9)); // kablo deliği
+  for(const sx of[-.85,.85])for(const sz of[-1.9,1.9]){const f=new THREE.Mesh(new THREE.CylinderGeometry(.13,.15,.12,16),std(0x111214,.1,.8));f.position.set(sx,-2.39,sz);f.castShadow=true;g.add(f)}
+  const fy=p.id==='k3'?[1.55,.35,-.85]:[1.55,.35,-.85];
+  fy.forEach(y=>{const f=makeFan(.52,{rgb:true,frame:p.ring,blade:p.id==='k2'?0xe9ecf0:0x20242a});f.position.set(.05,y,2.17);g.add(f)});
+  const rf=makeFan(.5,{rgb:p.id!=='k1',frame:p.ring,blade:p.id==='k2'?0xe9ecf0:0x20242a});rf.position.set(.1,1.45,-2.2);g.add(rf);
+  if(p.id==='k3'){const tf=makeFan(.5,{rgb:true,frame:p.ring});tf.rotation.x=Math.PI/2;tf.position.set(.35,2.22,-.9);g.add(tf)}
+  const glass=new THREE.Mesh(new THREE.BoxGeometry(.03,4.48,4.48),new THREE.MeshStandardMaterial({color:0xaedcff,transparent:true,opacity:.13,roughness:.03,metalness:.2,depthWrite:false}));
+  glass.position.set(4.6,0,0);glass.visible=false;g.add(glass);g.userData.glass=glass;
+  return g;
+},
+mobo(p){
+  const g=grp();cur=g;
+  const pcbM=new THREE.MeshStandardMaterial({roughness:.6,metalness:.25,map:texCanvas(512,512,(x,W,H)=>{
+    x.fillStyle=hex(p.pcb);x.fillRect(0,0,W,H);x.strokeStyle='rgba(255,255,255,.07)';x.lineWidth=2;
+    for(let i=0;i<70;i++){x.beginPath();let px=Math.random()*W,py=Math.random()*H;x.moveTo(px,py);for(let k=0;k<3;k++){Math.random()<.5?px+=(Math.random()-.5)*160:py+=(Math.random()-.5)*160;x.lineTo(px,py)}x.stroke()}
+    x.fillStyle=hex(p.acc);x.globalAlpha=.5;x.fillRect(W*.06,H*.04,W*.04,H*.3);x.globalAlpha=1;})});
+  box(g,[.05,3.1,2.9],[-1.045,.45,-.15],pcbM);
+  const acc=std(p.acc,.75,.35), dark=std(0x26292e,.4,.6);
+  const sock=box(g,[.03,.52,.52],[-1.005,1.25,-.45],std(0xb9bdc5,.85,.3));
+  box(g,[.15,.28,1.1],[-.95,1.78,-.55],acc); box(g,[.15,1.05,.26],[-.95,1.15,-1.1],acc);
+  [.3,.42,.54,.66].forEach(z=>box(g,[.05,1.32,.06],[-.995,1.25,z],dark));
+  box(g,[.05,.07,1.6],[-.995,.06,-.62],std(0x3a3d44,.5,.5)); box(g,[.05,.07,1.6],[-.995,-.72,-.62],dark);
+  box(g,[.09,.55,.62],[-.975,-.55,.78],acc);
+  box(g,[.26,.95,.42],[-.9,1.45,-1.42],std(new THREE.Color(p.acc).multiplyScalar(.6).getHex(),.6,.45));
+  box(g,[.08,.52,.13],[-.98,.95,1.22],std(0x15161a,.2,.8));
+  box(g,[.06,.4,.5],[-.985,.55,.6],std(0x15161a,.3,.7)); // ses yongası örtüsü
+  g.userData.focus=sock.position;
+  return g;
+},
+cpu(p){
+  const g=grp();cur=g;
+  const lm=labelMat(256,256,'#b9bec6',[{t:p.brand,x:.5,y:.32,s:.16,c:'#2b2f36',a:'center'},{t:p.name.split(' ').slice(-1)[0],x:.5,y:.6,s:.15,c:'#2b2f36',a:'center'}]);
+  const met=std(0xb9bec6,.85,.25);
+  const m=new THREE.Mesh(new THREE.BoxGeometry(.05,.42,.42),[lm,met,met,met,met,met]);m.position.set(-.965,1.25,-.45);m.castShadow=true;g.add(m);
+  return g;
+},
+cooler(p){
+  const g=grp();cur=g;
+  const cop=std(0xc7794a,.9,.3), fin=std(p.fin,.85,.3);
+  const cz=-.45, cy=1.25;
+  if(p.type==='aio'){
+    const pump=new THREE.Mesh(new THREE.CylinderGeometry(.27,.27,.22,32),std(0x15161a,.4,.5));pump.rotation.z=Math.PI/2;pump.position.set(-.83,cy,cz);g.add(pump);
+    const ring=new THREE.Mesh(new THREE.TorusGeometry(.22,.025,8,40),rgbMat());ring.rotation.y=Math.PI/2;ring.position.set(-.715,cy,cz);g.add(ring);
+    const cap=new THREE.Mesh(new THREE.CircleGeometry(.2,32),labelMat(128,128,'#101114',[{t:'LF III',x:.5,y:.5,s:.2,c:'#9aa3ad',a:'center'}]));cap.rotation.y=Math.PI/2;cap.position.set(-.716,cy,cz);g.add(cap);
+    box(g,[1.12,.2,3.55],[.4,2.16,.15],std(0x191a1d,.5,.6));
+    [-1.0,.15,1.3].forEach(z=>{const f=makeFan(.5,{frame:0x15171a});f.rotation.x=Math.PI/2;f.position.set(.4,2.0,z);g.add(f)});
+    const tm=std(0x0e0f11,.1,.7);
+    tube(g,[[-.75,cy+.12,cz-.1],[-.4,1.7,-.9],[.1,1.95,-1.4],[.25,2.12,-1.55]],.045,tm);
+    tube(g,[[-.75,cy-.12,cz-.1],[-.2,1.6,-1.0],[.4,1.92,-1.45],[.6,2.12,-1.55]],.045,tm);
+    g.userData.focus=new THREE.Vector3(-.3,1.5,-.3);
+  } else {
+    box(g,[.16,.38,.38],[-.9,cy,cz],cop);
+    const stacks=p.type==='air2'?[cz-.32,cz+.32]:[cz];
+    const H=p.type==='air2'?1.15:1.05, D=p.type==='air2'?.42:.5;
+    stacks.forEach(z=>{
+      for(let i=0;i<17;i++)box(g,[.022,H,D],[-.78+i*.038,cy+.05,z],fin);
+      box(g,[.035,H+.02,D+.02],[-.15,cy+.05,z],std(p.id==='o3'?0x2a2c30:0x1e2024,.6,.4));
+      [-.3,-.1,.1,.3].forEach(y=>{const hp=new THREE.Mesh(new THREE.CylinderGeometry(.025,.025,.72,10),cop);hp.rotation.z=Math.PI/2;hp.position.set(-.5,cy+y*.9,z);g.add(hp)});
+    });
+    const fanZ=p.type==='air2'?[cz,cz+.6]:[cz+.31];
+    fanZ.forEach(z=>{const f=makeFan(p.id==='o3'?.56:.5,{frame:p.id==='o3'?0xd9c7a8:p.fan,blade:p.id==='o3'?0x6b4a3a:0x1d2025});f.position.set(-.46,cy+.05,z);g.add(f)});
+    g.userData.focus=new THREE.Vector3(-.5,cy,cz);
+  }
+  return g;
+},
+ram(p){
+  const g=grp();cur=g;
+  const pcb=std(0x15361f,.2,.6), sp=std(p.color,.75,.35);
+  [.42,.66].forEach(z=>{
+    box(g,[.31,1.24,.022],[-.85,1.25,z],pcb);
+    box(g,[.29,1.2,.05],[-.84,1.25,z],sp);
+    if(p.rgb) box(g,[.05,1.18,.045],[-.67,1.25,z],rgbMat());
+    else box(g,[.03,1.2,.052],[-.69,1.25,z],std(new THREE.Color(p.color).multiplyScalar(.6).getHex(),.6,.4));
+  });
+  g.userData.focus=new THREE.Vector3(-.85,1.25,.54);
+  return g;
+},
+gpu(p){
+  const g=grp();cur=g;
+  const L=p.len,T=p.th,W=.95, cx=-1.0+W/2+.03, cy=.03-T/2, cz=-1.6+L/2;
+  const sh=std(p.col,.6,.4), bp=std(0x1a1b1e,.7,.4);
+  const nm=p.name.toUpperCase();
+  const side=labelMat(1024,Math.round(1024*T/L),hex(p.col),[{t:nm,x:.05,y:.42,s:.32,c:'#e8edf3'},{t:p.vram+' GB',x:.95,y:.42,s:.26,c:'#8b97a7',a:'right'}]);
+  const body=new THREE.Mesh(new THREE.BoxGeometry(W,T,L),[side,sh,bp,std(0x0f1012,.3,.8),sh,sh]);
+  body.position.set(cx,cy,cz);body.castShadow=body.receiveShadow=true;g.add(body);
+  box(g,[.012,.045,L*.85],[cx+W/2+.006,cy-T*.33,cz],rgbMat());
+  const r=Math.min(.4,L/(p.fans*2.25));
+  for(let i=0;i<p.fans;i++){const f=makeFan(r,{frame:0x121315,blade:0x1c1e22});f.rotation.x=Math.PI/2;f.position.set(cx,cy-T/2-.05,cz-L/2+L*(i+.5)/p.fans);g.add(f)}
+  box(g,[.6,T+.1,.03],[-.72,cy,-1.62],std(0x8d939b,.9,.3));
+  box(g,[.2,.06,.24],[cx+.2,.06,cz+L*.15],std(0x0e0f11,.2,.8));
+  g.userData.focus=new THREE.Vector3(cx,cy,cz);
+  return g;
+},
+ssd(p){
+  const g=grp();cur=g;
+  if(p.type==='sata'){
+    const lm=labelMat(256,256,'#1d2a3a',[{t:'CRUCIAL',x:.5,y:.4,s:.13,c:'#e8edf3',a:'center'},{t:'MX500 1TB',x:.5,y:.6,s:.1,c:'#8b97a7',a:'center'}]);
+    const d=std(0x5a6170,.7,.4), m=new THREE.Mesh(new THREE.BoxGeometry(.7,.07,1),[d,d,lm,d,d,d]);m.position.set(.5,-1.36,1.0);m.castShadow=true;g.add(m);
+    tube(g,[[.2,-1.36,1.0],[-.2,-1.2,1.3],[-.6,-.7,1.42],[-.98,-.4,1.28]],.03,std(0xb03030,.2,.6));
+    g.userData.focus=new THREE.Vector3(.5,-1.3,1.0);
+  } else {
+    box(g,[.02,.22,.8],[-1.01,.55,-.45],std(0x173a22,.3,.5));
+    if(p.type==='m2h'){const lm=labelMat(512,140,'#1b1d21',[{t:p.name.split(' ')[0].toUpperCase(),x:.06,y:.5,s:.42,c:'#cfd6de'},{t:'NVMe',x:.94,y:.5,s:.36,c:'#ff8a3d',a:'right'}]);
+      const d=std(0x1b1d21,.7,.35), m=new THREE.Mesh(new THREE.BoxGeometry(.06,.25,.82),[lm,d,d,d,d,d]);m.rotation.x=0;m.position.set(-.975,.55,-.45);
+      m.castShadow=true;g.add(m)}
+    else {box(g,[.008,.16,.2],[-.996,.55,-.6],std(0x111214,.3,.6));box(g,[.008,.14,.14],[-.996,.55,-.25],std(0x111214,.3,.6))}
+    g.userData.focus=new THREE.Vector3(-.98,.55,-.45);
+  }
+  return g;
+},
+psu(p){
+  const g=grp();cur=g;
+  const lm=labelMat(512,300,'#16181b',[{t:p.name.split(' ')[0].toUpperCase(),x:.08,y:.3,s:.13,c:'#cfd6de'},{t:p.w+' W',x:.08,y:.58,s:.24,c:'#e8edf3'},{t:p.rate,x:.08,y:.82,s:.1,c:'#ff8a3d'}]);
+  const b=std(0x16181b,.6,.45), m=new THREE.Mesh(new THREE.BoxGeometry(1.3,.75,1.45),[lm,b,b,b,b,b]);
+  m.position.set(-.35,-1.88,-1.5);m.castShadow=m.receiveShadow=true;g.add(m);
+  const cm=std(0x101114,.1,.75);
+  tube(g,[[-.4,-1.5,-.8],[-.55,-1.3,1.55],[-.7,.2,1.62],[-.92,.95,1.32]],.06,cm);
+  tube(g,[[.2,-1.5,-.8],[.5,-1.3,1.0],[.4,-.3,1.1],[.0,.12,.0]],.05,cm);
+  tube(g,[[-.6,-1.5,-1.4],[-.75,.2,-1.75],[-.85,1.9,-1.6],[-.95,1.95,-1.25]],.04,cm);
+  g.userData.focus=m.position.clone();
+  return g;
+}};
+
+const FOCUS={case:[0,0,0,10],mobo:[-.6,.5,-.1,7],cpu:[-.95,1.25,-.45,3.4],cooler:[-.5,1.35,-.4,4.6],ram:[-.85,1.25,.55,3.8],gpu:[-.5,-.2,-.2,5.4],ssd:[-.95,.55,-.45,3.2],psu:[-.35,-1.8,-1.4,5]};
+const camDir=new THREE.Vector3(1,.38,.62).normalize();
+let camTween=null;
+function distMul(){const s=$('#stage');const a=s.clientWidth/Math.max(1,s.clientHeight);return a<.75?1.55:a<1.1?1.25:1}
+function focusTo(t,d,dir=camDir,dur=950){
+  if(!camera)return; if(camTween)killTween(camTween);
+  const fp=camera.position.clone(), ft=controls.target.clone(), tt=new THREE.Vector3(...t), tp=tt.clone().add(dir.clone().multiplyScalar(d*distMul()));
+  camTween=tween(dur,e=>{camera.position.lerpVectors(fp,tp,e);controls.target.lerpVectors(ft,tt,e)},{ease:ease.io,done:()=>camTween=null});
+}
+function focusCat(cat){const f=FOCUS[cat];focusTo([f[0],f[1],f[2]],f[3])}
+function focusHome(){focusTo([0,0,0],10)}
+
+function disposeObj(o){o.traverse(x=>{if(x.geometry)x.geometry.dispose();if(x.material){(Array.isArray(x.material)?x.material:[x.material]).forEach(m=>{if(m.map)m.map.dispose();m.dispose()})}})}
+function place(cat,p){
+  if(!scene)return;
+  const old=placed[cat];
+  if(old){delete placed[cat];const f=old.position.clone(),t=f.clone().add(new THREE.Vector3(3.5,4.5,2));tween(550,e=>{old.position.lerpVectors(f,t,e);old.rotation.z=e*.8},{ease:ease.inn,done:()=>{caseRoot.remove(old);disposeObj(old)}})}
+  if(!p)return;
+  const g=BUILD[cat](p); placed[cat]=g; caseRoot.add(g);
+  if(cat==='case'&&powered){g.userData.glass.visible=true;g.userData.glass.position.x=1.12}
+  const to=new THREE.Vector3(), from=cat==='case'?new THREE.Vector3(0,7,0):new THREE.Vector3(3.2,4.2,1.6);
+  g.position.copy(from);g.rotation.y=cat==='case'?.6:-.9;g.scale.setScalar(.75);
+  tween(cat==='case'?1100:900,e=>{g.position.lerpVectors(from,to,e);g.rotation.y=(cat==='case'?.6:-.9)*(1-Math.min(1,e));g.scale.setScalar(.75+.25*Math.min(1,e))},{ease:ease.back,done:()=>{g.rotation.y=0;g.scale.setScalar(1);g.position.copy(to);burst(g.userData.focus?new THREE.Vector3().copy(g.userData.focus):new THREE.Vector3(0,-2.2,0),cat==='case'?60:26)}});
+}
+function burst(pos,n){
+  const geo=new THREE.BufferGeometry(),arr=new Float32Array(n*3),vel=[];
+  for(let i=0;i<n;i++){vel.push(new THREE.Vector3(Math.random()-.5,Math.random()*.9,Math.random()-.5).normalize().multiplyScalar(.6+Math.random()*1.2))}
+  geo.setAttribute('position',new THREE.BufferAttribute(arr,3));
+  const mat=new THREE.PointsMaterial({color:0xffa25a,size:.07,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending});
+  const pts=new THREE.Points(geo,mat);pts.position.copy(pos);caseRoot.add(pts);
+  tween(700,e=>{for(let i=0;i<n;i++){arr[i*3]=vel[i].x*e;arr[i*3+1]=vel[i].y*e-e*e*.6;arr[i*3+2]=vel[i].z*e}geo.attributes.position.needsUpdate=true;mat.opacity=1-e},{done:()=>{caseRoot.remove(pts);geo.dispose();mat.dispose()}});
+}
+
+let fanSpeed=0, rgbOn=0;
+function powerOn(){
+  const btn=$('#powerBtn');
+  if(count()<8)return;
+  const d=draw();
+  if(sel.psu.w<d){btn.classList.remove('shake');void btn.offsetWidth;btn.classList.add('shake');toast(`Sistem açılmadı: ${sel.psu.w} W güç kaynağı ~${d} W çekişe yetmiyor`,true);activeCat='psu';renderAll();focusCat('psu');return}
+  if(powered){openResults();return}
+  powered=true; btn.disabled=true; btn.querySelector('span').textContent='Açılıyor…';
+  const gl=placed.case.userData.glass; gl.visible=true;
+  focusTo([0,.1,0],9.5,new THREE.Vector3(1,.3,.75).normalize(),1200);
+  tween(800,e=>{gl.position.x=4.6-(4.6-1.12)*e},{ease:ease.out});
+  tween(1400,e=>{fanSpeed=e;rgbOn=e;innerLight.intensity=e*1.3},{delay:800,ease:ease.io,done:()=>{btn.disabled=false;btn.querySelector('span').textContent='Sonuçları Gör';openResults()}});
+}
+function powerOff(){
+  if(!powered)return; powered=false;
+  if(controls)controls.autoRotate=false;
+  const gl=placed.case&&placed.case.userData.glass;
+  const s0=fanSpeed;
+  tween(700,e=>{fanSpeed=s0*(1-e);rgbOn=s0*(1-e);innerLight.intensity=1.3*(1-e);if(gl)gl.position.x=1.12+(4.6-1.12)*e},{done:()=>{if(gl)gl.visible=false}});
+  const b=$('#powerBtn');b.querySelector('span').textContent='Güç Ver & Test Et';renderTotals();
+}
+
+function initScene(){
+  const stage=$('#stage');
+  renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+  renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+  renderer.outputEncoding=THREE.sRGBEncoding; renderer.toneMapping=THREE.ACESFilmicToneMapping; renderer.toneMappingExposure=1.05;
+  renderer.shadowMap.enabled=true; renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+  stage.prepend(renderer.domElement);
+  scene=new THREE.Scene(); scene.fog=new THREE.Fog(0x0c0f13,18,40);
+  camera=new THREE.PerspectiveCamera(38,1,.1,100);
+  controls=new THREE.OrbitControls(camera,renderer.domElement);
+  controls.enableDamping=true;controls.dampingFactor=.08;controls.enablePan=false;controls.minDistance=2.5;controls.maxDistance=20;controls.maxPolarAngle=Math.PI*.53;controls.autoRotateSpeed=1.4;
+  controls.addEventListener('start',()=>{if(camTween){killTween(camTween);camTween=null}controls.autoRotate=false});
+  scene.add(new THREE.HemisphereLight(0xc8d8ff,0x1a140e,.55));
+  const key=new THREE.DirectionalLight(0xffffff,1.15);key.position.set(6,9,7);key.castShadow=true;key.shadow.mapSize.set(1024,1024);
+  Object.assign(key.shadow.camera,{left:-6,right:6,top:6,bottom:-6,near:1,far:30});key.shadow.bias=-.0005;scene.add(key);
+  const rim=new THREE.DirectionalLight(0xff9a55,.55);rim.position.set(-6,4,-7);scene.add(rim);
+  const fill=new THREE.DirectionalLight(0x6fb6ff,.35);fill.position.set(-4,2,8);scene.add(fill);
+  innerLight=new THREE.PointLight(0x88ccff,0,6,1.6);innerLight.position.set(.3,.6,.4);scene.add(innerLight);
+  // tezgah ve antistatik mat
+  floorMat=std(0x11151a,.1,.95);
+  const floor=new THREE.Mesh(new THREE.PlaneGeometry(80,80),floorMat);floor.rotation.x=-Math.PI/2;floor.position.y=-2.46;floor.receiveShadow=true;scene.add(floor);
+  const matT=texCanvas(512,512,(x,W,H)=>{x.fillStyle='#1a2027';x.fillRect(0,0,W,H);x.strokeStyle='rgba(120,140,160,.18)';x.lineWidth=2;for(let i=0;i<=W;i+=32){x.beginPath();x.moveTo(i,0);x.lineTo(i,H);x.stroke();x.beginPath();x.moveTo(0,i);x.lineTo(W,i);x.stroke()}x.strokeStyle='rgba(255,138,61,.5)';x.lineWidth=6;x.strokeRect(6,6,W-12,H-12)});
+  const mat=new THREE.Mesh(new THREE.PlaneGeometry(9,9),new THREE.MeshStandardMaterial({map:matT,roughness:.9}));mat.rotation.x=-Math.PI/2;mat.position.y=-2.45;mat.receiveShadow=true;scene.add(mat);
+  // vida ve kablo bağı gibi küçük tezgah objeleri
+  cur=grp();
+  const sd=new THREE.Mesh(new THREE.CylinderGeometry(.06,.06,1.4,12),std(0xff8a3d,.2,.5));sd.rotation.z=Math.PI/2;sd.rotation.y=.5;sd.position.set(2.4,-2.38,2.6);sd.castShadow=true;scene.add(sd);
+  const tip=new THREE.Mesh(new THREE.CylinderGeometry(.02,.02,.7,8),std(0xc9ced6,.9,.3));tip.rotation.z=Math.PI/2;tip.rotation.y=.5;tip.position.set(1.62,-2.38,3.04);scene.add(tip);
+  for(let i=0;i<6;i++){const s=new THREE.Mesh(new THREE.CylinderGeometry(.04,.04,.03,8),std(0xc9ced6,.9,.3));s.position.set(2.8+Math.random()*.8,-2.43,1.4+Math.random()*.8);scene.add(s)}
+  caseRoot=new THREE.Group();scene.add(caseRoot);
+  camera.position.set(9,4,8);controls.target.set(0,0,0);
+  const ro=new ResizeObserver(resize);ro.observe(stage);resize();
+  $('#loading').remove();
+  let last=performance.now(), hue=0;
+  renderer.setAnimationLoop(now=>{
+    const dt=Math.min(.05,(now-last)/1000);last=now;
+    runTweens(now);
+    hue=(hue+dt*.08)%1;
+    for(const k in placed){const g=placed[k];
+      g.userData.rotors.forEach(r=>r.r.rotation.z+=r.v*fanSpeed*dt);
+      g.userData.rgb.forEach((m,i)=>{if(rgbOn>.01)m.emissive.setHSL((hue+i*.07)%1,1,.5*rgbOn);else m.emissive.setHex(0x222222)});
+    }
+    innerLight.color.setHSL((hue+.5)%1,.7,.6);
+    controls.update(); renderer.render(scene,camera);
+  });
+}
+function resize(){const s=$('#stage'),w=s.clientWidth,h=s.clientHeight;if(!w||!h)return;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix()}
+
+/* ============================ BAŞLAT ============================ */
+function start(data){
+  try{initScene()}catch(err){$('#loading').textContent='3D görünüm bu cihazda açılamadı; parça seçimi ve FPS testi yine çalışır.';console.error(err)}
+  const saved=(data&&data.sel)||{case:'k1'};
+  sel.case=byId('case',saved.case||'k1'); place('case',sel.case);
+  CATS.forEach(c=>{if(c.id!=='case'&&saved[c.id]){sel[c.id]=byId(c.id,saved[c.id]);place(c.id,sel[c.id])}});
+  const nx=CATS.find(c=>!sel[c.id]); activeCat=nx?nx.id:'psu';
+  renderAll();
+  if(camera){const f=FOCUS.case;focusTo([0,0,0],f[3],camDir,1600)}
+}
+window.claude?.hot?.snapshot?.(()=>({sel:Object.fromEntries(CATS.map(c=>[c.id,sel[c.id]&&sel[c.id].id]).filter(x=>x[1]))}));
+if(typeof THREE==='undefined'){
+  $('#loading').textContent='3D kütüphanesi yüklenemedi. Bağlantını kontrol edip sayfayı yenile.';
+} else {
+  window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
+}
+})();
+</script>
+</body></html>
