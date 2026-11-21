@@ -99,6 +99,7 @@ src/components/ui.tsx       Ortak arayüz parçaları
 src/rss.ts                  RSS okuyucu (Google Haberler + genel RSS beslemeleri)
 src/notifications.ts        Arka plan haber kontrolü ve bildirimler
 src/newsDiff.ts             "Hangi haberler yeni?" hesabı
+src/newsFeed.ts             Haber akışı: otomatik yenileme, manşet, gün bölümleri, kaynak rozeti
 src/storage.ts              Telefonda kalıcı veri (favoriler, ayarlar)
 src/favorites.tsx           Favori durumu
 src/components/NewsCard.tsx Haber kartı (kaydet / paylaş)

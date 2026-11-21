@@ -217,7 +217,7 @@ function Main() {
         {/* Ekranlar bağlı kalır; sekme değişince yüklenen veri ve kaydırma konumu korunur. */}
         <View style={styles.body}>
           <FadeInView visible={!showSettings && tab === 'news' && !showSaved} style={styles.screen}>
-            <NewsScreen />
+            <NewsScreen active={!showSettings && tab === 'news' && !showSaved} />
           </FadeInView>
           <FadeInView visible={!showSettings && tab === 'news' && showSaved} style={styles.screen}>
             <SavedScreen />
