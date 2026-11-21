@@ -5,7 +5,6 @@ import { NavigationBar } from 'expo-navigation-bar';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import * as Notifications from 'expo-notifications';
-import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 import { ICON_FONT, Icon, type IconName } from './src/components/Icon';
@@ -14,6 +13,7 @@ import { tapFeedback } from './src/haptics';
 import { openUrl } from './src/components/ui';
 import { FavoritesProvider } from './src/favorites';
 import { CLUB_COLORS } from './src/rizespor/names';
+import { GLASS, STADIUM_CHROME } from './src/rizespor/stadium';
 import DiscoverScreen from './src/screens/DiscoverScreen';
 import EconomyScreen from './src/screens/EconomyScreen';
 import NewsScreen from './src/screens/NewsScreen';
@@ -114,7 +114,8 @@ function Main() {
   const club = tab === 'rizespor' && !showSettings;
   const weatherVisible = tab === 'weather' && !showSettings;
   // Hava sekmesinde başlık ve sekme çubuğu gökyüzünün rengini alır; sahneyle kesintisiz birleşir.
-  const skyChrome = weatherVisible ? weatherChrome : null;
+  // Rizespor sekmesinde de aynısı: başlık gece göğüne, sekme çubuğu stadyumun çimine karışır.
+  const skyChrome = weatherVisible ? weatherChrome : club ? STADIUM_CHROME : null;
   const sky = skyChrome?.header ?? null;
   const styles = useMemo(
     () =>
@@ -207,14 +208,8 @@ function Main() {
       {/* Hava ekranında alt çubuk koyu gökyüzü rengindedir: Android gezinme düğmeleri açık renk olur. */}
       <NavigationBar style={skyChrome ? 'light' : 'auto'} />
       <SafeAreaView
-        style={[styles.root, club && { backgroundColor: CLUB_COLORS.green }, sky ? { backgroundColor: sky } : null]} edges={['top', 'left', 'right']}>
-        {club ? (
-          <LinearGradient colors={[CLUB_COLORS.green, CLUB_COLORS.blue]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
-            {headerContent}
-          </LinearGradient>
-        ) : (
-          <View style={{ backgroundColor: sky ?? colors.header }}>{headerContent}</View>
-        )}
+        style={[styles.root, sky ? { backgroundColor: sky } : null]} edges={['top', 'left', 'right']}>
+        <View style={{ backgroundColor: sky ?? colors.header }}>{headerContent}</View>
 
         {/* Ekranlar bağlı kalır; sekme değişince yüklenen veri ve kaydırma konumu korunur. */}
         <View style={styles.body}>
@@ -226,7 +221,7 @@ function Main() {
           </FadeInView>
           {mounted.has('rizespor') ? (
             <FadeInView visible={!showSettings && tab === 'rizespor'} style={styles.screen}>
-              <RizesporScreen openMatchId={openMatchId} />
+              <RizesporScreen openMatchId={openMatchId} active={club} />
             </FadeInView>
           ) : null}
           {mounted.has('tea') ? (
@@ -264,7 +259,7 @@ function Main() {
           {TABS.map((t) => {
             const active = t.id === tab && !showSettings;
             // Hava ekranında sekme çubuğu gökyüzüne karışır: seçili sekme beyaz, diğerleri yarı saydam beyaz.
-            const accent = skyChrome ? '#FFFFFF' : t.id === 'rizespor' ? CLUB_COLORS.green : colors.primary;
+            const accent = club ? GLASS.accent : skyChrome ? '#FFFFFF' : t.id === 'rizespor' ? CLUB_COLORS.green : colors.primary;
             const idle = skyChrome ? 'rgba(255,255,255,0.62)' : colors.textMuted;
             return (
               <Pressable

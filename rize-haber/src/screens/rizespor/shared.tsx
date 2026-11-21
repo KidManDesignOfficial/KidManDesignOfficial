@@ -4,7 +4,8 @@ import { Animated, StyleSheet, Text, View } from 'react-native';
 
 import { PressableScale, useReducedMotion, useAnimatedValue } from '../../components/motion';
 import { clock, dayLabel } from '../../rizespor/format';
-import { CLUB_COLORS, RIZESPOR_ID } from '../../rizespor/names';
+import { RIZESPOR_ID } from '../../rizespor/names';
+import { GLASS } from '../../rizespor/stadium';
 import type { Match } from '../../rizespor/parse';
 import { useTheme } from '../../theme';
 
@@ -64,8 +65,9 @@ export function LivePulse({ size = 10, color = '#FF3B30' }: { size?: number; col
   );
 }
 
+/** Maç satırı: stadyum sahnesinin üstünde cam kart. */
 export function MatchRow({ match, onPress }: { match: Match; onPress: () => void }) {
-  const { colors, fs } = useTheme();
+  const { fs } = useTheme();
   const styles = useMemo(
     () =>
       StyleSheet.create({
@@ -73,28 +75,28 @@ export function MatchRow({ match, onPress }: { match: Match; onPress: () => void
           flexDirection: 'row',
           alignItems: 'center',
           gap: 12,
-          backgroundColor: colors.card,
+          backgroundColor: GLASS.surface,
           borderRadius: 14,
           borderWidth: 1,
-          borderColor: colors.border,
+          borderColor: GLASS.border,
           paddingVertical: 12,
           paddingHorizontal: 14,
         },
-        when: { width: fs(58), alignItems: 'center', gap: 2 },
-        day: { fontSize: fs(12), color: colors.textMuted, fontWeight: '600', textAlign: 'center' },
-        time: { fontSize: fs(14), color: colors.text, fontWeight: '800' },
+        when: { width: fs(64), alignItems: 'center', gap: 2, paddingRight: 10, borderRightWidth: StyleSheet.hairlineWidth, borderRightColor: GLASS.border },
+        day: { fontSize: fs(12), color: GLASS.soft, fontWeight: '600', textAlign: 'center' },
+        time: { fontSize: fs(14), color: GLASS.text, fontWeight: '800' },
         teams: { flex: 1, gap: 6 },
         teamLine: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
-        team: { flex: 1, fontSize: fs(15), color: colors.text, fontWeight: '500' },
-        us: { fontWeight: '800', color: colors.isDark ? '#6FD39A' : CLUB_COLORS.greenDark },
-        score: { fontSize: fs(16), fontWeight: '800', color: colors.text, minWidth: 18, textAlign: 'right' },
-        winner: { color: colors.text },
-        loser: { color: colors.textMuted, fontWeight: '600' },
+        team: { flex: 1, fontSize: fs(15), color: GLASS.text, fontWeight: '500' },
+        us: { fontWeight: '800', color: GLASS.accent },
+        score: { fontSize: fs(16), fontWeight: '800', color: GLASS.text, minWidth: 18, textAlign: 'right' },
+        winner: { color: GLASS.text },
+        loser: { color: GLASS.faint, fontWeight: '600' },
         right: { width: 28, alignItems: 'center' },
-        live: { fontSize: fs(11), fontWeight: '800', color: '#FF3B30' },
-        venue: { fontSize: fs(12), color: colors.textMuted },
+        live: { fontSize: fs(11), fontWeight: '800', color: '#FF6B61' },
+        venue: { fontSize: fs(12), color: GLASS.soft },
       }),
-    [colors, fs],
+    [fs],
   );
 
   const isLive = match.state === 'in';

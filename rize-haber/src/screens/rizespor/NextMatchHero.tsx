@@ -62,8 +62,18 @@ export default function NextMatchHero({
   const styles = useMemo(
     () =>
       StyleSheet.create({
-        card: { marginHorizontal: 16, marginTop: 12, borderRadius: 22, overflow: 'hidden' },
+        card: {
+          marginHorizontal: 16,
+          marginTop: 12,
+          borderRadius: 22,
+          overflow: 'hidden',
+          borderWidth: 1,
+          borderColor: 'rgba(255,255,255,0.22)',
+        },
         inner: { padding: 18, gap: 14 },
+        // Kartın sağ üstünde iri, silik bir top: stadyum sahnesiyle aynı dili konuşur.
+        watermark: { position: 'absolute', right: -34, top: -30, opacity: 0.12, transform: [{ rotate: '-18deg' }] },
+        shine: { position: 'absolute', left: 0, right: 0, top: 0, height: 1, backgroundColor: 'rgba(255,255,255,0.35)' },
         top: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
         label: { color: 'rgba(255,255,255,0.85)', fontSize: fs(12), fontWeight: '800', letterSpacing: 1 },
         liveRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
@@ -128,11 +138,15 @@ export default function NextMatchHero({
   return (
     <PressableScale onPress={onOpen} scaleTo={0.985} containerStyle={styles.card} accessibilityRole="button" accessibilityLabel="Maç merkezini aç">
       <LinearGradient
-        colors={[CLUB_COLORS.green, CLUB_COLORS.blue]}
+        colors={[`${CLUB_COLORS.green}D9`, `${CLUB_COLORS.blue}C7`]}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={styles.inner}
       >
+        <View style={styles.watermark} pointerEvents="none">
+          <Icon name="football" size={170} color="#FFFFFF" />
+        </View>
+        <View style={styles.shine} pointerEvents="none" />
         <View style={styles.top}>
           {mode === 'live' ? (
             <View style={styles.liveRow}>

@@ -7,6 +7,7 @@ import { Card, SectionTitle } from '../../components/ui';
 import { latestResults, nextMatch, type ClubData } from '../../rizespor/api';
 import { signed } from '../../rizespor/format';
 import { CLUB_COLORS, POSITION_GROUPS, RIZESPOR_ID, flagEmoji } from '../../rizespor/names';
+import { GLASS } from '../../rizespor/stadium';
 import { recentForm, type Match } from '../../rizespor/parse';
 import { useTheme } from '../../theme';
 import NextMatchHero from './NextMatchHero';
@@ -15,27 +16,29 @@ import { MatchRow, ResultPill } from './shared';
 type ViewProps = { data: ClubData; refreshing: boolean; onRefresh: () => void; onOpenMatch: (m: Match) => void };
 
 function ClubRefresh(props: { refreshing: boolean; onRefresh: () => void }) {
-  return <RefreshControl {...props} colors={[CLUB_COLORS.green]} tintColor={CLUB_COLORS.green} />;
+  return <RefreshControl {...props} colors={[CLUB_COLORS.green]} tintColor={GLASS.text} progressBackgroundColor="#0B2A1C" />;
 }
 
 function useBaseStyles() {
-  const { colors, fs } = useTheme();
+  const { fs } = useTheme();
   return useMemo(
     () =>
       StyleSheet.create({
-        container: { flex: 1, backgroundColor: colors.background },
+        // Arka plandaki stadyum sahnesi görünsün diye zemin saydam; yüzeyler cam.
+        container: { flex: 1, backgroundColor: 'transparent' },
         content: { paddingBottom: 32 },
         pad: { paddingHorizontal: 16 },
         list: { gap: 8 },
-        muted: { color: colors.textMuted, fontSize: fs(14), textAlign: 'center', padding: 16 },
-        link: { color: CLUB_COLORS.green, fontWeight: '800', fontSize: fs(14), textAlign: 'center', paddingVertical: 10 },
+        glass: { backgroundColor: GLASS.surface, borderColor: GLASS.border },
+        muted: { color: GLASS.soft, fontSize: fs(14), textAlign: 'center', padding: 16 },
+        link: { color: GLASS.accent, fontWeight: '800', fontSize: fs(14), textAlign: 'center', paddingVertical: 10 },
       }),
-    [colors, fs],
+    [fs],
   );
 }
 
 export function MatchesView({ data, refreshing, onRefresh, onOpenMatch }: ViewProps) {
-  const { colors, fs } = useTheme();
+  const { fs } = useTheme();
   const base = useBaseStyles();
   const [showAllFixtures, setShowAllFixtures] = useState(false);
 
@@ -51,14 +54,14 @@ export function MatchesView({ data, refreshing, onRefresh, onOpenMatch }: ViewPr
     () =>
       StyleSheet.create({
         formCard: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-        formTitle: { fontSize: fs(13), color: colors.textMuted, fontWeight: '700', marginBottom: 8 },
+        formTitle: { fontSize: fs(13), color: GLASS.soft, fontWeight: '700', marginBottom: 8 },
         pills: { flexDirection: 'row', gap: 6 },
         statBlock: { alignItems: 'center', minWidth: 54 },
-        statNum: { fontSize: fs(22), fontWeight: '900', color: colors.text },
-        statLabel: { fontSize: fs(11), color: colors.textMuted, fontWeight: '700' },
+        statNum: { fontSize: fs(22), fontWeight: '900', color: GLASS.text },
+        statLabel: { fontSize: fs(11), color: GLASS.soft, fontWeight: '700' },
         stats: { flexDirection: 'row', gap: 4 },
       }),
-    [colors, fs],
+    [fs],
   );
 
   return (
@@ -68,8 +71,8 @@ export function MatchesView({ data, refreshing, onRefresh, onOpenMatch }: ViewPr
       <View style={base.pad}>
         {form.length > 0 || row ? (
           <>
-            <SectionTitle>Form ve sıralama</SectionTitle>
-            <Card>
+            <SectionTitle light>Form ve sıralama</SectionTitle>
+            <Card style={base.glass}>
               <View style={styles.formCard}>
                 <View>
                   <Text style={styles.formTitle}>Son {form.length} maç · eskiden yeniye →</Text>
@@ -96,7 +99,7 @@ export function MatchesView({ data, refreshing, onRefresh, onOpenMatch }: ViewPr
           </>
         ) : null}
 
-        <SectionTitle hint="Süper Lig">Fikstür</SectionTitle>
+        <SectionTitle light hint="Süper Lig">Fikstür</SectionTitle>
         {upcoming.length === 0 ? (
           <Text style={base.muted}>Yaklaşan maç bulunamadı.</Text>
         ) : (
@@ -112,7 +115,7 @@ export function MatchesView({ data, refreshing, onRefresh, onOpenMatch }: ViewPr
           </View>
         )}
 
-        <SectionTitle hint="En yeniden eskiye">Sonuçlar</SectionTitle>
+        <SectionTitle light hint="En yeniden eskiye">Sonuçlar</SectionTitle>
         {results.length === 0 ? (
           <Text style={base.muted}>Henüz oynanmış maç yok.</Text>
         ) : (
@@ -128,29 +131,30 @@ export function MatchesView({ data, refreshing, onRefresh, onOpenMatch }: ViewPr
 }
 
 export function StandingsView({ data, refreshing, onRefresh }: ViewProps) {
-  const { colors, fs } = useTheme();
+  const { fs } = useTheme();
   const base = useBaseStyles();
   const styles = useMemo(
     () =>
       StyleSheet.create({
-        table: { backgroundColor: colors.card, borderRadius: 16, borderWidth: 1, borderColor: colors.border, overflow: 'hidden' },
+        table: { backgroundColor: GLASS.surface, borderRadius: 16, borderWidth: 1, borderColor: GLASS.border, overflow: 'hidden' },
         row: { flexDirection: 'row', alignItems: 'center', paddingVertical: 10, paddingRight: 10 },
-        rowBorder: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: colors.border },
-        us: { backgroundColor: colors.isDark ? '#12331F' : '#E3F4EA' },
+        headRow: { backgroundColor: 'rgba(255,255,255,0.05)' },
+        rowBorder: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: GLASS.divider },
+        us: { backgroundColor: GLASS.highlight },
         zone: { width: 4, alignSelf: 'stretch', marginRight: 8 },
-        rank: { width: 24, fontSize: fs(13), fontWeight: '800', color: colors.text, textAlign: 'center' },
-        team: { flex: 1, fontSize: fs(14), color: colors.text, fontWeight: '600', paddingLeft: 6 },
-        teamUs: { fontWeight: '900', color: colors.isDark ? '#6FD39A' : CLUB_COLORS.greenDark },
-        cell: { width: fs(26), fontSize: fs(13), color: colors.textMuted, textAlign: 'center', fontVariant: ['tabular-nums'] },
+        rank: { width: 24, fontSize: fs(13), fontWeight: '800', color: GLASS.text, textAlign: 'center' },
+        team: { flex: 1, fontSize: fs(14), color: GLASS.text, fontWeight: '600', paddingLeft: 6 },
+        teamUs: { fontWeight: '900', color: GLASS.accent },
+        cell: { width: fs(26), fontSize: fs(13), color: GLASS.soft, textAlign: 'center', fontVariant: ['tabular-nums'] },
         gd: { width: fs(34) },
-        pts: { width: fs(30), fontSize: fs(14), fontWeight: '900', color: colors.text, textAlign: 'center' },
-        head: { color: colors.textMuted, fontWeight: '800', fontSize: fs(11) },
+        pts: { width: fs(30), fontSize: fs(14), fontWeight: '900', color: GLASS.text, textAlign: 'center' },
+        head: { color: GLASS.faint, fontWeight: '800', fontSize: fs(11) },
         legend: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginTop: 12 },
         legendItem: { flexDirection: 'row', alignItems: 'center', gap: 6 },
         legendDot: { width: 10, height: 10, borderRadius: 3 },
-        legendText: { fontSize: fs(12), color: colors.textMuted },
+        legendText: { fontSize: fs(12), color: GLASS.soft },
       }),
-    [colors, fs],
+    [fs],
   );
 
   const zones = useMemo(() => {
@@ -161,12 +165,12 @@ export function StandingsView({ data, refreshing, onRefresh }: ViewProps) {
 
   return (
     <ScrollView style={base.container} contentContainerStyle={[base.content, base.pad]} refreshControl={<ClubRefresh refreshing={refreshing} onRefresh={onRefresh} />}>
-      <SectionTitle hint="Trendyol Süper Lig 2026-27">Puan durumu</SectionTitle>
+      <SectionTitle light hint="Trendyol Süper Lig 2026-27">Puan durumu</SectionTitle>
       {data.standings.length === 0 ? (
         <Text style={base.muted}>Puan durumu yüklenemedi.</Text>
       ) : (
         <FadeInView style={styles.table}>
-          <View style={styles.row}>
+          <View style={[styles.row, styles.headRow]}>
             <View style={styles.zone} />
             <Text style={[styles.rank, styles.head]}>#</Text>
             <Text style={[styles.team, styles.head]}>Takım</Text>
@@ -217,12 +221,12 @@ export function StandingsView({ data, refreshing, onRefresh }: ViewProps) {
 }
 
 export function SquadView({ data, refreshing, onRefresh }: ViewProps) {
-  const { colors, fs } = useTheme();
+  const { fs } = useTheme();
   const base = useBaseStyles();
   const styles = useMemo(
     () =>
       StyleSheet.create({
-        summary: { fontSize: fs(13), color: colors.textMuted, marginTop: -4 },
+        summary: { fontSize: fs(13), color: GLASS.soft, marginTop: -4 },
         grid: { flexDirection: 'row', flexWrap: 'wrap', marginHorizontal: -4 },
         cellWrap: { width: '50%', padding: 4, alignSelf: 'stretch' },
         cell: {
@@ -231,10 +235,10 @@ export function SquadView({ data, refreshing, onRefresh }: ViewProps) {
           flexDirection: 'row',
           alignItems: 'center',
           gap: 10,
-          backgroundColor: colors.card,
+          backgroundColor: GLASS.surface,
           borderRadius: 14,
           borderWidth: 1,
-          borderColor: colors.border,
+          borderColor: GLASS.border,
           padding: 10,
         },
         jersey: {
@@ -249,11 +253,11 @@ export function SquadView({ data, refreshing, onRefresh }: ViewProps) {
         },
         jerseyText: { color: '#FFFFFF', fontSize: fs(13), fontWeight: '900' },
         info: { flex: 1, gap: 2 },
-        name: { fontSize: fs(14), fontWeight: '700', color: colors.text },
-        meta: { fontSize: fs(12), color: colors.textMuted },
-        injured: { color: '#D64545', fontWeight: '700' },
+        name: { fontSize: fs(14), fontWeight: '700', color: GLASS.text },
+        meta: { fontSize: fs(12), color: GLASS.soft },
+        injured: { color: '#FF7A7A', fontWeight: '700' },
       }),
-    [colors, fs],
+    [fs],
   );
 
   const ages = data.roster.map((p) => p.age).filter((a): a is number => a !== null);
@@ -262,7 +266,7 @@ export function SquadView({ data, refreshing, onRefresh }: ViewProps) {
 
   return (
     <ScrollView style={base.container} contentContainerStyle={[base.content, base.pad]} refreshControl={<ClubRefresh refreshing={refreshing} onRefresh={onRefresh} />}>
-      <SectionTitle>Kadro</SectionTitle>
+      <SectionTitle light>Kadro</SectionTitle>
       {data.roster.length === 0 ? (
         <Text style={base.muted}>Kadro yüklenemedi.</Text>
       ) : (
@@ -275,7 +279,7 @@ export function SquadView({ data, refreshing, onRefresh }: ViewProps) {
             if (players.length === 0) return null;
             return (
               <View key={g.id}>
-                <SectionTitle hint={`${players.length} oyuncu`}>{g.label}</SectionTitle>
+                <SectionTitle light hint={`${players.length} oyuncu`}>{g.label}</SectionTitle>
                 <FadeInView style={styles.grid}>
                   {players.map((p) => {
                     const flag = flagEmoji(p.nationality);

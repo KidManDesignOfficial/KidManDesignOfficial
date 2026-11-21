@@ -3,10 +3,12 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import { FadeInView } from '../components/motion';
 import { HeroSkeleton } from '../components/Skeleton';
+import StadiumScene from '../components/StadiumScene';
 import { SegmentedTabs, type Segment } from '../components/SegmentedTabs';
 import { PrimaryButton } from '../components/ui';
 import { fetchClubData, loadCachedClubData, mergeClubData, type ClubData } from '../rizespor/api';
 import { CLUB_COLORS } from '../rizespor/names';
+import { GLASS, STADIUM_CHROME } from '../rizespor/stadium';
 import type { Match } from '../rizespor/parse';
 import { syncMatchReminders } from '../rizespor/reminders';
 import { useTheme } from '../theme';
@@ -24,8 +26,8 @@ const SECTIONS: Segment<Section>[] = [
 const EMPTY: ClubData = { results: [], fixtures: [], standings: [], roster: [] };
 const LIVE_LIST_REFRESH_MS = 60_000;
 
-export default function RizesporScreen({ openMatchId }: { openMatchId?: string | null }) {
-  const { colors, fs } = useTheme();
+export default function RizesporScreen({ openMatchId, active = true }: { openMatchId?: string | null; active?: boolean }) {
+  const { fs } = useTheme();
   const [section, setSection] = useState<Section>('matches');
   const [visited, setVisited] = useState<Set<Section>>(() => new Set(['matches']));
   const [data, setData] = useState<ClubData>(EMPTY);
@@ -94,20 +96,20 @@ export default function RizesporScreen({ openMatchId }: { openMatchId?: string |
   const styles = useMemo(
     () =>
       StyleSheet.create({
-        container: { flex: 1, backgroundColor: colors.background },
+        container: { flex: 1, backgroundColor: STADIUM_CHROME.footer },
         page: { flex: 1 },
         center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32, gap: 12 },
-        muted: { color: colors.textMuted, fontSize: fs(14), textAlign: 'center' },
-        error: { color: colors.error, fontSize: fs(15), textAlign: 'center' },
+        error: { color: GLASS.text, fontSize: fs(15), textAlign: 'center', lineHeight: fs(22) },
       }),
-    [colors, fs],
+    [fs],
   );
 
   const props = { data, refreshing, onRefresh, onOpenMatch: setOpenMatch };
 
   return (
     <View style={styles.container}>
-      <SegmentedTabs segments={SECTIONS} value={section} onChange={select} activeColor={CLUB_COLORS.green} />
+      <StadiumScene active={active} />
+      <SegmentedTabs segments={SECTIONS} value={section} onChange={select} activeColor={CLUB_COLORS.green} glass />
 
       {state === 'loading' ? (
         <HeroSkeleton rows={5} />

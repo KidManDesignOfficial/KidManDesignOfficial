@@ -20,14 +20,14 @@ export function Card({ children, style }: { children: ReactNode; style?: StylePr
   return <View style={[styles.card, style]}>{children}</View>;
 }
 
-export function SectionTitle({ children, hint }: { children: ReactNode; hint?: string }) {
+export function SectionTitle({ children, hint, light = false }: { children: ReactNode; hint?: string; light?: boolean }) {
   const styles = useStyles();
   return (
     <View style={styles.sectionHeader}>
-      <Text style={styles.sectionTitle} accessibilityRole="header">
+      <Text style={[styles.sectionTitle, light && styles.sectionTitleLight]} accessibilityRole="header">
         {children}
       </Text>
-      {hint ? <Text style={styles.sectionHint}>{hint}</Text> : null}
+      {hint ? <Text style={[styles.sectionHint, light && styles.sectionHintLight]}>{hint}</Text> : null}
     </View>
   );
 }
@@ -125,6 +125,9 @@ function useStyles() {
         sectionHeader: { marginTop: 24, marginBottom: 10, gap: 2 },
         sectionTitle: { fontSize: fs(18), fontWeight: '800', color: colors.text },
         sectionHint: { fontSize: fs(13), color: colors.textMuted },
+        // Koyu sahnelerin (Rizespor stadyumu) üstünde beyaz başlık.
+        sectionTitleLight: { color: '#FFFFFF' },
+        sectionHintLight: { color: 'rgba(255,255,255,0.66)' },
         chipsScroll: { flexGrow: 0, flexShrink: 0 },
         chips: { paddingHorizontal: 16, paddingVertical: 12, gap: 8, alignItems: 'center' },
         chip: {
