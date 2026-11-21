@@ -1,8 +1,8 @@
 import { useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 
 import { mix } from '../../colors';
+import { HeroCard } from '../../components/HeroCard';
 import { Chip, ChipRow, openUrl } from '../../components/ui';
 import { CULTURE, FOOD_KINDS, FOODS, type Food } from '../../data/discover';
 import { useTheme } from '../../theme';
@@ -30,7 +30,8 @@ export default function FoodView() {
       StyleSheet.create({
         container: { flex: 1, backgroundColor: colors.background },
         content: { paddingBottom: 32 },
-        hero: { marginHorizontal: 16, marginTop: 12, borderRadius: 20, padding: 20, flexDirection: 'row', gap: 14, alignItems: 'center' },
+        hero: { marginHorizontal: 16, marginTop: 12 },
+        heroRow: { flexDirection: 'row', gap: 14, alignItems: 'center' },
         heroNumber: { color: '#FFFFFF', fontSize: fs(44), fontWeight: '800' },
         heroBody: { flex: 1, gap: 2 },
         heroTitle: { color: '#FFFFFF', fontSize: fs(16), fontWeight: '800' },
@@ -81,12 +82,14 @@ export default function FoodView() {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <LinearGradient
-        colors={[mix(GOLD, '#5A3A00', 0.35), mix(GOLD, '#000000', 0.55)]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
+      <HeroCard
+        gradient={[mix(GOLD, '#5A3A00', 0.35), mix(GOLD, '#000000', 0.55)]}
+        watermark="restaurant-outline"
+        eyebrow="COĞRAFİ İŞARET"
+        eyebrowIcon="ribbon-outline"
         style={styles.hero}
       >
+        <View style={styles.heroRow}>
         <Text style={styles.heroNumber}>{GEO_INDICATION_COUNT}</Text>
         <View style={styles.heroBody}>
           <Text style={styles.heroTitle}>coğrafi işaretli ürün</Text>
@@ -94,7 +97,8 @@ export default function FoodView() {
             Rize Çayı’ndan Anzer Balı’na, muhlamadan pepeçuraya; Türk Patent tescilli Rize lezzetleri.
           </Text>
         </View>
-      </LinearGradient>
+        </View>
+      </HeroCard>
 
       <ChipRow>
         {chips.map((c) => (

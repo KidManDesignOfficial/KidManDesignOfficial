@@ -111,6 +111,7 @@ src/time.ts                 "5 dk önce", gün adları vb.
 src/screens/NewsScreen.tsx  Haber listesi
 src/screens/WeatherScreen.tsx Hava durumu (cam kartlar)
 src/components/WeatherScene.tsx Canlı hava sahnesi (yerel sürücüde animasyon)
+src/components/HeroCard.tsx  Ekran vitrin kartı (geçiş, filigran, dağ silueti)
 src/weatherScene.ts          Hava kodu → sahne (saf, test edilir)
 src/rainSound.ts             İsteğe bağlı yağmur sesi (varsayılan kapalı)
 design/make-rain-sound.py    Özgün yağmur sesi sentezleyici → assets/sounds/rain.m4a

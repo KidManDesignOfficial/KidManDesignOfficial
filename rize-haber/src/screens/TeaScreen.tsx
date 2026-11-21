@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { RefreshControl, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 
+import { HeroCard } from '../components/HeroCard';
 import { NewsCard } from '../components/NewsCard';
 import { SkeletonCard, SkeletonGroup } from '../components/Skeleton';
 import { Card, LinkRow, SectionTitle } from '../components/ui';
@@ -68,14 +69,15 @@ export default function TeaScreen() {
       StyleSheet.create({
         container: { flex: 1, backgroundColor: colors.background },
         content: { padding: 16, paddingBottom: 32 },
-        hero: { backgroundColor: colors.header, borderRadius: 20, padding: 20, gap: 4 },
         heroLabel: { color: 'rgba(255,255,255,0.85)', fontSize: fs(14), fontWeight: '600' },
         heroPriceRow: { flexDirection: 'row', alignItems: 'baseline', gap: 6, marginTop: 4 },
-        heroPrice: { color: '#FFFFFF', fontSize: fs(44), fontWeight: '800' },
+        heroPrice: { color: '#FFFFFF', fontSize: fs(48), fontWeight: '800', letterSpacing: -1 },
         heroUnit: { color: 'rgba(255,255,255,0.85)', fontSize: fs(18), fontWeight: '600' },
         badge: {
           alignSelf: 'flex-start',
-          backgroundColor: 'rgba(255,255,255,0.18)',
+          backgroundColor: 'rgba(255,255,255,0.16)',
+          borderColor: 'rgba(255,255,255,0.26)',
+          borderWidth: 1,
           borderRadius: 999,
           paddingHorizontal: 10,
           paddingVertical: 4,
@@ -129,8 +131,13 @@ export default function TeaScreen() {
         />
       }
     >
-      <View style={styles.hero} accessible accessibilityLabel={`${data.current.year} yaş çay alım fiyatı kilogram başına ${formatLira(data.current.pricePerKg)}`}>
-        <Text style={styles.heroLabel}>{data.current.year} Yaş Çay Alım Fiyatı</Text>
+      <HeroCard
+        watermark="leaf"
+        eyebrow={`ÇAYKUR · ${data.current.year} SEZONU`}
+        eyebrowIcon="leaf-outline"
+        accessibilityLabel={`${data.current.year} yaş çay alım fiyatı kilogram başına ${formatLira(data.current.pricePerKg)}`}
+      >
+        <Text style={styles.heroLabel}>Yaş Çay Alım Fiyatı</Text>
         <View style={styles.heroPriceRow}>
           <Text style={styles.heroPrice}>{formatNumber(data.current.pricePerKg)} ₺</Text>
           <Text style={styles.heroUnit}>/ kg</Text>
@@ -147,7 +154,7 @@ export default function TeaScreen() {
           {data.current.announcedBy}
           {'\n'}İlan tarihi: {formatDateTr(data.current.announcedAt)}
         </Text>
-      </View>
+      </HeroCard>
 
       <SectionTitle hint="Teslim ettiğiniz yaş çayın tutarını hesaplayın">Hesaplayıcı</SectionTitle>
       <Card>
