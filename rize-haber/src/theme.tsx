@@ -8,7 +8,17 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import type { ReactNode } from 'react';
 import { useColorScheme } from 'react-native';
 
-import { ACCENTS, TEXT_SCALES, buildColors, type AccentId, type Colors, type TextSize } from './colors';
+import {
+  ACCENTS,
+  PALETTES,
+  PALETTE_IDS,
+  TEXT_SCALES,
+  buildColors,
+  type AccentId,
+  type Colors,
+  type PaletteId,
+  type TextSize,
+} from './colors';
 import { WEATHER_LOCATIONS } from './config';
 import { setHapticsEnabled } from './haptics';
 import { placeById } from './places';
@@ -25,11 +35,13 @@ export const DISCOVER_ENABLED = false;
 export const TAB_IDS: TabId[] = (['news', 'rizespor', 'tea', 'economy', 'weather', 'rize'] as TabId[]).filter(
   (id) => DISCOVER_ENABLED || id !== 'rize',
 );
-export { ACCENTS, TEXT_SCALES };
-export type { AccentId, Colors, TextSize };
+export { ACCENTS, PALETTES, PALETTE_IDS, TEXT_SCALES };
+export type { AccentId, Colors, PaletteId, TextSize };
 
 export type Settings = {
   accent: AccentId;
+  /** Zemin/kart/metin paleti (Klasik, Kâğıt, Yayla Sisi…). */
+  palette: PaletteId;
   mode: ThemeMode;
   textSize: TextSize;
   weatherLocationId: string;
@@ -49,6 +61,7 @@ export type Settings = {
 
 export const DEFAULT_SETTINGS: Settings = {
   accent: 'cay',
+  palette: 'klasik',
   mode: 'system',
   textSize: 'normal',
   weatherLocationId: WEATHER_LOCATIONS[0].id,
@@ -66,6 +79,7 @@ export function sanitizeSettings(stored: Partial<Settings> | null | undefined): 
   const bool = (v: unknown, d: boolean) => (typeof v === 'boolean' ? v : d);
   return {
     accent: s.accent in ACCENTS ? s.accent : DEFAULT_SETTINGS.accent,
+    palette: PALETTE_IDS.includes(s.palette) ? s.palette : DEFAULT_SETTINGS.palette,
     mode: s.mode === 'light' || s.mode === 'dark' || s.mode === 'system' ? s.mode : DEFAULT_SETTINGS.mode,
     textSize: s.textSize in TEXT_SCALES ? s.textSize : DEFAULT_SETTINGS.textSize,
     weatherLocationId: placeById(String(s.weatherLocationId)) ? s.weatherLocationId : DEFAULT_SETTINGS.weatherLocationId,
@@ -114,7 +128,7 @@ export function ThemeProvider({ children, initial }: { children: ReactNode; init
   }, []);
 
   const isDark = settings.mode === 'dark' || (settings.mode === 'system' && systemScheme === 'dark');
-  const colors = useMemo(() => buildColors(settings.accent, isDark), [settings.accent, isDark]);
+  const colors = useMemo(() => buildColors(settings.accent, isDark, settings.palette), [settings.accent, isDark, settings.palette]);
   const scale = TEXT_SCALES[settings.textSize].scale;
   const fs = useCallback((size: number) => Math.round(size * scale), [scale]);
 

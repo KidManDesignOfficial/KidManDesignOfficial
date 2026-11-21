@@ -26,12 +26,17 @@ import { useFavorites } from '../favorites';
 import { disableNewsNotifications, enableNewsNotifications, setMatchFeature } from '../notifications';
 import { REMINDER_MINUTES, getMatchSettings } from '../rizespor/reminders';
 import { loadNotificationsEnabled } from '../storage';
+import { buildColors } from '../colors';
+import { tapFeedback } from '../haptics';
 import {
   ACCENTS,
   DISCOVER_ENABLED,
+  PALETTES,
+  PALETTE_IDS,
   TEXT_SCALES,
   useTheme,
   type AccentId,
+  type PaletteId,
   type Settings,
   type TabId,
   type TextSize,
@@ -148,6 +153,7 @@ export default function SettingsScreen() {
         swatchSelected: { borderColor: colors.text },
         swatchCheck: { color: '#FFFFFF', fontSize: 18, fontWeight: '800' },
         swatchName: { fontSize: fs(11), color: colors.textMuted, textAlign: 'center' },
+        themeGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', rowGap: 12, marginTop: 12 },
         preview: { marginTop: 12, padding: 12, borderRadius: 12, backgroundColor: colors.primarySoft },
         previewText: { fontSize: fs(15), color: colors.text, lineHeight: fs(22) },
         switchRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
@@ -204,6 +210,23 @@ export default function SettingsScreen() {
       <SectionTitle>Görünüm</SectionTitle>
       <Card>
         <Text style={styles.rowLabel}>Tema</Text>
+        <Text style={styles.rowHint}>Zemin, kart ve yazı tonları. Renk ve açık/koyu seçimiyle birlikte çalışır.</Text>
+        <View style={styles.themeGrid} accessibilityRole="radiogroup">
+          {PALETTE_IDS.map((id) => (
+            <ThemeOption
+              key={id}
+              id={id}
+              selected={settings.palette === id}
+              accent={settings.accent}
+              isDark={colors.isDark}
+              onPress={() => updateSettings({ palette: id })}
+            />
+          ))}
+        </View>
+
+        <View style={styles.divider} />
+
+        <Text style={styles.rowLabel}>Açık / koyu</Text>
         <Text style={styles.rowHint}>“Sistem”, telefonunuzun açık/koyu ayarını izler.</Text>
         <Segmented
           styles={styles}
@@ -424,6 +447,85 @@ export default function SettingsScreen() {
         hakları ilgili yayın kuruluşlarına aittir.
       </Text>
     </ScrollView>
+  );
+}
+
+/** Tema seçeneği: seçili renk ve açık/koyu görünümle küçük bir ekran önizlemesi. */
+function ThemeOption({
+  id,
+  selected,
+  accent,
+  isDark,
+  onPress,
+}: {
+  id: PaletteId;
+  selected: boolean;
+  accent: AccentId;
+  isDark: boolean;
+  onPress: () => void;
+}) {
+  const { colors, fs } = useTheme();
+  const c = useMemo(() => buildColors(accent, isDark, id), [accent, isDark, id]);
+  const bar = (w: `${number}%`, color: string, h = 5) => <View style={{ width: w, height: h, borderRadius: 3, backgroundColor: color }} />;
+  return (
+    <PressableScale
+      onPress={() => {
+        tapFeedback();
+        onPress();
+      }}
+      scaleTo={0.97}
+      containerStyle={{ width: '48%' }}
+      accessibilityRole="radio"
+      accessibilityState={{ selected }}
+      accessibilityLabel={`${PALETTES[id].name} teması. ${PALETTES[id].hint}`}
+    >
+      <View
+        style={{
+          borderRadius: 14,
+          borderWidth: selected ? 2.5 : 1,
+          borderColor: selected ? colors.primary : colors.border,
+          overflow: 'hidden',
+          backgroundColor: c.background,
+        }}
+      >
+        <View style={{ height: 16, backgroundColor: c.header }} />
+        <View style={{ padding: 8, gap: 6 }}>
+          <View
+            style={{ backgroundColor: c.card, borderRadius: 8, padding: 7, gap: 5, borderWidth: StyleSheet.hairlineWidth, borderColor: c.border }}
+          >
+            {bar('85%', c.text)}
+            {bar('60%', c.textMuted, 4)}
+          </View>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+            <View style={{ width: 22, height: 10, borderRadius: 5, backgroundColor: c.primary }} />
+            {bar('40%', c.textMuted, 4)}
+          </View>
+        </View>
+        {selected ? (
+          <View
+            style={{
+              position: 'absolute',
+              top: 3,
+              right: 4,
+              width: 18,
+              height: 18,
+              borderRadius: 9,
+              backgroundColor: '#FFFFFF',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <Icon name="checkmark" size={13} color={colors.primary} />
+          </View>
+        ) : null}
+      </View>
+      <Text style={{ marginTop: 6, fontSize: fs(13), fontWeight: selected ? '800' : '600', color: colors.text }} numberOfLines={1}>
+        {PALETTES[id].name}
+      </Text>
+      <Text style={{ fontSize: fs(11), color: colors.textMuted, lineHeight: fs(15) }} numberOfLines={2}>
+        {PALETTES[id].hint}
+      </Text>
+    </PressableScale>
   );
 }
 

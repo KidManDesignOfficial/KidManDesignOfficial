@@ -45,35 +45,104 @@ export function mix(a: string, b: string, t: number): string {
   return `#${c(r1, r2)}${c(g1, g2)}${c(b1, b2)}`;
 }
 
-export function buildColors(accent: AccentId, isDark: boolean): Colors {
-  const a = ACCENTS[accent];
+/** Zemin, kart, metin ve çizgi tonları; vurgu renginden bağımsız seçilir. */
+export type PaletteId = 'klasik' | 'kagit' | 'sis' | 'tonlu' | 'zifiri' | 'kontrast';
+
+type Surface = { background: string; card: string; text: string; textMuted: string; border: string; error: string };
+
+/**
+ * Tema paletleri. Her biri açık ve koyu görünüm için ayrı zemin tanımlar. `tonlu` sabit renk
+ * yerine seçili vurgu renginden türetilir (aşağıda `buildColors`).
+ */
+export const PALETTES: Record<PaletteId, { name: string; hint: string; light: Surface; dark: Surface }> = {
+  klasik: {
+    name: 'Klasik',
+    hint: 'Sade, dengeli zemin',
+    light: { background: '#F4F6F5', card: '#FFFFFF', text: '#16201A', textMuted: '#5E6B63', border: '#DCE3DE', error: '#B3261E' },
+    dark: { background: '#0F1311', card: '#1A201C', text: '#E8EDEA', textMuted: '#9AA79F', border: '#2C3530', error: '#FF8A80' },
+  },
+  kagit: {
+    name: 'Kâğıt',
+    hint: 'Sıcak krem; uzun okumada göz yormaz',
+    light: { background: '#F3ECDF', card: '#FFFAF1', text: '#2A2017', textMuted: '#6B5C4D', border: '#E2D6C2', error: '#A8261C' },
+    dark: { background: '#16120E', card: '#221C16', text: '#EDE4D6', textMuted: '#A99A8A', border: '#3A3027', error: '#FF8A7A' },
+  },
+  sis: {
+    name: 'Yayla Sisi',
+    hint: 'Serin, mavimsi gri tonlar',
+    light: { background: '#EDF1F5', card: '#FAFCFE', text: '#17202A', textMuted: '#586574', border: '#D3DBE4', error: '#B3261E' },
+    dark: { background: '#0F141A', card: '#18202A', text: '#E5EBF2', textMuted: '#93A1B0', border: '#28323E', error: '#FF8A80' },
+  },
+  tonlu: {
+    name: 'Renk tonlu',
+    hint: 'Zemin seçtiğiniz rengin tonunu alır',
+    // Gerçek değerler vurgu renginden hesaplanır; bunlar yalnızca yedek.
+    light: { background: '#F4F6F5', card: '#FFFFFF', text: '#16201A', textMuted: '#5E6B63', border: '#DCE3DE', error: '#B3261E' },
+    dark: { background: '#0F1311', card: '#1A201C', text: '#E8EDEA', textMuted: '#9AA79F', border: '#2C3530', error: '#FF8A80' },
+  },
+  zifiri: {
+    name: 'Zifiri',
+    hint: 'Koyuda tam siyah; OLED’de pil dostu',
+    light: { background: '#FFFFFF', card: '#F5F6F7', text: '#0B0D0E', textMuted: '#585D62', border: '#E1E3E6', error: '#B3261E' },
+    dark: { background: '#000000', card: '#0E0F10', text: '#F2F3F4', textMuted: '#9A9EA3', border: '#232528', error: '#FF8A80' },
+  },
+  kontrast: {
+    name: 'Yüksek kontrast',
+    hint: 'En net yazı ve belirgin çizgiler',
+    light: { background: '#FFFFFF', card: '#FFFFFF', text: '#000000', textMuted: '#2B2B2B', border: '#5C5C5C', error: '#8C0F0F' },
+    dark: { background: '#000000', card: '#0A0A0A', text: '#FFFFFF', textMuted: '#DADADA', border: '#9A9A9A', error: '#FFA8A0' },
+  },
+};
+
+export const PALETTE_IDS = Object.keys(PALETTES) as PaletteId[];
+
+/** Seçili vurgu renginden türetilen hafif tonlu zemin (`tonlu` paleti). */
+function tintedSurface(a: { light: string; dark: string }, isDark: boolean): Surface {
   if (isDark) {
     return {
-      primary: a.dark,
-      onPrimary: '#FFFFFF',
-      header: mix(a.light, '#000000', 0.35),
-      primarySoft: mix(a.dark, '#121614', 0.82),
-      background: '#0F1311',
-      card: '#1A201C',
-      text: '#E8EDEA',
-      textMuted: '#9AA79F',
-      border: '#2C3530',
+      background: mix(a.light, '#000000', 0.82),
+      card: mix(a.light, '#000000', 0.7),
+      text: mix(a.dark, '#FFFFFF', 0.86),
+      textMuted: mix(a.dark, '#FFFFFF', 0.45),
+      border: mix(a.light, '#000000', 0.5),
       error: '#FF8A80',
-      isDark,
     };
   }
   return {
-    primary: a.light,
-    onPrimary: '#FFFFFF',
-    header: a.light,
-    primarySoft: mix(a.light, '#FFFFFF', 0.88),
-    background: '#F4F6F5',
-    card: '#FFFFFF',
-    text: '#16201A',
-    textMuted: '#5E6B63',
-    border: '#DCE3DE',
+    background: mix(a.light, '#FFFFFF', 0.9),
+    card: mix(a.light, '#FFFFFF', 0.97),
+    text: mix(a.light, '#000000', 0.78),
+    textMuted: mix(a.light, '#3A3A3A', 0.55),
+    border: mix(a.light, '#FFFFFF', 0.8),
     error: '#B3261E',
-    isDark,
   };
 }
 
+export function buildColors(accent: AccentId, isDark: boolean, palette: PaletteId = 'klasik'): Colors {
+  const a = ACCENTS[accent];
+  const p = PALETTES[palette] ?? PALETTES.klasik;
+  const surface = palette === 'tonlu' ? tintedSurface(a, isDark) : isDark ? p.dark : p.light;
+  const strong = palette === 'kontrast';
+  if (isDark) {
+    // Tam siyah zeminde vurgu biraz açılır ki seçili öğeler net seçilsin.
+    const primary = strong ? mix(a.dark, '#FFFFFF', 0.3) : a.dark;
+    return {
+      ...surface,
+      primary,
+      onPrimary: '#FFFFFF',
+      header: mix(a.light, '#000000', palette === 'zifiri' || strong ? 0.55 : 0.35),
+      // Klasik palet önceki sürümlerle birebir aynı kalsın.
+      primarySoft: mix(primary, palette === 'klasik' ? '#121614' : surface.background, 0.82),
+      isDark,
+    };
+  }
+  const primary = strong ? mix(a.light, '#000000', 0.2) : a.light;
+  return {
+    ...surface,
+    primary,
+    onPrimary: '#FFFFFF',
+    header: primary,
+    primarySoft: mix(primary, surface.card, 0.88),
+    isDark,
+  };
+}
