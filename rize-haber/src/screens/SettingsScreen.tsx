@@ -54,6 +54,8 @@ const MODES: { id: ThemeMode; label: string }[] = [
 const DATA_SOURCES = [
   { label: 'Haberler: Google Haberler', url: 'https://news.google.com' },
   { label: 'Hava durumu: Open-Meteo', url: 'https://open-meteo.com' },
+  { label: 'Döviz kurları: TCMB', url: 'https://www.tcmb.gov.tr/kurlar/today.xml' },
+  { label: 'Altın fiyatı: gold-api.com', url: 'https://gold-api.com' },
   { label: 'Çay fiyatları: T.C. Tarım ve Orman Bakanlığı', url: 'https://www.tarimorman.gov.tr' },
   { label: 'Çay sektörü: ÇAYKUR', url: 'https://www.caykur.gov.tr' },
   { label: 'Tarihçe: Rize Valiliği', url: 'https://www.rize.gov.tr' },

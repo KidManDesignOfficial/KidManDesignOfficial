@@ -15,6 +15,7 @@ import { openUrl } from './src/components/ui';
 import { FavoritesProvider } from './src/favorites';
 import { CLUB_COLORS } from './src/rizespor/names';
 import DiscoverScreen from './src/screens/DiscoverScreen';
+import EconomyScreen from './src/screens/EconomyScreen';
 import NewsScreen from './src/screens/NewsScreen';
 import Onboarding, { hasOnboarded } from './src/screens/Onboarding';
 import RizesporScreen from './src/screens/RizesporScreen';
@@ -33,12 +34,13 @@ const useNotificationResponse =
 SplashScreen.preventAutoHideAsync().catch(() => {});
 SplashScreen.setOptions({ fade: true, duration: 350 });
 
-type Tab = 'news' | 'rizespor' | 'tea' | 'weather' | 'rize';
+type Tab = 'news' | 'rizespor' | 'tea' | 'economy' | 'weather' | 'rize';
 
 const TABS: { id: Tab; label: string; icon: IconName; iconActive: IconName; title: string }[] = [
   { id: 'news', label: 'Haberler', icon: 'newspaper-outline', iconActive: 'newspaper', title: 'Rize Haber' },
   { id: 'rizespor', label: 'Rizespor', icon: 'football-outline', iconActive: 'football', title: 'Çaykur Rizespor' },
   { id: 'tea', label: 'Çay', icon: 'leaf-outline', iconActive: 'leaf', title: 'Çay Fiyatları' },
+  { id: 'economy', label: 'Ekonomi', icon: 'trending-up-outline', iconActive: 'trending-up', title: 'Ekonomi' },
   { id: 'weather', label: 'Hava', icon: 'partly-sunny-outline', iconActive: 'partly-sunny', title: 'Hava Durumu' },
   { id: 'rize', label: 'Keşfet', icon: 'compass-outline', iconActive: 'compass', title: 'Rize’yi Keşfet' },
 ];
@@ -148,7 +150,7 @@ function Main() {
           borderTopWidth: StyleSheet.hairlineWidth,
           borderTopColor: colors.border,
         },
-        tabButton: { flex: 1, alignItems: 'center', paddingTop: 8, paddingBottom: 6, gap: 2 },
+        tabButton: { flex: 1, alignItems: 'center', paddingTop: 8, paddingBottom: 6, paddingHorizontal: 2, gap: 2 },
         tabIndicator: { position: 'absolute', top: 0, height: 3, width: 28, borderRadius: 2 },
         tabLabel: { fontSize: fs(11), fontWeight: '600', color: colors.textMuted },
       }),
@@ -232,6 +234,11 @@ function Main() {
               <TeaScreen />
             </FadeInView>
           ) : null}
+          {mounted.has('economy') ? (
+            <FadeInView visible={!showSettings && tab === 'economy'} style={styles.screen}>
+              <EconomyScreen active={!showSettings && tab === 'economy'} onOpenTea={() => goTo('tea')} />
+            </FadeInView>
+          ) : null}
           {mounted.has('weather') ? (
             <FadeInView visible={weatherVisible} style={styles.screen}>
               <WeatherScreen active={weatherVisible} onSkyColors={setWeatherChrome} />
@@ -270,7 +277,12 @@ function Main() {
               >
                 <View style={[styles.tabIndicator, active && { backgroundColor: accent }]} />
                 <Icon name={active ? t.iconActive : t.icon} size={23} color={active ? accent : idle} />
-                <Text style={[styles.tabLabel, { color: active ? accent : idle }]} numberOfLines={1}>
+                <Text
+                  style={[styles.tabLabel, { color: active ? accent : idle }]}
+                  numberOfLines={1}
+                  adjustsFontSizeToFit
+                  minimumFontScale={0.8}
+                >
                   {t.label}
                 </Text>
               </Pressable>

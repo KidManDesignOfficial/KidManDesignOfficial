@@ -4,6 +4,7 @@
  */
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+import type { Markets } from './markets';
 import type { NewsItem } from './rss';
 import type { Weather } from './weather';
 
@@ -54,6 +55,15 @@ export async function loadCachedWeather(locationId: string): Promise<{ weather: 
 
 export function saveCachedWeather(locationId: string, weather: Weather): Promise<void> {
   return write(`weather:${locationId}`, weather);
+}
+
+export async function loadCachedMarkets(): Promise<Markets | null> {
+  const s = await read<Markets>('markets');
+  return s && s.data && Array.isArray(s.data.rates) && s.data.rates.length ? s.data : null;
+}
+
+export function saveCachedMarkets(markets: Markets): Promise<void> {
+  return write('markets', markets);
 }
 
 /** "14:05" ya da "dün 14:05" ya da "12 Kas 14:05" */

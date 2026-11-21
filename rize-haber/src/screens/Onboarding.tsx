@@ -37,7 +37,7 @@ async function markOnboarded() {
 const FEATURES: { icon: IconName; title: string; text: string }[] = [
   { icon: 'newspaper-outline', title: 'Rize’nin gündemi', text: 'İlçe ilçe güncel haberler, bildirimlerle.' },
   { icon: 'football-outline', title: 'Çaykur Rizespor', text: 'Fikstür, canlı skor, puan durumu ve kadro.' },
-  { icon: 'leaf-outline', title: 'Yaş çay fiyatı', text: 'Resmî alım fiyatı ve tutar hesaplayıcı.' },
+  { icon: 'leaf-outline', title: 'Çay ve ekonomi', text: 'Yaş çay fiyatı, döviz kurları ve altın.' },
   { icon: 'compass-outline', title: 'Rize’yi keşfet', text: 'Yaylalar, lezzetler, kültür ve tarih.' },
 ];
 

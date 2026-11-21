@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Animated,
-  AppState,
   FlatList,
   Pressable,
   RefreshControl,
@@ -14,6 +13,7 @@ import {
   type NativeSyntheticEvent,
 } from 'react-native';
 
+import { useAppActive } from '../appState';
 import { Icon } from '../components/Icon';
 import { EASE_OUT, useAnimatedValue, useReducedMotion } from '../components/motion';
 import { NewsCard } from '../components/NewsCard';
@@ -40,16 +40,6 @@ type CategoryState = {
 const EMPTY: CategoryState = { items: [], loading: false, error: null, loadedAt: null };
 /** Bu kadar aşağı kaydırılmışken yeni haber gelirse "yeni haber" düğmesi gösterilir. */
 const SCROLLED_DOWN_PX = 160;
-
-/** Uygulama ön plandayken true. */
-function useAppActive(): boolean {
-  const [active, setActive] = useState(AppState.currentState === 'active');
-  useEffect(() => {
-    const sub = AppState.addEventListener('change', (s) => setActive(s === 'active'));
-    return () => sub.remove();
-  }, []);
-  return active;
-}
 
 /**
  * @param active Haberler sekmesi ekranda mı? Görünürken ve uygulama ön plandayken haberler

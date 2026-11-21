@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="isokur.xsl"?>
+<Tarih_Date Tarih="20.11.2026" Date="11/20/2026"  Bulten_No="2026/221" >
+	<Currency CrossOrder="0" Kod="USD" CurrencyCode="USD">
+			<Unit>1</Unit>
+			<Isim>ABD DOLARI</Isim>
+			<CurrencyName>US DOLLAR</CurrencyName>
+			<ForexBuying>42.3150</ForexBuying>
+			<ForexSelling>42.3912</ForexSelling>
+			<BanknoteBuying>42.2854</BanknoteBuying>
+			<BanknoteSelling>42.4548</BanknoteSelling>
+			<CrossRateUSD/>
+			<CrossRateOther/>
+		</Currency>
+	<Currency CrossOrder="2" Kod="EUR" CurrencyCode="EUR">
+			<Unit>1</Unit>
+			<Isim>EURO</Isim>
+			<CurrencyName>EURO</CurrencyName>
+			<ForexBuying>48.9012</ForexBuying>
+			<ForexSelling>48.9893</ForexSelling>
+			<BanknoteBuying>48.8670</BanknoteBuying>
+			<BanknoteSelling>49.0628</BanknoteSelling>
+			<CrossRateUSD/>
+			<CrossRateOther>1.1556</CrossRateOther>
+		</Currency>
+	<Currency CrossOrder="3" Kod="GBP" CurrencyCode="GBP">
+			<Unit>1</Unit>
+			<Isim>İNGİLİZ STERLİNİ</Isim>
+			<CurrencyName>POUND STERLING</CurrencyName>
+			<ForexBuying>55.4310</ForexBuying>
+			<ForexSelling>55.7200</ForexSelling>
+			<BanknoteBuying>55.3922</BanknoteBuying>
+			<BanknoteSelling>55.8036</BanknoteSelling>
+			<CrossRateUSD/>
+			<CrossRateOther>1.3100</CrossRateOther>
+		</Currency>
+	<Currency CrossOrder="9" Kod="JPY" CurrencyCode="JPY">
+			<Unit>100</Unit>
+			<Isim>JAPON YENİ</Isim>
+			<CurrencyName>JAPENESE YEN</CurrencyName>
+			<ForexBuying>27.1500</ForexBuying>
+			<ForexSelling>27.3300</ForexSelling>
+			<BanknoteBuying>26.9600</BanknoteBuying>
+			<BanknoteSelling>27.5000</BanknoteSelling>
+			<CrossRateUSD>155.88</CrossRateUSD>
+			<CrossRateOther/>
+		</Currency>
+	<Currency CrossOrder="13" Kod="RUB" CurrencyCode="RUB">
+			<Unit>1</Unit>
+			<Isim>RUS RUBLESİ</Isim>
+			<CurrencyName>RUSSIAN ROUBLE</CurrencyName>
+			<ForexBuying>0.5210</ForexBuying>
+			<ForexSelling>0.5278</ForexSelling>
+			<BanknoteBuying></BanknoteBuying>
+			<BanknoteSelling></BanknoteSelling>
+			<CrossRateUSD>81.22</CrossRateUSD>
+			<CrossRateOther/>
+		</Currency>
+</Tarih_Date>
