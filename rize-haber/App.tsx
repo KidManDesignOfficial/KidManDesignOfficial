@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { BackHandler, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { NavigationBar } from 'expo-navigation-bar';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import * as Notifications from 'expo-notifications';
@@ -21,6 +22,7 @@ import SavedScreen from './src/screens/SavedScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
 import TeaScreen from './src/screens/TeaScreen';
 import WeatherScreen from './src/screens/WeatherScreen';
+import type { SkyChrome } from './src/weatherScene';
 import { ThemeProvider, useTheme } from './src/theme';
 
 // Bildirim yanıtı yalnızca telefonda vardır; web önizlemesinde boş döner.
@@ -70,7 +72,7 @@ function Main() {
   const [showSaved, setShowSaved] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [openMatchId, setOpenMatchId] = useState<string | null>(null);
-  const [weatherHeader, setWeatherHeader] = useState<string | null>(null);
+  const [weatherChrome, setWeatherChrome] = useState<SkyChrome | null>(null);
   // Her sekme ilk açıldığında yüklenir: açılış hızlanır, gereksiz ağ isteği ve pil harcanmaz.
   const [mounted, setMounted] = useState<Set<Tab | 'settings'>>(() => new Set(['news']));
   const mount = useCallback((t: Tab | 'settings') => {
@@ -109,8 +111,9 @@ function Main() {
 
   const club = tab === 'rizespor' && !showSettings;
   const weatherVisible = tab === 'weather' && !showSettings;
-  // Hava sekmesinde başlık çubuğu gökyüzünün rengini alır; sahneyle kesintisiz birleşir.
-  const sky = weatherVisible ? weatherHeader : null;
+  // Hava sekmesinde başlık ve sekme çubuğu gökyüzünün rengini alır; sahneyle kesintisiz birleşir.
+  const skyChrome = weatherVisible ? weatherChrome : null;
+  const sky = skyChrome?.header ?? null;
   const styles = useMemo(
     () =>
       StyleSheet.create({
@@ -199,6 +202,8 @@ function Main() {
   return (
     <>
       <StatusBar style="light" />
+      {/* Hava ekranında alt çubuk koyu gökyüzü rengindedir: Android gezinme düğmeleri açık renk olur. */}
+      <NavigationBar style={skyChrome ? 'light' : 'auto'} />
       <SafeAreaView
         style={[styles.root, club && { backgroundColor: CLUB_COLORS.green }, sky ? { backgroundColor: sky } : null]} edges={['top', 'left', 'right']}>
         {club ? (
@@ -229,7 +234,7 @@ function Main() {
           ) : null}
           {mounted.has('weather') ? (
             <FadeInView visible={weatherVisible} style={styles.screen}>
-              <WeatherScreen active={weatherVisible} onHeaderColor={setWeatherHeader} />
+              <WeatherScreen active={weatherVisible} onSkyColors={setWeatherChrome} />
             </FadeInView>
           ) : null}
           {mounted.has('rize') ? (
@@ -244,10 +249,16 @@ function Main() {
           ) : null}
         </View>
 
-        <SafeAreaView edges={['bottom']} style={styles.tabBar} accessibilityRole="tablist">
+        <SafeAreaView
+          edges={['bottom']}
+          style={[styles.tabBar, skyChrome && { backgroundColor: skyChrome.footer, borderTopColor: 'rgba(255,255,255,0.12)' }]}
+          accessibilityRole="tablist"
+        >
           {TABS.map((t) => {
             const active = t.id === tab && !showSettings;
-            const accent = t.id === 'rizespor' ? CLUB_COLORS.green : colors.primary;
+            // Hava ekranında sekme çubuğu gökyüzüne karışır: seçili sekme beyaz, diğerleri yarı saydam beyaz.
+            const accent = skyChrome ? '#FFFFFF' : t.id === 'rizespor' ? CLUB_COLORS.green : colors.primary;
+            const idle = skyChrome ? 'rgba(255,255,255,0.62)' : colors.textMuted;
             return (
               <Pressable
                 key={t.id}
@@ -258,8 +269,8 @@ function Main() {
                 accessibilityLabel={t.label}
               >
                 <View style={[styles.tabIndicator, active && { backgroundColor: accent }]} />
-                <Icon name={active ? t.iconActive : t.icon} size={23} color={active ? accent : colors.textMuted} />
-                <Text style={[styles.tabLabel, active && { color: accent }]} numberOfLines={1}>
+                <Icon name={active ? t.iconActive : t.icon} size={23} color={active ? accent : idle} />
+                <Text style={[styles.tabLabel, { color: active ? accent : idle }]} numberOfLines={1}>
                   {t.label}
                 </Text>
               </Pressable>

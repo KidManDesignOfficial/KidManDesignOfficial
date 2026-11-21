@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { sceneFor, seeded } from '../src/weatherScene.ts';
+import { luminance, sceneFor, seeded, skyChrome } from '../src/weatherScene.ts';
 
 test('açık hava: gündüz güneş, gece lacivert gökyüzü', () => {
   const day = sceneFor(0, true);
@@ -64,5 +64,18 @@ test('seeded tekrarlanabilir ve 0–1 aralığında', () => {
   for (let i = 0; i < 500; i++) {
     const v = seeded(i, i % 5);
     assert.ok(v >= 0 && v < 1);
+  }
+});
+
+test('çerçeve renkleri: başlık gökyüzü üstü, sekme çubuğu koyu ve geçerli', () => {
+  for (const code of [0, 2, 3, 45, 61, 65, 73, 95]) {
+    for (const isDay of [true, false]) {
+      const scene = sceneFor(code, isDay);
+      const { header, footer } = skyChrome(scene);
+      assert.equal(header, scene.sky[0]);
+      assert.match(footer, /^#[0-9A-F]{6}$/);
+      // Beyaz simgeler okunsun diye sekme çubuğu koyu kalmalı (parlaklık ≤ %36).
+      assert.ok(luminance(footer) <= 0.36, `kod ${code}: sekme çubuğu çok açık (${footer})`);
+    }
   }
 });

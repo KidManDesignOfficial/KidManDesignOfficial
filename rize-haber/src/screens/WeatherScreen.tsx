@@ -14,7 +14,7 @@ import { useRainSound, useRainSoundPreference } from '../rainSound';
 import { useTheme } from '../theme';
 import { clockTime, dayLabel } from '../time';
 import { describeWeatherCode, fetchWeather, type Weather } from '../weather';
-import { sceneFor } from '../weatherScene';
+import { sceneFor, skyChrome, type SkyChrome } from '../weatherScene';
 
 const WHITE = '#FFFFFF';
 const SOFT = 'rgba(255,255,255,0.78)';
@@ -29,12 +29,12 @@ const SHADOW = {
 
 export default function WeatherScreen({
   active = true,
-  onHeaderColor,
+  onSkyColors,
 }: {
   /** Ekran görünür mü? Değilse sahne animasyonları ve ses durur (pil tasarrufu). */
   active?: boolean;
-  /** Başlık çubuğunun rengini gökyüzüne uydurmak için; veri yokken null. */
-  onHeaderColor?: (color: string | null) => void;
+  /** Üst başlık ve alt sekme çubuğunu gökyüzüne uydurmak için renkler; veri yokken null. */
+  onSkyColors?: (colors: SkyChrome | null) => void;
 }) {
   const { colors, fs, settings } = useTheme();
   // Kullanıcının bu ekranda seçtiği ilçe; Ayarlar'daki varsayılan değişirse geçersiz olur.
@@ -90,11 +90,13 @@ export default function WeatherScreen({
   const code = current?.code;
   const isDay = current?.isDay ?? true;
   const scene = useMemo(() => (code == null ? null : sceneFor(code, isDay)), [code, isDay]);
-  const headerColor = scene?.sky[0] ?? null;
+  const chrome = scene ? skyChrome(scene) : null;
+  const chromeHeader = chrome?.header ?? null;
+  const chromeFooter = chrome?.footer ?? null;
 
   useEffect(() => {
-    onHeaderColor?.(headerColor);
-  }, [headerColor, onHeaderColor]);
+    onSkyColors?.(chromeHeader && chromeFooter ? { header: chromeHeader, footer: chromeFooter } : null);
+  }, [chromeHeader, chromeFooter, onSkyColors]);
 
   const [soundOn, setSoundOn] = useRainSoundPreference();
   const rainy = scene?.rainy ?? false;

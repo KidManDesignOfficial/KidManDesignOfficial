@@ -13,7 +13,7 @@ import { useEffect, useMemo } from 'react';
 import { Animated, Easing, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 
-import { seeded, type Scene } from '../weatherScene';
+import { seeded, skyChrome, type Scene } from '../weatherScene';
 import { useAnimatedValue, useReducedMotion } from './motion';
 
 const FILL = { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 } as const;
@@ -51,6 +51,7 @@ export default function WeatherScene({ scene, active }: { scene: Scene; active: 
   }, [fade, sceneKey]);
 
   const night = !scene.isDay;
+  const footer = skyChrome(scene).footer;
   return (
     <View
       style={[FILL, styles.clip]}
@@ -77,6 +78,13 @@ export default function WeatherScene({ scene, active }: { scene: Scene; active: 
       </Animated.View>
       {/* Alt kısımda hafif koyulaşma: kartlardaki beyaz yazılar her gökyüzünde okunur kalır. */}
       <LinearGradient colors={['rgba(0,0,0,0)', 'rgba(0,0,0,0.28)']} start={{ x: 0, y: 0.35 }} end={{ x: 0, y: 1 }} style={FILL} />
+      {/* En altta sekme çubuğunun rengine erir: ekran ile alt çubuk arasında çizgi ya da şerit kalmaz. */}
+      <LinearGradient
+        colors={[`${footer}00`, footer]}
+        start={{ x: 0, y: 0.82 }}
+        end={{ x: 0, y: 1 }}
+        style={FILL}
+      />
     </View>
   );
 }

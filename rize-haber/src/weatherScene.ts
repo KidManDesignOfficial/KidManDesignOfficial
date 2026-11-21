@@ -67,6 +67,36 @@ export function sceneFor(code: number, isDay: boolean): Scene {
   return { ...c, isDay, sky: SKY[c.kind][isDay ? 'day' : 'night'] };
 }
 
+/** Sahneyle kesintisiz birleşen uygulama çerçevesi: üst başlık ve alt sekme çubuğu renkleri. */
+export type SkyChrome = { header: string; footer: string };
+
+/**
+ * Başlık gökyüzünün üst rengini alır. Sekme çubuğu, sahnenin altındaki koyu geçişin bittiği tonu
+ * (alt renk en az %30 karartılmış) alır; böylece ekranın altında beyaz şerit kalmaz. Açık güneşli
+ * gökyüzünde beyaz yazılar okunaklı kalsın diye parlaklık %36'nın altına inene dek koyulaştırılır.
+ */
+export function skyChrome(scene: Scene): SkyChrome {
+  let t = 0.3;
+  let footer = darken(scene.sky[1], t);
+  while (luminance(footer) > 0.36 && t < 0.7) {
+    t += 0.05;
+    footer = darken(scene.sky[1], t);
+  }
+  return { header: scene.sky[0], footer };
+}
+
+function darken(hex: string, t: number): string {
+  const n = parseInt(hex.slice(1), 16);
+  const c = (v: number) => Math.round(v * (1 - t)).toString(16).padStart(2, '0').toUpperCase();
+  return `#${c((n >> 16) & 255)}${c((n >> 8) & 255)}${c(n & 255)}`;
+}
+
+/** Algılanan parlaklık (0 = siyah, 1 = beyaz). */
+export function luminance(hex: string): number {
+  const n = parseInt(hex.slice(1), 16);
+  return (0.2126 * ((n >> 16) & 255) + 0.7152 * ((n >> 8) & 255) + 0.0722 * (n & 255)) / 255;
+}
+
 /**
  * Tekrarlanabilir sözde rastgele sayı (0–1). Sahnedeki damla/yıldız yerleşimi her çizimde aynı
  * kalsın diye sıra numarasından türetilir; Math.random kullanılmaz.
