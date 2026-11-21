@@ -1,6 +1,6 @@
 # Rize Haber – Gizlilik Politikası
 
-**Yürürlük tarihi:** 16 Kasım 2026
+**Yürürlük tarihi:** 22 Kasım 2026
 
 Rize Haber, Rize’nin haberlerini, hava durumunu, yaş çay alım fiyatını, Çaykur Rizespor maç bilgilerini
 ve şehrin gezi rehberini sunan bağımsız bir mobil uygulamadır. Bu metin, uygulamanın hangi verileri
@@ -10,7 +10,8 @@ nasıl kullandığını açıklar.
 
 - **Hesap yok, kayıt yok.** Uygulama ad, e-posta, telefon numarası gibi kişisel bilgi istemez.
 - **Reklam ve analitik yok.** Kullanım takibi, reklam kimliği veya üçüncü taraf analitik aracı kullanılmaz.
-- **Konum izni istenmez.** Hava durumu için ilçeyi veya köyü listeden siz seçersiniz; köy listesi uygulamanın içindedir, arama internete gönderilmez.
+- **Konum isteğe bağlıdır.** Hava durumu için ilçeyi veya köyü listeden siz seçersiniz; köy listesi uygulamanın içindedir, arama internete gönderilmez. Keşfet bölümünde “Konumumu kullan”a dokunursanız telefonun **yalnızca yaklaşık konumu** (hassas konum ve arka planda konum izni istenmez) bir kez okunur.
+- **Konumunuz telefondan çıkmaz.** Yakındaki yerlerin uzaklığı telefonda hesaplanır; koordinatlar kaydedilmez ve hiçbir sunucuya gönderilmez. Hava tahmini ve “haritada ara” düğmeleri için yalnızca size en yakın **ilçe merkezinin** konumu kullanılır.
 - **Verileriniz telefonunuzda kalır.** Ayarlarınız ve kaydettikleriniz yalnızca cihazınızda saklanır.
 
 ## Cihazınızda saklanan bilgiler

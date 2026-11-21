@@ -7,9 +7,11 @@ import { Icon, type IconName } from '../../components/Icon';
 import { Chevron, Collapsible, FadeInView, PressableScale, useAnimatedValue } from '../../components/motion';
 import { pressFeedback } from '../../haptics';
 import { Chip, ChipRow, openUrl } from '../../components/ui';
-import { PLACE_CATEGORIES, PLACES, mapsUrl, type Place, type PlaceCategory } from '../../data/discover';
+import { PLACE_CATEGORIES, PLACES, VISIT_LABELS, mapsUrl, type Place, type PlaceCategory } from '../../data/discover';
 import { loadPlaceList, savePlaceList } from '../../storage';
+import { formatKm, distanceKm } from '../../explore';
 import { useTheme, type Colors } from '../../theme';
+import type { ExploreRef } from '../../useExploreLocation';
 
 /** Kategori renkleri: yayla yeşil, doğa deniz mavisi, tarih toprak, müze mor. */
 const CATEGORY_TINT: Record<PlaceCategory, string> = {
@@ -21,11 +23,12 @@ const CATEGORY_TINT: Record<PlaceCategory, string> = {
 
 type Filter = 'all' | PlaceCategory | 'list';
 
-export default function PlacesView() {
+export default function PlacesView({ origin }: { origin: ExploreRef }) {
   const { colors, fs } = useTheme();
   const [filter, setFilter] = useState<Filter>('all');
   const [openId, setOpenId] = useState<string | null>(null);
   const [myList, setMyList] = useState<string[]>([]);
+  const [byDistance, setByDistance] = useState(false);
 
   useEffect(() => {
     loadPlaceList().then(setMyList);
@@ -40,11 +43,16 @@ export default function PlacesView() {
     });
   }, []);
 
+  const distances = useMemo(() => new Map(PLACES.map((p) => [p.id, distanceKm(origin, p)])), [origin]);
   const visible = useMemo(() => {
-    if (filter === 'all') return PLACES;
-    if (filter === 'list') return PLACES.filter((p) => myList.includes(p.id));
-    return PLACES.filter((p) => p.category === filter);
-  }, [filter, myList]);
+    const list =
+      filter === 'all'
+        ? PLACES
+        : filter === 'list'
+          ? PLACES.filter((p) => myList.includes(p.id))
+          : PLACES.filter((p) => p.category === filter);
+    return byDistance ? [...list].sort((a, b) => distances.get(a.id)! - distances.get(b.id)!) : list;
+  }, [byDistance, distances, filter, myList]);
 
   const styles = useMemo(
     () =>
@@ -96,6 +104,10 @@ export default function PlacesView() {
           <Chip key={c.id} label={c.label} selected={filter === c.id} onPress={() => setFilter(c.id)} />
         ))}
       </ChipRow>
+      <ChipRow>
+        <Chip label="Önerilen sıra" selected={!byDistance} onPress={() => setByDistance(false)} />
+        <Chip label={origin.source === 'gps' ? '📍 Bana yakın olanlar' : `📍 Yakına göre (${origin.label})`} selected={byDistance} onPress={() => setByDistance(true)} />
+      </ChipRow>
 
       {visible.length === 0 ? (
         <View style={styles.empty}>
@@ -112,6 +124,7 @@ export default function PlacesView() {
               place={place}
               open={openId === place.id}
               inList={myList.includes(place.id)}
+              km={distances.get(place.id) ?? null}
               onToggleOpen={() => setOpenId((id) => (id === place.id ? null : place.id))}
               onToggleList={() => toggleList(place.id)}
               colors={colors}
@@ -126,6 +139,7 @@ export default function PlacesView() {
 
 type CardProps = {
   place: Place;
+  km: number | null;
   open: boolean;
   inList: boolean;
   onToggleOpen: () => void;
@@ -134,7 +148,7 @@ type CardProps = {
   fs: (n: number) => number;
 };
 
-const PlaceCard = memo(function PlaceCard({ place, open, inList, onToggleOpen, onToggleList, colors, fs }: CardProps) {
+const PlaceCard = memo(function PlaceCard({ place, km, open, inList, onToggleOpen, onToggleList, colors, fs }: CardProps) {
   const category = PLACE_CATEGORIES.find((c) => c.id === place.category)!;
   const progress = useAnimatedValue(open ? 1 : 0);
   const tint = colors.isDark ? mix(CATEGORY_TINT[place.category], '#000000', 0.25) : CATEGORY_TINT[place.category];
@@ -214,7 +228,10 @@ const PlaceCard = memo(function PlaceCard({ place, open, inList, onToggleOpen, o
             {inList ? <Icon name="heart" size={fs(20)} color="#FFFFFF" /> : null}
           </View>
           <Text style={styles.name}>{place.name}</Text>
-          <Text style={styles.district}>📍 {place.district}</Text>
+          <Text style={styles.district}>
+            📍 {place.district}
+            {km !== null ? ` · ${formatKm(km)} uzakta` : ''} · {VISIT_LABELS[place.visit]}
+          </Text>
         </LinearGradient>
 
         <View style={styles.body}>

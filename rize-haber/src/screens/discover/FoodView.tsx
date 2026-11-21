@@ -3,9 +3,11 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { mix } from '../../colors';
 import { HeroCard } from '../../components/HeroCard';
-import { Chip, ChipRow, openUrl } from '../../components/ui';
+import { Chip, ChipRow, SectionTitle, openUrl } from '../../components/ui';
 import { CULTURE, FOOD_KINDS, FOODS, type Food } from '../../data/discover';
 import { useTheme } from '../../theme';
+import type { ExploreRef } from '../../useExploreLocation';
+import VenueList from './VenueList';
 
 type Filter = 'all' | Food['kind'] | 'gi';
 
@@ -15,7 +17,7 @@ const GOLD = '#B8860B';
 export const GEO_INDICATION_COUNT =
   FOODS.filter((f) => f.geoIndication).length + CULTURE.filter((c) => c.badge?.startsWith('Coğrafi')).length;
 
-export default function FoodView() {
+export default function FoodView({ origin }: { origin: ExploreRef }) {
   const { colors, fs } = useTheme();
   const [filter, setFilter] = useState<Filter>('all');
 
@@ -100,6 +102,11 @@ export default function FoodView() {
         </View>
       </HeroCard>
 
+      <VenueList origin={origin} />
+
+      <View style={{ paddingHorizontal: 16 }}>
+        <SectionTitle hint="Coğrafi işaretli ürünler ve yöresel yemekler">Yöresel lezzetler</SectionTitle>
+      </View>
       <ChipRow>
         {chips.map((c) => (
           <Chip key={c.id} label={c.label} selected={filter === c.id} onPress={() => setFilter(c.id)} />
