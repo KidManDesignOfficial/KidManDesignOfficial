@@ -15,6 +15,8 @@ import { FavoritesProvider } from './src/favorites';
 import { CLUB_COLORS } from './src/rizespor/names';
 import { GLASS, STADIUM_CHROME } from './src/rizespor/stadium';
 import { useRizeSky } from './src/components/RizeScene';
+import { ECON_CHROME, MARKET } from './src/economyScene';
+import { TEA_CHROME, TEA_GLASS } from './src/teaScene';
 import DiscoverScreen from './src/screens/DiscoverScreen';
 import EconomyScreen from './src/screens/EconomyScreen';
 import NewsScreen from './src/screens/NewsScreen';
@@ -114,12 +116,25 @@ function Main() {
 
   const club = tab === 'rizespor' && !showSettings;
   const newsVisible = tab === 'news' && !showSettings;
+  const teaVisible = tab === 'tea' && !showSettings;
+  const economyVisible = tab === 'economy' && !showSettings;
   // Haberler sekmesi: günün saatine göre Rize manzarası (gündüz / akşam üstü / gece).
   const rizeSky = useRizeSky();
   const weatherVisible = tab === 'weather' && !showSettings;
   // Hava sekmesinde başlık ve sekme çubuğu gökyüzünün rengini alır; sahneyle kesintisiz birleşir.
   // Rizespor sekmesinde de aynısı: başlık gece göğüne, sekme çubuğu stadyumun çimine karışır.
-  const skyChrome = weatherVisible ? weatherChrome : club ? STADIUM_CHROME : newsVisible ? rizeSky.chrome : null;
+  // Haberler, Çay ve Ekonomi sekmelerinde de başlık ve sekme çubuğu kendi sahnelerinin renklerini alır.
+  const skyChrome = weatherVisible
+    ? weatherChrome
+    : club
+      ? STADIUM_CHROME
+      : newsVisible
+        ? rizeSky.chrome
+        : teaVisible
+          ? TEA_CHROME
+          : economyVisible
+            ? ECON_CHROME
+            : null;
   const sky = skyChrome?.header ?? null;
   const styles = useMemo(
     () =>
@@ -229,13 +244,13 @@ function Main() {
             </FadeInView>
           ) : null}
           {mounted.has('tea') ? (
-            <FadeInView visible={!showSettings && tab === 'tea'} style={styles.screen}>
-              <TeaScreen />
+            <FadeInView visible={teaVisible} style={styles.screen}>
+              <TeaScreen active={teaVisible} />
             </FadeInView>
           ) : null}
           {mounted.has('economy') ? (
-            <FadeInView visible={!showSettings && tab === 'economy'} style={styles.screen}>
-              <EconomyScreen active={!showSettings && tab === 'economy'} onOpenTea={() => goTo('tea')} />
+            <FadeInView visible={economyVisible} style={styles.screen}>
+              <EconomyScreen active={economyVisible} onOpenTea={() => goTo('tea')} />
             </FadeInView>
           ) : null}
           {mounted.has('weather') ? (
@@ -263,7 +278,7 @@ function Main() {
           {TABS.map((t) => {
             const active = t.id === tab && !showSettings;
             // Hava ekranında sekme çubuğu gökyüzüne karışır: seçili sekme beyaz, diğerleri yarı saydam beyaz.
-            const accent = club ? GLASS.accent : skyChrome ? '#FFFFFF' : t.id === 'rizespor' ? CLUB_COLORS.green : colors.primary;
+            const accent = club ? GLASS.accent : economyVisible ? MARKET.gold : teaVisible ? TEA_GLASS.accent : skyChrome ? '#FFFFFF' : t.id === 'rizespor' ? CLUB_COLORS.green : colors.primary;
             const idle = skyChrome ? 'rgba(255,255,255,0.62)' : colors.textMuted;
             return (
               <Pressable

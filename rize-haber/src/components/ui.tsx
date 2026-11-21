@@ -81,18 +81,20 @@ export function ChipRow({ children }: { children: ReactNode }) {
   );
 }
 
-export function LinkRow({ label, url }: { label: string; url: string }) {
+export function LinkRow({ label, url, glass = false }: { label: string; url: string; glass?: boolean }) {
   const { colors } = useTheme();
   const styles = useStyles();
+  // Cam görünüm (koyu sahne üstü): açık yeşil yazı, ince beyaz ayraç.
+  const tint = glass ? '#9BE8B4' : colors.primary;
   return (
     <Pressable
       onPress={() => openUrl(url, colors)}
-      style={({ pressed }) => [styles.linkRow, pressed && styles.pressed]}
+      style={({ pressed }) => [styles.linkRow, glass && styles.linkRowGlass, pressed && styles.pressed]}
       accessibilityRole="link"
       accessibilityLabel={label}
     >
-      <Text style={styles.linkText}>{label}</Text>
-      <Icon name="open-outline" size={18} color={colors.primary} />
+      <Text style={[styles.linkText, glass && { color: tint }]}>{label}</Text>
+      <Icon name="open-outline" size={18} color={tint} />
     </Pressable>
   );
 }
@@ -156,6 +158,7 @@ function useStyles() {
           borderTopWidth: StyleSheet.hairlineWidth,
           borderTopColor: colors.border,
         },
+        linkRowGlass: { borderTopColor: 'rgba(255,255,255,0.12)' },
         linkText: { flex: 1, fontSize: fs(15), color: colors.primary, fontWeight: '600' },
         linkArrow: { fontSize: fs(16), color: colors.primary },
         pressed: { opacity: 0.6 },

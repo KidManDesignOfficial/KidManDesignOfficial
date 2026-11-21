@@ -89,17 +89,17 @@ export function NewsSkeleton({ count = 5, glass = false }: { count?: number; gla
 }
 
 /** Büyük kart + liste taslağı (hava durumu, Rizespor). */
-export function HeroSkeleton({ rows = 4 }: { rows?: number }) {
+export function HeroSkeleton({ rows = 4, glass = false }: { rows?: number; glass?: boolean }) {
   return (
     <SkeletonGroup style={{ padding: 16, gap: 12 }}>
-      <Bone height={190} radius={20} />
+      <Bone height={190} radius={20} glass={glass} />
       <View style={{ flexDirection: 'row', gap: 8 }}>
-        <Bone height={64} radius={12} width="32%" />
-        <Bone height={64} radius={12} width="32%" />
-        <Bone height={64} radius={12} width="32%" />
+        <Bone height={64} radius={12} width="32%" glass={glass} />
+        <Bone height={64} radius={12} width="32%" glass={glass} />
+        <Bone height={64} radius={12} width="32%" glass={glass} />
       </View>
       {Array.from({ length: rows }, (_, i) => (
-        <Bone key={i} height={58} radius={14} />
+        <Bone key={i} height={58} radius={14} glass={glass} />
       ))}
     </SkeletonGroup>
   );

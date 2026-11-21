@@ -20,6 +20,27 @@ export function useAnimatedValue(initial: number): Animated.Value {
   return value;
 }
 
+/**
+ * Arka plan sahneleri için 0→1 arasında sürekli dönen saat (yerel sürücüde, doğrusal).
+ * `running` yanlışsa durur; sahne durağan çizilir.
+ */
+export function useLoopClock(duration: number, running: boolean): Animated.Value {
+  const clock = useAnimatedValue(0);
+  useEffect(() => {
+    if (!running) return;
+    clock.setValue(0);
+    const loop = Animated.loop(Animated.timing(clock, { toValue: 1, duration, easing: Easing.linear, useNativeDriver: true }));
+    loop.start();
+    return () => loop.stop();
+  }, [clock, duration, running]);
+  return clock;
+}
+
+/** Saatten türetilen, `speed` kat hızlı ve `phase` kadar kaydırılmış 0→1 döngü. */
+export function loopPhase(clock: Animated.Value, speed: number, phase: number) {
+  return Animated.modulo(Animated.add(Animated.multiply(clock, speed), phase), 1);
+}
+
 /** Doğal hissettiren yavaşlayan eğri (Material "emphasized decelerate"e yakın). */
 export const EASE_OUT = Easing.bezier(0.2, 0.8, 0.2, 1);
 export const DURATION = { short: 180, medium: 300 } as const;
