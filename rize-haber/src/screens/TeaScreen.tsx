@@ -8,7 +8,7 @@ import { Animated, RefreshControl, ScrollView, StyleSheet, Text, TextInput, View
 import { LinearGradient } from 'expo-linear-gradient';
 
 import { HeroCard } from '../components/HeroCard';
-import { loopPhase, useLoopClock, useSceneStill } from '../components/motion';
+import { loopPhase, useLoopClock, useSceneStill, useScrollTopOnShow } from '../components/motion';
 import TeaScene from '../components/TeaScene';
 import { Card, LinkRow, SectionTitle } from '../components/ui';
 import { formatDateTr, formatLira, formatNumber, parseKg, yearOverYearChange, type TeaData } from '../tea';
@@ -20,6 +20,7 @@ import { useTheme } from '../theme';
 const HERO_GRADIENT = ['rgba(155,232,180,0.28)', 'rgba(6,40,24,0.55)'] as const;
 
 export default function TeaScreen({ active = true }: { active?: boolean }) {
+  const scrollRef = useScrollTopOnShow();
   const { fs } = useTheme();
   const [data, setData] = useState<TeaData>(BUNDLED_TEA_DATA);
   const [refreshing, setRefreshing] = useState(false);
@@ -126,6 +127,7 @@ export default function TeaScreen({ active = true }: { active?: boolean }) {
     <View style={styles.root}>
       <TeaScene active={active} />
       <ScrollView
+        ref={scrollRef}
         style={styles.container}
         contentContainerStyle={styles.content}
         keyboardShouldPersistTaps="handled"

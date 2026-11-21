@@ -2,7 +2,7 @@
 import { useMemo, useState } from 'react';
 import { RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 
-import { FadeInView, PressableScale } from '../../components/motion';
+import { FadeInView, PressableScale, useScrollTopOnShow } from '../../components/motion';
 import { Card, SectionTitle } from '../../components/ui';
 import { latestResults, nextMatch, type ClubData } from '../../rizespor/api';
 import { clock, signed } from '../../rizespor/format';
@@ -48,6 +48,7 @@ function useBaseStyles() {
 }
 
 export function MatchesView({ data, now, dataAt, refreshing, onRefresh, onOpenMatch }: ViewProps) {
+  const scrollRef = useScrollTopOnShow();
   const { fs } = useTheme();
   const base = useBaseStyles();
   const [showAllFixtures, setShowAllFixtures] = useState(false);
@@ -80,7 +81,7 @@ export function MatchesView({ data, now, dataAt, refreshing, onRefresh, onOpenMa
   );
 
   return (
-    <ScrollView style={base.container} contentContainerStyle={base.content} refreshControl={<ClubRefresh refreshing={refreshing} onRefresh={onRefresh} />}>
+    <ScrollView ref={scrollRef} style={base.container} contentContainerStyle={base.content} refreshControl={<ClubRefresh refreshing={refreshing} onRefresh={onRefresh} />}>
       {hero ? <NextMatchHero match={hero} mode={mode} dataAt={dataAt} onOpen={() => onOpenMatch(hero)} /> : null}
 
       <View style={base.pad}>
@@ -168,6 +169,7 @@ export function MatchesView({ data, now, dataAt, refreshing, onRefresh, onOpenMa
 }
 
 export function StandingsView({ data, refreshing, onRefresh }: ViewProps) {
+  const scrollRef = useScrollTopOnShow();
   const { fs } = useTheme();
   const base = useBaseStyles();
   const styles = useMemo(
@@ -201,7 +203,7 @@ export function StandingsView({ data, refreshing, onRefresh }: ViewProps) {
   }, [data.standings]);
 
   return (
-    <ScrollView style={base.container} contentContainerStyle={[base.content, base.pad]} refreshControl={<ClubRefresh refreshing={refreshing} onRefresh={onRefresh} />}>
+    <ScrollView ref={scrollRef} style={base.container} contentContainerStyle={[base.content, base.pad]} refreshControl={<ClubRefresh refreshing={refreshing} onRefresh={onRefresh} />}>
       <SectionTitle light hint="Trendyol Süper Lig 2026-27">Puan durumu</SectionTitle>
       {data.standings.length === 0 ? (
         <Text style={base.muted}>Puan durumu yüklenemedi.</Text>
@@ -268,6 +270,7 @@ function playerLine(p: ClubData['roster'][number]): string {
 }
 
 export function SquadView({ data, refreshing, onRefresh }: ViewProps) {
+  const scrollRef = useScrollTopOnShow();
   const { fs } = useTheme();
   const base = useBaseStyles();
   const styles = useMemo(
@@ -312,7 +315,7 @@ export function SquadView({ data, refreshing, onRefresh }: ViewProps) {
   const foreign = data.roster.filter((p) => p.nationality && p.nationality !== 'TUR').length;
 
   return (
-    <ScrollView style={base.container} contentContainerStyle={[base.content, base.pad]} refreshControl={<ClubRefresh refreshing={refreshing} onRefresh={onRefresh} />}>
+    <ScrollView ref={scrollRef} style={base.container} contentContainerStyle={[base.content, base.pad]} refreshControl={<ClubRefresh refreshing={refreshing} onRefresh={onRefresh} />}>
       <SectionTitle light>Kadro</SectionTitle>
       {data.roster.length === 0 ? (
         <Text style={base.muted}>Kadro yüklenemedi.</Text>

@@ -5,9 +5,9 @@
  * "Hareketi azalt" (erişilebilirlik) açıksa ya da kullanıcı Ayarlar → Özelleştirme'den
  * animasyonları kapattıysa animasyonlar anında tamamlanır.
  */
-import { useEffect, useState } from 'react';
-import type { ReactNode } from 'react';
-import { AccessibilityInfo, Animated, Easing, Pressable, View } from 'react-native';
+import { createContext, useContext, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import type { ComponentRef, ReactNode } from 'react';
+import { AccessibilityInfo, Animated, Easing, Pressable, ScrollView, View } from 'react-native';
 import type { PressableProps, StyleProp, ViewStyle } from 'react-native';
 
 import { useTheme } from '../theme';
@@ -201,13 +201,48 @@ export function FadeInView({
 
   const translateY = progress.interpolate({ inputRange: [0, 1], outputRange: [10, 0] });
 
+  // Her yeniden görünüşte sayaç artar; iç içe sekmelerde üst sekmenin sayacı da hesaba katılır.
+  const parent = useContext(ShowContext);
+  const [shows, setShows] = useState(0);
+  const [wasVisible, setWasVisible] = useState(visible);
+  if (visible !== wasVisible) {
+    setWasVisible(visible);
+    if (visible) setShows((n) => n + 1);
+  }
+  const key = `${parent}.${shows}`;
+
   return (
     <Animated.View
       style={[style, !visible && { display: 'none' }, { opacity: progress, transform: [{ translateY }] }]}
     >
-      {children}
+      <ShowContext.Provider value={key}>{children}</ShowContext.Provider>
     </Animated.View>
   );
+}
+
+const ShowContext = createContext('0');
+
+type Scrollable = {
+  scrollTo?: (o: { x?: number; y?: number; animated?: boolean }) => void;
+  scrollToOffset?: (o: { offset: number; animated?: boolean }) => void;
+};
+
+/**
+ * Kaydırılabilir listeye verilecek ref: liste, içinde bulunduğu sekme (FadeInView) her yeniden
+ * açıldığında animasyonsuz en üste döner. Sekme değiştirince sayfa yarıda kalmaz.
+ */
+export function useScrollTopOnShow<T extends Scrollable = ComponentRef<typeof ScrollView>>() {
+  const ref = useRef<T>(null);
+  const key = useContext(ShowContext);
+  const first = useRef(key);
+  useLayoutEffect(() => {
+    if (key === first.current) return;
+    first.current = key;
+    const list = ref.current;
+    if (list?.scrollToOffset) list.scrollToOffset({ offset: 0, animated: false });
+    else list?.scrollTo?.({ y: 0, animated: false });
+  }, [key]);
+  return ref;
 }
 
 /** Dönen ok (▾): `progress` 0 → 1 iken 0° → 180°. */

@@ -8,6 +8,7 @@ import { CULTURE, FOOD_KINDS, FOODS, type Food } from '../../data/discover';
 import { useTheme } from '../../theme';
 import type { ExploreRef } from '../../useExploreLocation';
 import VenueList from './VenueList';
+import { useScrollTopOnShow } from '../../components/motion';
 
 type Filter = 'all' | Food['kind'] | 'gi';
 
@@ -18,6 +19,7 @@ export const GEO_INDICATION_COUNT =
   FOODS.filter((f) => f.geoIndication).length + CULTURE.filter((c) => c.badge?.startsWith('Coğrafi')).length;
 
 export default function FoodView({ origin }: { origin: ExploreRef }) {
+  const scrollRef = useScrollTopOnShow();
   const { colors, fs } = useTheme();
   const [filter, setFilter] = useState<Filter>('all');
 
@@ -83,7 +85,7 @@ export default function FoodView({ origin }: { origin: ExploreRef }) {
   ];
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+    <ScrollView ref={scrollRef} style={styles.container} contentContainerStyle={styles.content}>
       <HeroCard
         gradient={[mix(GOLD, '#5A3A00', 0.35), mix(GOLD, '#000000', 0.55)]}
         watermark="restaurant-outline"

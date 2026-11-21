@@ -18,7 +18,7 @@ import { Icon } from '../components/Icon';
 
 import LocationPicker from '../components/LocationPicker';
 import { Card, Chip, LinkRow, SectionTitle, openUrl } from '../components/ui';
-import { PressableScale, useSystemReducedMotion } from '../components/motion';
+import { PressableScale, useSystemReducedMotion, useScrollTopOnShow } from '../components/motion';
 import type { IconName } from '../components/Icon';
 import { CONTACT_EMAIL, DEVELOPER_NAME } from '../config';
 import { placeById, placeSubtitle, pushRecent, DISTRICT_PLACES } from '../places';
@@ -106,6 +106,7 @@ const DATA_SOURCES = [
 ];
 
 export default function SettingsScreen() {
+  const scrollRef = useScrollTopOnShow();
   const { settings, updateSettings, colors, fs } = useTheme();
   const { favorites, clearFavorites } = useFavorites();
   const systemReduced = useSystemReducedMotion();
@@ -198,7 +199,7 @@ export default function SettingsScreen() {
   }, [favorites.length, clearFavorites]);
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+    <ScrollView ref={scrollRef} style={styles.container} contentContainerStyle={styles.content}>
       <SectionTitle>Görünüm</SectionTitle>
       <Card>
         <Text style={styles.rowLabel}>Tema</Text>

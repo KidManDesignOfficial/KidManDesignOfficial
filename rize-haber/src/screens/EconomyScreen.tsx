@@ -12,7 +12,7 @@ import { useAppActive } from '../appState';
 import EconomyScene from '../components/EconomyScene';
 import { HeroCard } from '../components/HeroCard';
 import { Icon } from '../components/Icon';
-import { useAnimatedValue, useSceneStill } from '../components/motion';
+import { useAnimatedValue, useSceneStill, useScrollTopOnShow } from '../components/motion';
 import { HeroSkeleton } from '../components/Skeleton';
 import { Card, Chip, ChipRow, PrimaryButton, SectionTitle } from '../components/ui';
 import { ECON_CHROME, ECON_GLASS as G, FLAGS, MARKET } from '../economyScene';
@@ -36,6 +36,7 @@ type Props = {
 };
 
 export default function EconomyScreen({ active = true, onOpenTea }: Props) {
+  const scrollRef = useScrollTopOnShow();
   const { fs } = useTheme();
   const appActive = useAppActive();
   const [markets, setMarkets] = useState<Markets | null>(null);
@@ -265,6 +266,7 @@ export default function EconomyScreen({ active = true, onOpenTea }: Props) {
       <EconomyScene active={running} />
       <Ticker items={ticker} running={running} />
       <ScrollView
+        ref={scrollRef}
         style={styles.container}
         contentContainerStyle={styles.content}
         keyboardShouldPersistTaps="handled"

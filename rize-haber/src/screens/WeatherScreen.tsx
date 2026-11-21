@@ -4,7 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 
 import { Icon, type IconName } from '../components/Icon';
 import LocationPicker from '../components/LocationPicker';
-import { PressableScale } from '../components/motion';
+import { PressableScale, useScrollTopOnShow } from '../components/motion';
 import { HeroSkeleton } from '../components/Skeleton';
 import { Chip, ChipRow, PrimaryButton } from '../components/ui';
 import WeatherScene from '../components/WeatherScene';
@@ -38,6 +38,7 @@ export default function WeatherScreen({
   /** Üst başlık ve alt sekme çubuğunu gökyüzüne uydurmak için renkler; veri yokken null. */
   onSkyColors?: (colors: SkyChrome | null) => void;
 }) {
+  const scrollRef = useScrollTopOnShow();
   const { colors, fs, settings, updateSettings } = useTheme();
   const [pickerOpen, setPickerOpen] = useState(false);
   // Kullanıcının bu ekranda seçtiği ilçe; Ayarlar'daki varsayılan değişirse geçersiz olur.
@@ -228,6 +229,7 @@ export default function WeatherScreen({
     <View style={styles.root}>
       {scene ? <WeatherScene scene={scene} active={active} /> : null}
       <ScrollView
+        ref={scrollRef}
         style={styles.scroll}
         contentContainerStyle={styles.content}
         refreshControl={

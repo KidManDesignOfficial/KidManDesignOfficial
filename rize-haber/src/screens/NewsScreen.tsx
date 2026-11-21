@@ -15,7 +15,7 @@ import {
 
 import { useAppActive } from '../appState';
 import { Icon } from '../components/Icon';
-import { EASE_OUT, useAnimatedValue, useReducedMotion } from '../components/motion';
+import { EASE_OUT, useAnimatedValue, useReducedMotion, useScrollTopOnShow } from '../components/motion';
 import { NewsCard } from '../components/NewsCard';
 import RizeScene from '../components/RizeScene';
 import { NewsSkeleton } from '../components/Skeleton';
@@ -58,7 +58,7 @@ export default function NewsScreen({ active = true, sky = rizeSkyFor(new Date().
   /** Aşağıdayken gelen yeni haber sayısı (üstteki "yeni haber" düğmesi). */
   const [pendingNew, setPendingNew] = useState(0);
   const controllers = useRef<Record<string, AbortController>>({});
-  const listRef = useRef<FlatList<FeedRow>>(null);
+  const listRef = useScrollTopOnShow<FlatList<FeedRow>>();
   const scrollY = useRef(0);
   const stateRef = useRef(byCategory);
   useEffect(() => {
@@ -227,7 +227,7 @@ export default function NewsScreen({ active = true, sky = rizeSkyFor(new Date().
     tapFeedback();
     setPendingNew(0);
     listRef.current?.scrollToOffset({ offset: 0, animated: !reduced });
-  }, [reduced]);
+  }, [reduced, listRef]);
 
   useEffect(() => {
     const all = controllers.current;

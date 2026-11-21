@@ -13,8 +13,10 @@ import {
   type TimelineEntry,
 } from '../data/rize';
 import { useTheme } from '../theme';
+import { useScrollTopOnShow } from '../components/motion';
 
 export default function RizeScreen() {
+  const scrollRef = useScrollTopOnShow();
   const { colors, fs } = useTheme();
   const styles = useMemo(
     () =>
@@ -51,7 +53,7 @@ export default function RizeScreen() {
   );
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+    <ScrollView ref={scrollRef} style={styles.container} contentContainerStyle={styles.content}>
       <HeroCard watermark="compass-outline" eyebrow="DOĞU KARADENİZ · 53" eyebrowIcon="location-outline" mountains>
         <Text style={styles.heroTitle}>Rize</Text>
         <Text style={styles.heroText}>

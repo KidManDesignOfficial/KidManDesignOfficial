@@ -7,7 +7,7 @@ import { Alert, Linking, ScrollView, StyleSheet, Text, View } from 'react-native
 
 import { HeroCard } from '../../components/HeroCard';
 import { Icon } from '../../components/Icon';
-import { FadeInView, PressableScale } from '../../components/motion';
+import { FadeInView, PressableScale, useScrollTopOnShow } from '../../components/motion';
 import { Card, Chip, ChipRow, SectionTitle } from '../../components/ui';
 import { PLACE_CATEGORIES, PLACES, VISIT_LABELS, type Place, type PlaceCategory } from '../../data/discover';
 import { VENUE_KINDS, VENUES, mapsNearbyUrl } from '../../data/venues';
@@ -45,6 +45,7 @@ type Props = {
 };
 
 export default function TodayView({ ref_, locating, locate, resetToSetting }: Props) {
+  const scrollRef = useScrollTopOnShow();
   const { colors, fs } = useTheme();
   const [now] = useState(() => new Date());
   const target = planTarget(now);
@@ -101,7 +102,7 @@ export default function TodayView({ ref_, locating, locate, resetToSetting }: Pr
   const wx = weather ? describeWeatherCode(weather.code) : null;
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+    <ScrollView ref={scrollRef} style={styles.container} contentContainerStyle={styles.content}>
       <HeroCard watermark="compass-outline" eyebrow={`${target.label.toUpperCase()} · ${target.date.getDate()} ${MONTHS[month - 1].toUpperCase()}`} eyebrowIcon="sparkles-outline" mountains style={styles.hero}>
         <Text style={styles.heroTitle}>{target.label} nereye gidelim?</Text>
         <Text style={styles.heroText}>{todayHeadline(weather, target.date)}</Text>

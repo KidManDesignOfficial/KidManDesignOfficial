@@ -2,7 +2,7 @@
   "expo": {
     "name": "Rize Haber",
     "slug": "rize-haber",
-    "version": "1.14.1",
+    "version": "1.14.2",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
@@ -19,7 +19,7 @@
       },
       "predictiveBackGestureEnabled": false,
       "package": "com.kidmandesign.rizehaber",
-      "versionCode": 23,
+      "versionCode": 24,
       "blockedPermissions": [
         "android.permission.READ_EXTERNAL_STORAGE",
         "android.permission.WRITE_EXTERNAL_STORAGE",

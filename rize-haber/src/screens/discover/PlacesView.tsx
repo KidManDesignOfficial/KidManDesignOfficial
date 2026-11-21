@@ -4,7 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 
 import { mix } from '../../colors';
 import { Icon, type IconName } from '../../components/Icon';
-import { Chevron, Collapsible, FadeInView, PressableScale, useAnimatedValue } from '../../components/motion';
+import { Chevron, Collapsible, FadeInView, PressableScale, useAnimatedValue, useScrollTopOnShow } from '../../components/motion';
 import { pressFeedback } from '../../haptics';
 import { Chip, ChipRow, openUrl } from '../../components/ui';
 import { PLACE_CATEGORIES, PLACES, VISIT_LABELS, mapsUrl, type Place, type PlaceCategory } from '../../data/discover';
@@ -24,6 +24,7 @@ const CATEGORY_TINT: Record<PlaceCategory, string> = {
 type Filter = 'all' | PlaceCategory | 'list';
 
 export default function PlacesView({ origin }: { origin: ExploreRef }) {
+  const scrollRef = useScrollTopOnShow();
   const { colors, fs } = useTheme();
   const [filter, setFilter] = useState<Filter>('all');
   const [openId, setOpenId] = useState<string | null>(null);
@@ -80,7 +81,7 @@ export default function PlacesView({ origin }: { origin: ExploreRef }) {
   ];
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+    <ScrollView ref={scrollRef} style={styles.container} contentContainerStyle={styles.content}>
       <LinearGradient
         colors={[colors.header, mix(colors.header, '#000000', 0.35)]}
         start={{ x: 0, y: 0 }}
