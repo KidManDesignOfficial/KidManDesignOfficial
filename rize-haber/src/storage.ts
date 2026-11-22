@@ -76,8 +76,20 @@ export async function clearSeenIds(): Promise<void> {
   }
 }
 
-export function loadSettings(): Promise<Partial<Settings>> {
-  return readJson<Partial<Settings>>(KEYS.settings, {});
+const LEGACY_RAIN_SOUND_KEY = 'rizehaber:rainSound:v1';
+
+export async function loadSettings(): Promise<Partial<Settings>> {
+  const stored = await readJson<Partial<Settings>>(KEYS.settings, {});
+  // 1.11 öncesi yağmur sesi tercihi ayrı anahtarda tutuluyordu; ayarlara taşınır.
+  if (stored && typeof stored === 'object' && stored.rainSound === undefined) {
+    try {
+      const legacy = await AsyncStorage.getItem(LEGACY_RAIN_SOUND_KEY);
+      if (legacy != null) return { ...stored, rainSound: legacy === '1' };
+    } catch {
+      // yok say
+    }
+  }
+  return stored;
 }
 
 export function saveSettings(settings: Settings): Promise<void> {

@@ -1,23 +1,29 @@
+/**
+ * Çay: yaş çay alım fiyatı, hesaplayıcı, yıllara göre fiyatlar ve kaynaklar.
+ * Arka planda sabah çay bahçesi sahnesi; içerik cam kartlardadır. Vitrin kartında buharı tüten
+ * ince belli çay bardağı bulunur.
+ */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { RefreshControl, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Animated, RefreshControl, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 
-import { NewsCard } from '../components/NewsCard';
-import { SkeletonCard, SkeletonGroup } from '../components/Skeleton';
+import { HeroCard } from '../components/HeroCard';
+import { loopPhase, useLoopClock, useSceneStill, useScrollTopOnShow } from '../components/motion';
+import { TeaBackdrop, useTabChrome } from '../components/TabBackdrop';
 import { Card, LinkRow, SectionTitle } from '../components/ui';
-import { googleNewsRssUrl } from '../config';
-import { fetchRss, type NewsItem } from '../rss';
 import { formatDateTr, formatLira, formatNumber, parseKg, yearOverYearChange, type TeaData } from '../tea';
 import { BUNDLED_TEA_DATA, fetchRemoteTeaData, loadLocalTeaData } from '../teaData';
+import { TEA_GLASS as G } from '../teaScene';
 import { useTheme } from '../theme';
 
-const TEA_NEWS_QUERY = '("yaş çay" OR ÇAYKUR OR "çay fiyatı" OR "kuru çay" OR "çay üreticisi") when:30d';
-const TEA_NEWS_LIMIT = 6;
+/** Vitrin kartı: üst solda taze yaprak yeşili, alt sağda koyu bahçe yeşili (cam). */
+const HERO_GRADIENT = ['rgba(155,232,180,0.28)', 'rgba(6,40,24,0.55)'] as const;
 
-export default function TeaScreen() {
-  const { colors, fs } = useTheme();
+export default function TeaScreen({ active = true }: { active?: boolean }) {
+  const scrollRef = useScrollTopOnShow();
+  const { fs } = useTheme();
+  const chrome = useTabChrome('tea');
   const [data, setData] = useState<TeaData>(BUNDLED_TEA_DATA);
-  const [news, setNews] = useState<NewsItem[]>([]);
-  const [newsState, setNewsState] = useState<'loading' | 'ready' | 'error'>('loading');
   const [refreshing, setRefreshing] = useState(false);
   const [kgInput, setKgInput] = useState('');
   const controller = useRef<AbortController | null>(null);
@@ -26,21 +32,11 @@ export default function TeaScreen() {
     controller.current?.abort();
     const c = new AbortController();
     controller.current = c;
-    setNewsState((s) => (s === 'ready' ? s : 'loading'));
 
-    const [remote, items] = await Promise.all([
-      fetchRemoteTeaData(c.signal),
-      fetchRss(googleNewsRssUrl(TEA_NEWS_QUERY), c.signal).catch(() => null),
-    ]);
+    const remote = await fetchRemoteTeaData(c.signal);
     if (c.signal.aborted) return;
 
     if (remote) setData((current) => (remote.updatedAt >= current.updatedAt ? remote : current));
-    if (items) {
-      setNews(items.slice(0, TEA_NEWS_LIMIT));
-      setNewsState('ready');
-    } else {
-      setNewsState((s) => (s === 'ready' ? s : 'error'));
-    }
   }, []);
 
   useEffect(() => {
@@ -66,179 +62,266 @@ export default function TeaScreen() {
   const styles = useMemo(
     () =>
       StyleSheet.create({
-        container: { flex: 1, backgroundColor: colors.background },
+        root: { flex: 1, backgroundColor: chrome.footer },
+        container: { flex: 1, backgroundColor: 'transparent' },
         content: { padding: 16, paddingBottom: 32 },
-        hero: { backgroundColor: colors.header, borderRadius: 20, padding: 20, gap: 4 },
-        heroLabel: { color: 'rgba(255,255,255,0.85)', fontSize: fs(14), fontWeight: '600' },
+        card: { backgroundColor: G.surface, borderColor: G.border },
+        heroShell: { borderWidth: 1, borderColor: 'rgba(155,232,180,0.32)' },
+        heroLabel: { color: G.soft, fontSize: fs(14), fontWeight: '600' },
         heroPriceRow: { flexDirection: 'row', alignItems: 'baseline', gap: 6, marginTop: 4 },
-        heroPrice: { color: '#FFFFFF', fontSize: fs(44), fontWeight: '800' },
-        heroUnit: { color: 'rgba(255,255,255,0.85)', fontSize: fs(18), fontWeight: '600' },
+        heroPrice: { color: G.text, fontSize: fs(48), fontWeight: '800', letterSpacing: -1 },
+        heroUnit: { color: G.soft, fontSize: fs(18), fontWeight: '600' },
         badge: {
           alignSelf: 'flex-start',
-          backgroundColor: 'rgba(255,255,255,0.18)',
+          backgroundColor: 'rgba(255,255,255,0.14)',
+          borderColor: 'rgba(255,255,255,0.24)',
+          borderWidth: 1,
           borderRadius: 999,
           paddingHorizontal: 10,
           paddingVertical: 4,
           marginTop: 6,
         },
-        badgeText: { color: '#FFFFFF', fontSize: fs(13), fontWeight: '700' },
-        heroMeta: { color: 'rgba(255,255,255,0.8)', fontSize: fs(13), marginTop: 10, lineHeight: fs(19) },
-        label: { fontSize: fs(14), color: colors.textMuted, marginBottom: 8 },
+        badgeText: { color: G.text, fontSize: fs(13), fontWeight: '700' },
+        heroMeta: { color: G.soft, fontSize: fs(13), marginTop: 10, lineHeight: fs(19) },
+        label: { fontSize: fs(14), color: G.soft, marginBottom: 8 },
         input: {
           borderWidth: 1,
-          borderColor: colors.border,
+          borderColor: G.border,
           borderRadius: 12,
           paddingHorizontal: 14,
           paddingVertical: 12,
           fontSize: fs(18),
-          color: colors.text,
-          backgroundColor: colors.background,
+          color: G.text,
+          backgroundColor: G.input,
         },
-        resultRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', marginTop: 14 },
-        resultLabel: { fontSize: fs(15), color: colors.textMuted },
-        resultValue: { fontSize: fs(26), fontWeight: '800', color: colors.primary },
-        hint: { fontSize: fs(12), color: colors.textMuted, marginTop: 8, lineHeight: fs(17) },
+        resultRow: {
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'baseline',
+          marginTop: 14,
+          paddingTop: 12,
+          borderTopWidth: StyleSheet.hairlineWidth,
+          borderTopColor: G.divider,
+        },
+        resultLabel: { fontSize: fs(15), color: G.soft },
+        resultValue: { fontSize: fs(26), fontWeight: '800', color: G.accent, flexShrink: 1 },
+        hint: { fontSize: fs(12), color: G.faint, marginTop: 8, lineHeight: fs(17) },
         barRow: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 6 },
-        barYear: { width: fs(48), fontSize: fs(15), fontWeight: '700', color: colors.text },
-        barTrack: { flex: 1, height: 14, borderRadius: 7, backgroundColor: colors.primarySoft, overflow: 'hidden' },
-        barFill: { height: '100%', borderRadius: 7, backgroundColor: colors.primary },
-        barValue: { width: fs(92), textAlign: 'right', fontSize: fs(14), fontWeight: '700', color: colors.text },
-        note: { fontSize: fs(14), color: colors.text, lineHeight: fs(21) },
+        barYear: { width: fs(48), fontSize: fs(15), fontWeight: '700', color: G.soft },
+        barYearCurrent: { color: G.text },
+        barTrack: { flex: 1, height: 14, borderRadius: 7, backgroundColor: 'rgba(255,255,255,0.09)', overflow: 'hidden' },
+        barFill: { height: '100%', borderRadius: 7, overflow: 'hidden' },
+        barValue: { width: fs(92), textAlign: 'right', fontSize: fs(14), fontWeight: '700', color: G.soft },
+        barValueCurrent: { color: G.amber },
+        note: { fontSize: fs(14), color: G.text, lineHeight: fs(21) },
         noteRow: { flexDirection: 'row', gap: 8, paddingVertical: 4 },
-        bullet: { color: colors.primary, fontSize: fs(14), fontWeight: '800' },
-        newsList: { gap: 10 },
-        muted: { fontSize: fs(14), color: colors.textMuted, textAlign: 'center', padding: 12 },
-        body: { fontSize: fs(14), color: colors.text, lineHeight: fs(21), marginBottom: 4 },
-        updated: { fontSize: fs(12), color: colors.textMuted, textAlign: 'center', marginTop: 16 },
+        bullet: { color: G.accent, fontSize: fs(14), fontWeight: '800' },
+        body: { fontSize: fs(14), color: G.soft, lineHeight: fs(21), marginBottom: 4 },
+        updated: { fontSize: fs(12), color: G.faint, textAlign: 'center', marginTop: 16 },
       }),
-    [colors, fs],
+    [fs, chrome],
   );
+
+  const currentYear = data.current.year;
 
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={styles.content}
-      keyboardShouldPersistTaps="handled"
-      refreshControl={
-        <RefreshControl
-          refreshing={refreshing}
-          onRefresh={onRefresh}
-          colors={[colors.primary]}
-          tintColor={colors.primary}
-          progressBackgroundColor={colors.card}
-        />
-      }
-    >
-      <View style={styles.hero} accessible accessibilityLabel={`${data.current.year} yaş çay alım fiyatı kilogram başına ${formatLira(data.current.pricePerKg)}`}>
-        <Text style={styles.heroLabel}>{data.current.year} Yaş Çay Alım Fiyatı</Text>
-        <View style={styles.heroPriceRow}>
-          <Text style={styles.heroPrice}>{formatNumber(data.current.pricePerKg)} ₺</Text>
-          <Text style={styles.heroUnit}>/ kg</Text>
-        </View>
-        {change ? (
-          <View style={styles.badge}>
-            <Text style={styles.badgeText}>
-              {change.percent >= 0 ? '▲' : '▼'} %{formatNumber(Math.abs(change.percent), 1)} · {change.previous.year}:{' '}
-              {formatLira(change.previous.pricePerKg)}
-            </Text>
+    <View style={styles.root}>
+      <TeaBackdrop active={active} />
+      <ScrollView
+        ref={scrollRef}
+        style={styles.container}
+        contentContainerStyle={styles.content}
+        keyboardShouldPersistTaps="handled"
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={[G.accent]}
+            tintColor={G.accent}
+            progressBackgroundColor={chrome.header}
+          />
+        }
+      >
+        <HeroCard
+          gradient={HERO_GRADIENT}
+          style={styles.heroShell}
+          watermark="leaf"
+          eyebrow={`ÇAYKUR · ${data.current.year} SEZONU`}
+          eyebrowIcon="leaf-outline"
+          accessibilityLabel={`${data.current.year} yaş çay alım fiyatı kilogram başına ${formatLira(data.current.pricePerKg)}`}
+        >
+          <TeaGlass running={active} />
+          <Text style={styles.heroLabel}>Yaş Çay Alım Fiyatı</Text>
+          <View style={styles.heroPriceRow}>
+            <Text style={styles.heroPrice}>{formatNumber(data.current.pricePerKg)} ₺</Text>
+            <Text style={styles.heroUnit}>/ kg</Text>
           </View>
-        ) : null}
-        <Text style={styles.heroMeta}>
-          {data.current.announcedBy}
-          {'\n'}İlan tarihi: {formatDateTr(data.current.announcedAt)}
-        </Text>
-      </View>
-
-      <SectionTitle hint="Teslim ettiğiniz yaş çayın tutarını hesaplayın">Hesaplayıcı</SectionTitle>
-      <Card>
-        <Text style={styles.label}>Yaş çay miktarı (kg)</Text>
-        <TextInput
-          value={kgInput}
-          onChangeText={setKgInput}
-          placeholder="Örnek: 1250"
-          placeholderTextColor={colors.textMuted}
-          keyboardType="decimal-pad"
-          style={styles.input}
-          accessibilityLabel="Yaş çay miktarı, kilogram"
-          maxLength={12}
-        />
-        <View style={styles.resultRow}>
-          <Text style={styles.resultLabel}>Tutar</Text>
-          <Text style={styles.resultValue}>{kg ? formatLira(kg * data.current.pricePerKg) : '—'}</Text>
-        </View>
-        <Text style={styles.hint}>
-          {formatNumber(data.current.pricePerKg)} ₺/kg üzerinden brüt tutardır. Kesintiler, destekler ve ödeme
-          koşulları dahil değildir.
-        </Text>
-      </Card>
-
-      <SectionTitle>Yıllara göre alım fiyatı</SectionTitle>
-      <Card>
-        {data.history.map((h) => (
-          <View key={h.year} style={styles.barRow}>
-            <Text style={styles.barYear} numberOfLines={1}>
-              {h.year}
-            </Text>
-            <View style={styles.barTrack}>
-              <View style={[styles.barFill, { width: `${(h.pricePerKg / maxPrice) * 100}%` }]} />
+          {change ? (
+            <View style={styles.badge}>
+              <Text style={styles.badgeText}>
+                {change.percent >= 0 ? '▲' : '▼'} %{formatNumber(Math.abs(change.percent), 1)} · {change.previous.year}:{' '}
+                {formatLira(change.previous.pricePerKg)}
+              </Text>
             </View>
-            <Text style={styles.barValue} numberOfLines={1}>
-              {formatLira(h.pricePerKg)}
+          ) : null}
+          <Text style={styles.heroMeta}>
+            {data.current.announcedBy}
+            {'\n'}İlan tarihi: {formatDateTr(data.current.announcedAt)}
+          </Text>
+        </HeroCard>
+
+        <SectionTitle light hint="Teslim ettiğiniz yaş çayın tutarını hesaplayın">
+          Hesaplayıcı
+        </SectionTitle>
+        <Card style={styles.card}>
+          <Text style={styles.label}>Yaş çay miktarı (kg)</Text>
+          <TextInput
+            value={kgInput}
+            onChangeText={setKgInput}
+            placeholder="Örnek: 1250"
+            placeholderTextColor={G.faint}
+            keyboardType="decimal-pad"
+            style={styles.input}
+            accessibilityLabel="Yaş çay miktarı, kilogram"
+            maxLength={12}
+          />
+          <View style={styles.resultRow}>
+            <Text style={styles.resultLabel}>Tutar</Text>
+            <Text style={styles.resultValue} numberOfLines={1} adjustsFontSizeToFit>
+              {kg ? formatLira(kg * data.current.pricePerKg) : '—'}
             </Text>
           </View>
-        ))}
-      </Card>
+          <Text style={styles.hint}>
+            {formatNumber(data.current.pricePerKg)} ₺/kg üzerinden brüt tutardır. Kesintiler, destekler ve ödeme
+            koşulları dahil değildir.
+          </Text>
+        </Card>
 
-      {data.notes.length > 0 ? (
-        <>
-          <SectionTitle>Bilgi</SectionTitle>
-          <Card>
-            {data.notes.map((n) => (
-              <View key={n} style={styles.noteRow}>
-                <Text style={styles.bullet}>•</Text>
-                <Text style={[styles.note, { flex: 1 }]}>{n}</Text>
+        <SectionTitle light>Yıllara göre alım fiyatı</SectionTitle>
+        <Card style={styles.card}>
+          {data.history.map((h) => {
+            const current = h.year === currentYear;
+            return (
+              <View key={h.year} style={styles.barRow}>
+                <Text style={[styles.barYear, current && styles.barYearCurrent]} numberOfLines={1}>
+                  {h.year}
+                </Text>
+                <View style={styles.barTrack}>
+                  <View style={[styles.barFill, { width: `${(h.pricePerKg / maxPrice) * 100}%` }]}>
+                    <LinearGradient
+                      colors={current ? ['#5FD08F', G.amber] : ['rgba(95,208,143,0.55)', 'rgba(155,232,180,0.8)']}
+                      start={{ x: 0, y: 0.5 }}
+                      end={{ x: 1, y: 0.5 }}
+                      style={StyleSheet.absoluteFill}
+                    />
+                  </View>
+                </View>
+                <Text style={[styles.barValue, current && styles.barValueCurrent]} numberOfLines={1}>
+                  {formatLira(h.pricePerKg)}
+                </Text>
               </View>
-            ))}
-          </Card>
-        </>
-      ) : null}
+            );
+          })}
+        </Card>
 
-      <SectionTitle hint="Fiyat, prim ve ödeme duyuruları – son 30 gün">Çay gündemi</SectionTitle>
-      {newsState === 'loading' ? (
-        <SkeletonGroup style={{ gap: 10 }}>
-          <SkeletonCard />
-          <SkeletonCard />
-          <SkeletonCard />
-        </SkeletonGroup>
-      ) : newsState === 'error' ? (
-        <Text style={styles.muted}>Çay haberleri yüklenemedi. Aşağı çekerek yenileyin.</Text>
-      ) : news.length === 0 ? (
-        <Text style={styles.muted}>Son 30 günde çayla ilgili haber bulunamadı.</Text>
-      ) : (
-        <View style={styles.newsList}>
-          {news.map((item) => (
-            <NewsCard key={item.id} item={item} />
+        {data.notes.length > 0 ? (
+          <>
+            <SectionTitle light>Bilgi</SectionTitle>
+            <Card style={styles.card}>
+              {data.notes.map((n) => (
+                <View key={n} style={styles.noteRow}>
+                  <Text style={styles.bullet}>•</Text>
+                  <Text style={[styles.note, { flex: 1 }]}>{n}</Text>
+                </View>
+              ))}
+            </Card>
+          </>
+        ) : null}
+
+        <SectionTitle light>Kuru çay satış fiyatları</SectionTitle>
+        <Card style={styles.card}>
+          <Text style={styles.body}>
+            ÇAYKUR ürünlerinin güncel satış fiyatları ürüne ve ambalaja göre değişir. Doğru bilgi için resmî
+            kaynağı kullanın.
+          </Text>
+          <LinkRow glass label="ÇAYKUR ürünleri ve fiyatları" url="https://www.caykur.gov.tr" />
+        </Card>
+
+        <SectionTitle light>Kaynaklar</SectionTitle>
+        <Card style={styles.card}>
+          {data.links.map((l) => (
+            <LinkRow glass key={l.url} label={l.label} url={l.url} />
           ))}
-        </View>
-      )}
+        </Card>
 
-      <SectionTitle>Kuru çay satış fiyatları</SectionTitle>
-      <Card>
-        <Text style={styles.body}>
-          ÇAYKUR ürünlerinin güncel satış fiyatları ürüne ve ambalaja göre değişir. Doğru bilgi için resmî
-          kaynağı kullanın.
-        </Text>
-        <LinkRow label="ÇAYKUR ürünleri ve fiyatları" url="https://www.caykur.gov.tr" />
-      </Card>
-
-      <SectionTitle>Kaynaklar</SectionTitle>
-      <Card>
-        {data.links.map((l) => (
-          <LinkRow key={l.url} label={l.label} url={l.url} />
-        ))}
-      </Card>
-
-      <Text style={styles.updated}>Veri güncelleme tarihi: {formatDateTr(data.updatedAt)}</Text>
-    </ScrollView>
+        <Text style={styles.updated}>Veri güncelleme tarihi: {formatDateTr(data.updatedAt)}</Text>
+      </ScrollView>
+    </View>
   );
 }
+
+// ——— Vitrin kartındaki ince belli çay bardağı ve tüten buhar ———
+
+function TeaGlass({ running }: { running: boolean }) {
+  const reduced = useSceneStill();
+  const moving = running && !reduced;
+  const clock = useLoopClock(3600, moving);
+  const wisps = [0, 1, 2].map((i) => {
+    const t = loopPhase(clock, 1, i / 3);
+    return {
+      left: 15 + i * 7,
+      translateY: moving ? t.interpolate({ inputRange: [0, 1], outputRange: [0, -26] }) : -8 - i * 4,
+      translateX: moving ? t.interpolate({ inputRange: [0, 0.5, 1], outputRange: [0, i % 2 ? 3 : -3, 0] }) : 0,
+      opacity: moving ? t.interpolate({ inputRange: [0, 0.3, 1], outputRange: [0, 0.45, 0] }) : 0.3,
+    };
+  });
+  return (
+    <View style={glassStyles.wrap} pointerEvents="none" accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+      {wisps.map((w, i) => (
+        <Animated.View
+          key={i}
+          style={[glassStyles.wisp, { left: w.left, opacity: w.opacity, transform: [{ translateY: w.translateY }, { translateX: w.translateX }] }]}
+        />
+      ))}
+      {/* Bardak: geniş ağız, ince bel, dolgun gövde; içinde demli çay */}
+      <View style={glassStyles.rim} />
+      <View style={glassStyles.upper}>
+        <LinearGradient colors={G.tea} style={[StyleSheet.absoluteFill, { top: 5 }]} />
+        <View style={glassStyles.shine} />
+      </View>
+      <View style={glassStyles.waist}>
+        <LinearGradient colors={[G.tea[1], G.tea[1]]} style={StyleSheet.absoluteFill} />
+      </View>
+      <View style={glassStyles.lower}>
+        <LinearGradient colors={[G.tea[1], '#5E1A0B']} style={StyleSheet.absoluteFill} />
+      </View>
+      <View style={glassStyles.saucer} />
+    </View>
+  );
+}
+
+const glassStyles = StyleSheet.create({
+  wrap: { position: 'absolute', top: 4, right: 6, width: 46, height: 88, alignItems: 'center', justifyContent: 'flex-end' },
+  wisp: { position: 'absolute', top: 10, width: 3, height: 14, borderRadius: 2, backgroundColor: 'rgba(255,255,255,0.7)' },
+  rim: { width: 34, height: 3, borderRadius: 2, backgroundColor: 'rgba(255,255,255,0.6)' },
+  upper: {
+    width: 32,
+    height: 27,
+    borderBottomLeftRadius: 15,
+    borderBottomRightRadius: 15,
+    overflow: 'hidden',
+    backgroundColor: 'rgba(255,255,255,0.22)',
+  },
+  shine: { position: 'absolute', left: 5, top: 5, width: 3, height: 13, borderRadius: 2, backgroundColor: 'rgba(255,255,255,0.4)' },
+  waist: { width: 13, height: 3, overflow: 'hidden' },
+  lower: {
+    width: 22,
+    height: 14,
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+    borderBottomLeftRadius: 5,
+    borderBottomRightRadius: 5,
+    overflow: 'hidden',
+  },
+  saucer: { width: 46, height: 5, borderRadius: 3, marginTop: 1, backgroundColor: 'rgba(255,255,255,0.45)' },
+});

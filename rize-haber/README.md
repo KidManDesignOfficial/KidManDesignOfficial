@@ -6,12 +6,13 @@ Rize'deki günlük haberleri ve hava durumunu gösteren Android uygulaması (Rea
 
 | Sekme | İçerik |
 |---|---|
-| **Haberler** | Google Haberler üzerinden son 7 günün Rize haberleri · kategoriler · arama · Kaydet / Paylaş · başlıktaki **★ Kaydedilenler** |
-| **Rizespor** | Sıradaki maç kartı (saniye saniye geri sayım, “🍵 Çayını demle” hatırlatması) · canlı skor · son 5 maç formu, sıra ve puan · fikstür ve sonuçlar · Süper Lig puan durumu · kadro (mevki, yaş, uyruk, sakatlık) · transfer ve maç haberleri · **Maç Merkezi:** maç anları zaman çizelgesi, sahada ilk 11’ler, istatistikler, canlıda 30 sn’de bir yenileme ve gol kutlaması |
-| **Çay** | Güncel yaş çay alım fiyatı (resmî kaynak + ilan tarihi) · önceki yıla göre değişim · **tutar hesaplayıcı** · yıllara göre fiyat grafiği · çay gündemi haberleri · kaynak bağlantıları |
-| **Hava** | Anlık durum · 24 saatlik ve 7 günlük tahmin · 12 ilçe + Ayder |
-| **Keşfet** | **Gezi:** 15 yer (yayla, doğa, tarih, müze), haritada aç, gezi listem, paylaş · **Lezzet:** 14 coğrafi işaretli ürün ve yöresel tatlar · **Kültür:** Rize bezi, horon, kemençe, tulum, şenlikler, pratik bilgiler · **Tarihçe** |
-| **Ayarlar** (⚙️) | Tema (Sistem/Açık/Koyu) · 5 renk · yazı boyutu (Normal/Büyük/Çok büyük) · varsayılan hava konumu · bildirimler · kaydedilenleri temizle · hakkında ve veri kaynakları |
+| **Haberler** | Saate göre değişen Rize manzarası (Kaçkarlar, Karadeniz, çay tepeleri) ve cam kartlar · Google Haberler üzerinden son 7 günün Rize haberleri · ekran açıkken 5 dk'da bir otomatik yenileme · manşet ve gün başlıkları · kategoriler · arama · Kaydet / Paylaş · başlıktaki **★ Kaydedilenler** |
+| **Rizespor** | Maç gecesi stadyum sahnesi (projektörler, tribün flaşları, saha; canlı maçta daha hareketli, Rizespor golünde havai fişek) ve cam kartlar · sıradaki maç kartı (saniye saniye geri sayım, “🍵 Çayını demle” hatırlatması) · **canlı takip:** başlama saatinden 15 dk önce açılan maç penceresinde 20 sn’de bir güncelleme, telefonda saniye saniye ilerleyen dakika ve ilerleme çubuğu · gol, devre arası, maç sonu ve kırmızı kartta ekran efekti (konfeti, flaş, bilgi şeridi) · Süper Lig’de günün skorları · son 5 maç formu, sıra ve puan · sezon özeti (iç saha / deplasman, gol ortalaması, gol yemeden biten maçlar, seri) · fikstür ve sonuçlar · Süper Lig puan durumu · kadro (mevki, yaş, uyruk, sakatlık, maç / gol / asist) ve takım liderleri · **Maç Merkezi:** Özet (maç akışı şeridi, asistli maç anları ve devre ayraçları, hakem ve seyirci), Kadro (sahada gol ve kart işaretli ilk 11’ler, öne çıkanlar, yedekler), İstatistik (hücum, pas, savunma, disiplin) ve Rekabet (puan durumu, iki takımın son 5 maçı, önceki karşılaşmalar) |
+| **Çay** | Sabah çay bahçesi sahnesi (kat kat çay tepeleri, şafak güneşi, sis, savrulan yapraklar) ve cam kartlar · buharı tüten ince belli bardak · güncel yaş çay alım fiyatı (resmî kaynak + ilan tarihi) · önceki yıla göre değişim · **tutar hesaplayıcı** · yıllara göre fiyat grafiği · kaynak bağlantıları |
+| **Ekonomi** | Piyasa ekranı sahnesi (ızgara, mum grafiği, canlı nokta, süzülen ₺ $ € £) ve cam kartlar · **kayan kur bandı** · TCMB döviz kurları (bayraklı) (USD, EUR, GBP, CHF, SAR, RUB, GEL; alış/satış) · gram ve ons altın · döviz çevirici · yaş çay fiyatı · çevrimdışı son veri · 10 dk'da bir otomatik yenileme |
+| **Hava** | Anlık durum · 24 saatlik ve 7 günlük tahmin · 12 ilçe, Ayder ve ~480 köy, belde, yayla (eski adlarıyla aranabilir, çevrimdışı) · havaya göre canlanan sahne (güneş, ay/yıldız, bulut, yağmur, şimşek, kar, sis) · isteğe bağlı yağmur sesi |
+| **Keşfet** _(şimdilik kapalı, uygulamada görünmez; `DISCOVER_ENABLED`)_ | **Kuşbakışı:** Rize’ye yukarıdan bakan 3B canlı harita — OpenStreetMap binaları, gerçek yollarda sağdan akan, tek yön kurallarına uyan araçlar (otomobil, sarı taksi, dolmuş, otobüs, kamyon), gece farlar ve sokak lambaları, kamera turu, trafik yoğunluğu, 16 noktaya uçuş (trafik canlandırmadır) · **Bugün:** “Bugün nereye gideyim?” önerileri (hava, mevsim, saat ve uzaklığa göre; gerekçeleriyle, “Başka öner”, akşamları yarın için) · yakındaki gezi yerleri ve lezzet durakları · en çok önerilenler · isteğe bağlı yaklaşık konum (koordinat telefondan çıkmaz) · **Gezi:** 34 yer (yayla, doğa, tarihi yapılar, müze; kaynaklı), uzaklık ve “yakına göre” sıralama, haritada aç, gezi listem, paylaş · **Lezzet:** “Nerede yenir?” (kaynağıyla sık önerilen lokanta, kafe ve pideciler; puan ve fiyat uydurulmaz, harita bağlantısıyla güncel yorumlar) · 14 coğrafi işaretli ürün ve yöresel tatlar · **Kültür:** Rize bezi, horon, kemençe, tulum, şenlikler, pratik bilgiler · **Tarihçe** |
+| **Ayarlar** (⚙️) | 6 tema (Klasik, Kâğıt, Yayla Sisi, Renk tonlu, Zifiri, Yüksek kontrast) · açık/koyu/sistem · 5 renk · her sekme için ayrı seçilen arka plan sahnesi (Ayarlar → Arka planlar) · yazı boyutu (Normal/Büyük/Çok büyük) · özelleştirme (arayüz animasyonları, hareketli arka planlar, titreşim, yağmur sesi, açılış ekranı) · varsayılan hava konumu (ilçe veya köy) · bildirimler · kaydedilenleri temizle · hakkında ve veri kaynakları |
 
 Ayarlar başlıktaki ⚙️ düğmesindedir.
 
@@ -19,8 +20,10 @@ Ayarlar başlıktaki ⚙️ düğmesindedir.
 Maç, puan durumu ve kadro verisi ESPN’in herkese açık ama **belgelenmemiş** veri adreslerinden alınır
 (`src/rizespor/api.ts`). Kaynak değişirse yalnızca `src/rizespor/api.ts` ve `src/rizespor/parse.ts` güncellenir;
 gerçek yanıt örnekleriyle yazılmış testler (`test/fixtures/espn`) biçim değişikliğini hemen yakalar.
-Veri resmî kulüp/TFF verisi değildir ve gecikmeli olabilir. Maç hatırlatmaları telefonda zamanlanır;
-skor bildirimleri arka plan görevine bağlı olduğundan gecikmeli gelebilir.
+Veri resmî kulüp/TFF verisi değildir ve gecikmeli olabilir. Canlı maçta uygulama açıkken ligin günlük skor
+tablosu 20 saniyede bir okunur (`src/rizespor/live.ts`); dakika iki okuma arasında telefonda ilerletilir.
+Maç hatırlatmaları telefonda zamanlanır; uygulama kapalıyken gelen skor bildirimleri arka plan görevine bağlı
+olduğundan (Android en sık 15 dakikada bir çalıştırır) gecikmeli gelebilir.
 
 Haber metinleri kopyalanmaz; yalnızca başlık, kaynak ve bağlantı gösterilir.
 
@@ -88,28 +91,45 @@ npx expo start      # telefonda Expo Go ile anlık önizleme
 ```
 App.tsx                     Ana yerleşim: başlık + alt sekme çubuğu
 src/config.ts               Haber kategorileri (arama sorguları), ilçe koordinatları
+src/places.ts               İlçe + köy/belde/yayla listesi, Türkçe duyarsız arama (saf, test edilir)
+src/data/rizePlaces.ts      Köy ve yayla konumları — GeoNames (CC BY 4.0), scripts/rize-places.py üretir
+src/components/LocationPicker.tsx Konum seçici (arama, ilçeye göre köyler)
 src/colors.ts, src/theme.tsx Renk paletleri, tema ve kullanıcı ayarları
+src/backdrops.ts, src/components/Backdrop.tsx  Sekmelerin seçilebilir arka plan sahneleri ve çizimi
 src/tea.ts, src/teaData.ts  Çay fiyatı verisi: doğrulama, hesaplama, uzaktan güncelleme
 data/cay.json               Güncel çay fiyatı (uygulama buradan okur)
 src/data/rize.ts            Rize tarihçesi ve çayın hikâyesi (kaynaklarıyla)
 src/data/discover.ts        Gezilecek yerler, lezzetler, kültür (kaynaklarıyla)
-src/rizespor/                Rizespor: veri okuma (api, parse), diziliş, hatırlatmalar
-src/screens/rizespor/       Rizespor ekranları: maçlar, puan, kadro, haberler, Maç Merkezi, saha
+src/rizespor/                Rizespor: veri okuma (api, parse), canlı takip (live), sezon özeti (season), diziliş, hatırlatmalar
+src/screens/rizespor/       Rizespor ekranları: maçlar, puan, kadro, Maç Merkezi, saha, kutlama efektleri
 src/components/ui.tsx       Ortak arayüz parçaları
 src/rss.ts                  RSS okuyucu (Google Haberler + genel RSS beslemeleri)
 src/notifications.ts        Arka plan haber kontrolü ve bildirimler
 src/newsDiff.ts             "Hangi haberler yeni?" hesabı
+src/newsFeed.ts             Haber akışı: otomatik yenileme, manşet, gün bölümleri, kaynak rozeti
 src/storage.ts              Telefonda kalıcı veri (favoriler, ayarlar)
 src/favorites.tsx           Favori durumu
 src/components/NewsCard.tsx Haber kartı (kaydet / paylaş)
 src/screens/SavedScreen.tsx Kaydedilenler
 src/screens/TeaScreen.tsx   Çay fiyatları
+src/screens/EconomyScreen.tsx Ekonomi: döviz, altın, çevirici
+src/markets.ts              TCMB kur ve altın verisi (ayrıştırma, hesap; saf, test edilir)
+src/appState.ts             Uygulama ön planda mı? (otomatik yenilemeler için)
 src/screens/RizeScreen.tsx  Rize’yi tanı
 src/screens/SettingsScreen.tsx Ayarlar
 src/weather.ts              Open-Meteo istemcisi, hava kodu → Türkçe açıklama
 src/time.ts                 "5 dk önce", gün adları vb.
 src/screens/NewsScreen.tsx  Haber listesi
-src/screens/WeatherScreen.tsx Hava durumu
+src/screens/WeatherScreen.tsx Hava durumu (cam kartlar)
+src/components/WeatherScene.tsx Canlı hava sahnesi (yerel sürücüde animasyon)
+src/components/RizeScene.tsx Haberler arka planı: Rize manzarası, saate göre renk (src/rizeScene.ts)
+src/components/StadiumScene.tsx Rizespor maç gecesi sahnesi (renkler: src/rizespor/stadium.ts)
+src/components/TeaScene.tsx  Çay arka planı: sabah çay bahçesi (renkler: src/teaScene.ts)
+src/components/EconomyScene.tsx Ekonomi arka planı: piyasa ekranı (renkler ve grafikler: src/economyScene.ts)
+src/components/HeroCard.tsx  Ekran vitrin kartı (geçiş, filigran, dağ silueti)
+src/weatherScene.ts          Hava kodu → sahne (saf, test edilir)
+src/rainSound.ts             İsteğe bağlı yağmur sesi (varsayılan kapalı)
+design/make-rain-sound.py    Özgün yağmur sesi sentezleyici → assets/sounds/rain.m4a
 test/*.test.ts              Birim testleri
 ```
 

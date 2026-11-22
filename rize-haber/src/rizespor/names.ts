@@ -25,6 +25,11 @@ export function teamName(raw: string | undefined | null): string {
   return TEAM_NAMES[raw] ?? raw;
 }
 
+/** Takım adının kısa biçimi (dar satırlar için). */
+export function shortTeamName(name: string): string {
+  return name.replace(/^Çaykur\s+/, '').replace(/\s+(FK|SK|SFK|JK|AŞ)$/, '');
+}
+
 const VENUE_NAMES: Record<string, string> = {
   'Estadio Caykur Didi': 'Çaykur Didi Stadyumu',
   'Diyarbakir Stadyumu': 'Diyarbakır Stadyumu',
@@ -52,17 +57,32 @@ export function positionGroup(name: string | undefined | null): PositionGroup {
   return 'MID';
 }
 
-export const STAT_LABELS: { key: string; label: string; percent?: boolean }[] = [
-  { key: 'possessionPct', label: 'Topla oynama', percent: true },
-  { key: 'totalShots', label: 'Şut' },
-  { key: 'shotsOnTarget', label: 'İsabetli şut' },
-  { key: 'wonCorners', label: 'Korner' },
-  { key: 'foulsCommitted', label: 'Faul' },
-  { key: 'offsides', label: 'Ofsayt' },
-  { key: 'yellowCards', label: 'Sarı kart' },
-  { key: 'redCards', label: 'Kırmızı kart' },
-  { key: 'saves', label: 'Kurtarış' },
-  { key: 'accuratePasses', label: 'İsabetli pas' },
+export type StatGroup = 'attack' | 'passing' | 'defence' | 'discipline';
+
+export const STAT_GROUPS: { id: StatGroup; label: string }[] = [
+  { id: 'attack', label: 'Hücum' },
+  { id: 'passing', label: 'Pas' },
+  { id: 'defence', label: 'Savunma' },
+  { id: 'discipline', label: 'Disiplin' },
+];
+
+export const STAT_LABELS: { key: string; label: string; group: StatGroup; percent?: boolean }[] = [
+  { key: 'possessionPct', label: 'Topla oynama', group: 'attack', percent: true },
+  { key: 'totalShots', label: 'Şut', group: 'attack' },
+  { key: 'shotsOnTarget', label: 'İsabetli şut', group: 'attack' },
+  { key: 'blockedShots', label: 'Engellenen şut', group: 'attack' },
+  { key: 'wonCorners', label: 'Korner', group: 'attack' },
+  { key: 'offsides', label: 'Ofsayt', group: 'attack' },
+  { key: 'totalPasses', label: 'Pas', group: 'passing' },
+  { key: 'accuratePasses', label: 'İsabetli pas', group: 'passing' },
+  { key: 'passPct', label: 'Pas isabeti', group: 'passing', percent: true },
+  { key: 'totalTackles', label: 'Müdahale', group: 'defence' },
+  { key: 'effectiveTackles', label: 'Başarılı müdahale', group: 'defence' },
+  { key: 'totalClearance', label: 'Uzaklaştırma', group: 'defence' },
+  { key: 'saves', label: 'Kurtarış', group: 'defence' },
+  { key: 'foulsCommitted', label: 'Faul', group: 'discipline' },
+  { key: 'yellowCards', label: 'Sarı kart', group: 'discipline' },
+  { key: 'redCards', label: 'Kırmızı kart', group: 'discipline' },
 ];
 
 /** ISO-3166 alpha-3 → alpha-2 (bayrak emojisi için); kadrodaki yaygın ülkeler. */

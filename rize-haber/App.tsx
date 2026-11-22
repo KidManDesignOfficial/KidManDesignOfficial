@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { BackHandler, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { NavigationBar } from 'expo-navigation-bar';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import * as Notifications from 'expo-notifications';
-import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 import { ICON_FONT, Icon, type IconName } from './src/components/Icon';
@@ -13,7 +13,13 @@ import { tapFeedback } from './src/haptics';
 import { openUrl } from './src/components/ui';
 import { FavoritesProvider } from './src/favorites';
 import { CLUB_COLORS } from './src/rizespor/names';
+import { GLASS } from './src/rizespor/stadium';
+import { useRizeSky } from './src/components/RizeScene';
+import { useTabChrome } from './src/components/TabBackdrop';
+import { MARKET } from './src/economyScene';
+import { TEA_GLASS } from './src/teaScene';
 import DiscoverScreen from './src/screens/DiscoverScreen';
+import EconomyScreen from './src/screens/EconomyScreen';
 import NewsScreen from './src/screens/NewsScreen';
 import Onboarding, { hasOnboarded } from './src/screens/Onboarding';
 import RizesporScreen from './src/screens/RizesporScreen';
@@ -21,7 +27,9 @@ import SavedScreen from './src/screens/SavedScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
 import TeaScreen from './src/screens/TeaScreen';
 import WeatherScreen from './src/screens/WeatherScreen';
-import { ThemeProvider, useTheme } from './src/theme';
+import type { SkyChrome } from './src/weatherScene';
+import { loadSettings } from './src/storage';
+import { DISCOVER_ENABLED, ThemeProvider, useTheme, type Settings, type TabId } from './src/theme';
 
 // Bildirim yanıtı yalnızca telefonda vardır; web önizlemesinde boş döner.
 const useNotificationResponse =
@@ -31,23 +39,29 @@ const useNotificationResponse =
 SplashScreen.preventAutoHideAsync().catch(() => {});
 SplashScreen.setOptions({ fade: true, duration: 350 });
 
-type Tab = 'news' | 'rizespor' | 'tea' | 'weather' | 'rize';
+type Tab = TabId;
 
-const TABS: { id: Tab; label: string; icon: IconName; iconActive: IconName; title: string }[] = [
+type TabDef = { id: Tab; label: string; icon: IconName; iconActive: IconName; title: string };
+
+const TABS = ([
   { id: 'news', label: 'Haberler', icon: 'newspaper-outline', iconActive: 'newspaper', title: 'Rize Haber' },
   { id: 'rizespor', label: 'Rizespor', icon: 'football-outline', iconActive: 'football', title: 'Çaykur Rizespor' },
   { id: 'tea', label: 'Çay', icon: 'leaf-outline', iconActive: 'leaf', title: 'Çay Fiyatları' },
+  { id: 'economy', label: 'Ekonomi', icon: 'trending-up-outline', iconActive: 'trending-up', title: 'Ekonomi' },
   { id: 'weather', label: 'Hava', icon: 'partly-sunny-outline', iconActive: 'partly-sunny', title: 'Hava Durumu' },
   { id: 'rize', label: 'Keşfet', icon: 'compass-outline', iconActive: 'compass', title: 'Rize’yi Keşfet' },
-];
+] as TabDef[]).filter((t) => DISCOVER_ENABLED || t.id !== 'rize');
 
 export default function App() {
   const [fontsLoaded, fontError] = useFonts(ICON_FONT);
   const [onboarded, setOnboarded] = useState<boolean | null>(null);
+  // Ayarlar açılış ekranı kapanmadan okunur: ilk karede doğru tema ve açılış sekmesi görünür.
+  const [stored, setStored] = useState<Partial<Settings> | null>(null);
   useEffect(() => {
     hasOnboarded().then(setOnboarded);
+    loadSettings().then(setStored);
   }, []);
-  const ready = (fontsLoaded || fontError !== null) && onboarded !== null;
+  const ready = (fontsLoaded || fontError !== null) && onboarded !== null && stored !== null;
   useEffect(() => {
     if (ready) SplashScreen.hideAsync().catch(() => {});
   }, [ready]);
@@ -55,7 +69,7 @@ export default function App() {
 
   return (
     <SafeAreaProvider>
-      <ThemeProvider>
+      <ThemeProvider initial={stored}>
         <FavoritesProvider>
           {onboarded ? <Main /> : <Onboarding onDone={() => setOnboarded(true)} />}
         </FavoritesProvider>
@@ -65,13 +79,15 @@ export default function App() {
 }
 
 function Main() {
-  const { colors, fs } = useTheme();
-  const [tab, setTab] = useState<Tab>('news');
+  const { colors, fs, settings } = useTheme();
+  const startTab = settings.startTab;
+  const [tab, setTab] = useState<Tab>(startTab);
   const [showSaved, setShowSaved] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [openMatchId, setOpenMatchId] = useState<string | null>(null);
+  const [weatherChrome, setWeatherChrome] = useState<SkyChrome | null>(null);
   // Her sekme ilk açıldığında yüklenir: açılış hızlanır, gereksiz ağ isteği ve pil harcanmaz.
-  const [mounted, setMounted] = useState<Set<Tab | 'settings'>>(() => new Set(['news']));
+  const [mounted, setMounted] = useState<Set<Tab | 'settings'>>(() => new Set(['news', startTab]));
   const mount = useCallback((t: Tab | 'settings') => {
     setMounted((m) => (m.has(t) ? m : new Set(m).add(t)));
   }, []);
@@ -86,7 +102,7 @@ function Main() {
 
   useOpenNotifications(goTo, () => setShowSaved(false), setOpenMatchId);
 
-  // Android geri tuşu: önce Ayarlar'ı / Kaydedilenler'i kapat, sonra Haberler sekmesine dön.
+  // Android geri tuşu: önce Ayarlar'ı / Kaydedilenler'i kapat, sonra açılış sekmesine dön.
   useEffect(() => {
     const sub = BackHandler.addEventListener('hardwareBackPress', () => {
       if (showSettings) {
@@ -97,16 +113,43 @@ function Main() {
         setShowSaved(false);
         return true;
       }
-      if (tab !== 'news') {
-        setTab('news');
+      if (tab !== startTab) {
+        setTab(startTab);
+        mount(startTab);
         return true;
       }
       return false;
     });
     return () => sub.remove();
-  }, [showSaved, showSettings, tab]);
+  }, [showSaved, showSettings, tab, startTab, mount]);
 
   const club = tab === 'rizespor' && !showSettings;
+  const newsVisible = tab === 'news' && !showSettings;
+  const teaVisible = tab === 'tea' && !showSettings;
+  const economyVisible = tab === 'economy' && !showSettings;
+  // Haberler sekmesi: günün saatine göre Rize manzarası (gündüz / akşam üstü / gece).
+  const rizeSky = useRizeSky();
+  const weatherVisible = tab === 'weather' && !showSettings;
+  // Hava sekmesinde başlık ve sekme çubuğu gökyüzünün rengini alır; sahneyle kesintisiz birleşir.
+  // Rizespor sekmesinde de aynısı: başlık gece göğüne, sekme çubuğu stadyumun çimine karışır.
+  // Haberler, Çay ve Ekonomi sekmelerinde de başlık ve sekme çubuğu kendi sahnelerinin renklerini alır.
+  // Ayarlar → Arka planlar'dan başka bir sahne seçildiyse çerçeve o sahnenin renklerini alır.
+  const newsChrome = useTabChrome('news', rizeSky);
+  const clubChrome = useTabChrome('rizespor');
+  const teaChrome = useTabChrome('tea');
+  const economyChrome = useTabChrome('economy');
+  const skyChrome = weatherVisible
+    ? weatherChrome
+    : club
+      ? clubChrome
+      : newsVisible
+        ? newsChrome
+        : teaVisible
+          ? teaChrome
+          : economyVisible
+            ? economyChrome
+            : null;
+  const sky = skyChrome?.header ?? null;
   const styles = useMemo(
     () =>
       StyleSheet.create({
@@ -141,7 +184,7 @@ function Main() {
           borderTopWidth: StyleSheet.hairlineWidth,
           borderTopColor: colors.border,
         },
-        tabButton: { flex: 1, alignItems: 'center', paddingTop: 8, paddingBottom: 6, gap: 2 },
+        tabButton: { flex: 1, alignItems: 'center', paddingTop: 8, paddingBottom: 6, paddingHorizontal: 2, gap: 2 },
         tabIndicator: { position: 'absolute', top: 0, height: 3, width: 28, borderRadius: 2 },
         tabLabel: { fontSize: fs(11), fontWeight: '600', color: colors.textMuted },
       }),
@@ -195,41 +238,43 @@ function Main() {
   return (
     <>
       <StatusBar style="light" />
-      <SafeAreaView style={[styles.root, club && { backgroundColor: CLUB_COLORS.green }]} edges={['top', 'left', 'right']}>
-        {club ? (
-          <LinearGradient colors={[CLUB_COLORS.green, CLUB_COLORS.blue]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
-            {headerContent}
-          </LinearGradient>
-        ) : (
-          <View style={{ backgroundColor: colors.header }}>{headerContent}</View>
-        )}
+      {/* Hava ekranında alt çubuk koyu gökyüzü rengindedir: Android gezinme düğmeleri açık renk olur. */}
+      <NavigationBar style={skyChrome ? 'light' : 'auto'} />
+      <SafeAreaView
+        style={[styles.root, sky ? { backgroundColor: sky } : null]} edges={['top', 'left', 'right']}>
+        <View style={{ backgroundColor: sky ?? colors.header }}>{headerContent}</View>
 
         {/* Ekranlar bağlı kalır; sekme değişince yüklenen veri ve kaydırma konumu korunur. */}
         <View style={styles.body}>
           <FadeInView visible={!showSettings && tab === 'news' && !showSaved} style={styles.screen}>
-            <NewsScreen />
+            <NewsScreen active={newsVisible && !showSaved} sky={rizeSky} />
           </FadeInView>
           <FadeInView visible={!showSettings && tab === 'news' && showSaved} style={styles.screen}>
-            <SavedScreen />
+            <SavedScreen sky={rizeSky} active={newsVisible && showSaved} />
           </FadeInView>
           {mounted.has('rizespor') ? (
             <FadeInView visible={!showSettings && tab === 'rizespor'} style={styles.screen}>
-              <RizesporScreen openMatchId={openMatchId} />
+              <RizesporScreen openMatchId={openMatchId} active={club} />
             </FadeInView>
           ) : null}
           {mounted.has('tea') ? (
-            <FadeInView visible={!showSettings && tab === 'tea'} style={styles.screen}>
-              <TeaScreen />
+            <FadeInView visible={teaVisible} style={styles.screen}>
+              <TeaScreen active={teaVisible} />
+            </FadeInView>
+          ) : null}
+          {mounted.has('economy') ? (
+            <FadeInView visible={economyVisible} style={styles.screen}>
+              <EconomyScreen active={economyVisible} onOpenTea={() => goTo('tea')} />
             </FadeInView>
           ) : null}
           {mounted.has('weather') ? (
-            <FadeInView visible={!showSettings && tab === 'weather'} style={styles.screen}>
-              <WeatherScreen />
+            <FadeInView visible={weatherVisible} style={styles.screen}>
+              <WeatherScreen active={weatherVisible} onSkyColors={setWeatherChrome} />
             </FadeInView>
           ) : null}
-          {mounted.has('rize') ? (
+          {DISCOVER_ENABLED && mounted.has('rize') ? (
             <FadeInView visible={!showSettings && tab === 'rize'} style={styles.screen}>
-              <DiscoverScreen />
+              <DiscoverScreen active={!showSettings && tab === 'rize'} />
             </FadeInView>
           ) : null}
           {mounted.has('settings') ? (
@@ -239,10 +284,16 @@ function Main() {
           ) : null}
         </View>
 
-        <SafeAreaView edges={['bottom']} style={styles.tabBar} accessibilityRole="tablist">
+        <SafeAreaView
+          edges={['bottom']}
+          style={[styles.tabBar, skyChrome && { backgroundColor: skyChrome.footer, borderTopColor: 'rgba(255,255,255,0.12)' }]}
+          accessibilityRole="tablist"
+        >
           {TABS.map((t) => {
             const active = t.id === tab && !showSettings;
-            const accent = t.id === 'rizespor' ? CLUB_COLORS.green : colors.primary;
+            // Hava ekranında sekme çubuğu gökyüzüne karışır: seçili sekme beyaz, diğerleri yarı saydam beyaz.
+            const accent = club ? GLASS.accent : economyVisible ? MARKET.gold : teaVisible ? TEA_GLASS.accent : skyChrome ? '#FFFFFF' : t.id === 'rizespor' ? CLUB_COLORS.green : colors.primary;
+            const idle = skyChrome ? 'rgba(255,255,255,0.62)' : colors.textMuted;
             return (
               <Pressable
                 key={t.id}
@@ -253,8 +304,13 @@ function Main() {
                 accessibilityLabel={t.label}
               >
                 <View style={[styles.tabIndicator, active && { backgroundColor: accent }]} />
-                <Icon name={active ? t.iconActive : t.icon} size={23} color={active ? accent : colors.textMuted} />
-                <Text style={[styles.tabLabel, active && { color: accent }]} numberOfLines={1}>
+                <Icon name={active ? t.iconActive : t.icon} size={23} color={active ? accent : idle} />
+                <Text
+                  style={[styles.tabLabel, { color: active ? accent : idle }]}
+                  numberOfLines={1}
+                  adjustsFontSizeToFit
+                  minimumFontScale={0.8}
+                >
                   {t.label}
                 </Text>
               </Pressable>

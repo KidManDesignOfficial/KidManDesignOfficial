@@ -2,13 +2,15 @@
  * Uygulama genelindeki hareketler: açılır-kapanır içerik, basınca yaylanma, yumuşak beliriş.
  *
  * Tek bir yerde tanımlandıkları için her ekranda aynı süre ve eğri kullanılır. Telefonda
- * "Hareketi azalt" (erişilebilirlik) açıksa animasyonlar anında tamamlanır.
+ * "Hareketi azalt" (erişilebilirlik) açıksa ya da kullanıcı Ayarlar → Özelleştirme'den
+ * animasyonları kapattıysa animasyonlar anında tamamlanır.
  */
-import { useEffect, useState } from 'react';
-import type { ReactNode } from 'react';
-import { AccessibilityInfo, Animated, Easing, Pressable, View } from 'react-native';
+import { createContext, useContext, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import type { ComponentRef, ReactNode } from 'react';
+import { AccessibilityInfo, Animated, Easing, Pressable, ScrollView, View } from 'react-native';
 import type { PressableProps, StyleProp, ViewStyle } from 'react-native';
 
+import { useTheme } from '../theme';
 import { Icon } from './Icon';
 
 /**
@@ -20,11 +22,33 @@ export function useAnimatedValue(initial: number): Animated.Value {
   return value;
 }
 
+/**
+ * Arka plan sahneleri için 0→1 arasında sürekli dönen saat (yerel sürücüde, doğrusal).
+ * `running` yanlışsa durur; sahne durağan çizilir.
+ */
+export function useLoopClock(duration: number, running: boolean): Animated.Value {
+  const clock = useAnimatedValue(0);
+  useEffect(() => {
+    if (!running) return;
+    clock.setValue(0);
+    const loop = Animated.loop(Animated.timing(clock, { toValue: 1, duration, easing: Easing.linear, useNativeDriver: true }));
+    loop.start();
+    return () => loop.stop();
+  }, [clock, duration, running]);
+  return clock;
+}
+
+/** Saatten türetilen, `speed` kat hızlı ve `phase` kadar kaydırılmış 0→1 döngü. */
+export function loopPhase(clock: Animated.Value, speed: number, phase: number) {
+  return Animated.modulo(Animated.add(Animated.multiply(clock, speed), phase), 1);
+}
+
 /** Doğal hissettiren yavaşlayan eğri (Material "emphasized decelerate"e yakın). */
 export const EASE_OUT = Easing.bezier(0.2, 0.8, 0.2, 1);
 export const DURATION = { short: 180, medium: 300 } as const;
 
-export function useReducedMotion(): boolean {
+/** Telefonun erişilebilirlik ayarı "Hareketi azalt" açık mı? */
+export function useSystemReducedMotion(): boolean {
   const [reduced, setReduced] = useState(false);
   useEffect(() => {
     let mounted = true;
@@ -38,6 +62,20 @@ export function useReducedMotion(): boolean {
     };
   }, []);
   return reduced;
+}
+
+/** Arayüz animasyonları (geçiş, açılır-kapanır, yaylanma) kapalı mı? */
+export function useReducedMotion(): boolean {
+  const system = useSystemReducedMotion();
+  const { settings } = useTheme();
+  return system || !settings.uiMotion;
+}
+
+/** Arka plan sahneleri durağan mı çizilmeli? (yağmur, bulut, buhar, borsa şeridi, stadyum ışıkları) */
+export function useSceneStill(): boolean {
+  const system = useSystemReducedMotion();
+  const { settings } = useTheme();
+  return system || !settings.sceneMotion;
 }
 
 /**
@@ -163,13 +201,48 @@ export function FadeInView({
 
   const translateY = progress.interpolate({ inputRange: [0, 1], outputRange: [10, 0] });
 
+  // Her yeniden görünüşte sayaç artar; iç içe sekmelerde üst sekmenin sayacı da hesaba katılır.
+  const parent = useContext(ShowContext);
+  const [shows, setShows] = useState(0);
+  const [wasVisible, setWasVisible] = useState(visible);
+  if (visible !== wasVisible) {
+    setWasVisible(visible);
+    if (visible) setShows((n) => n + 1);
+  }
+  const key = `${parent}.${shows}`;
+
   return (
     <Animated.View
       style={[style, !visible && { display: 'none' }, { opacity: progress, transform: [{ translateY }] }]}
     >
-      {children}
+      <ShowContext.Provider value={key}>{children}</ShowContext.Provider>
     </Animated.View>
   );
+}
+
+const ShowContext = createContext('0');
+
+type Scrollable = {
+  scrollTo?: (o: { x?: number; y?: number; animated?: boolean }) => void;
+  scrollToOffset?: (o: { offset: number; animated?: boolean }) => void;
+};
+
+/**
+ * Kaydırılabilir listeye verilecek ref: liste, içinde bulunduğu sekme (FadeInView) her yeniden
+ * açıldığında animasyonsuz en üste döner. Sekme değiştirince sayfa yarıda kalmaz.
+ */
+export function useScrollTopOnShow<T extends Scrollable = ComponentRef<typeof ScrollView>>() {
+  const ref = useRef<T>(null);
+  const key = useContext(ShowContext);
+  const first = useRef(key);
+  useLayoutEffect(() => {
+    if (key === first.current) return;
+    first.current = key;
+    const list = ref.current;
+    if (list?.scrollToOffset) list.scrollToOffset({ offset: 0, animated: false });
+    else list?.scrollTo?.({ y: 0, animated: false });
+  }, [key]);
+  return ref;
 }
 
 /** Dönen ok (▾): `progress` 0 → 1 iken 0° → 180°. */

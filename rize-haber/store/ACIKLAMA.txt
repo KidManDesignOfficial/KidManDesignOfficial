@@ -1,43 +1,46 @@
-Rize Haber, Rize’ye dair her şeyi tek uygulamada toplar: gündem, Çaykur Rizespor, yaş çay alım fiyatı, hava durumu ve şehrin gezi rehberi.
+Rize Haber, Rize’ye dair her gün baktığınız şeyleri tek uygulamada toplar: gündem, Çaykur Rizespor, yaş çay alım fiyatı, döviz ve altın, hava durumu.
 
 📰 RİZE’NİN GÜNDEMİ
-• Rize ve ilçelerinden güncel haberler; Gündem, Spor, Ekonomi, Asayiş ve İlçeler kategorileri
+• Rize ve ilçelerinden son 7 günün haberleri; Gündem, Spor, Ekonomi, Asayiş ve İlçeler kategorileri
+• Manşet, gün başlıkları ve arama; ekran açıkken haberler kendiliğinden yenilenir
 • Her haber kaynağıyla birlikte gösterilir ve tek dokunuşla kaynağında açılır
 • Haberleri kaydedin, WhatsApp ve diğer uygulamalarla paylaşın
-• İsteğe bağlı yeni haber bildirimleri
-• İnternet yokken son yüklenen haberler görüntülenir
+• İsteğe bağlı yeni haber bildirimleri; internet yokken son yüklenen haberler görüntülenir
 
 ⚽ ÇAYKUR RİZESPOR
-• Sıradaki maç için geri sayım
-• “🍵 Çayını demle, maç başlıyor!” – maçtan 30 dakika önce hatırlatma
-• Fikstür, sonuçlar ve son 5 maç formu
-• Süper Lig puan durumu ve takım kadrosu
-• Maç Merkezi: maç anları, sahada ilk 11’ler ve istatistikler; canlı maçlarda otomatik yenileme
-• Transfer ve maç haberleri
+• Sıradaki maç için saniye saniye geri sayım
+• “🍵 Çayını demle, maç başlıyor!” – maç öncesi hatırlatma
+• Canlı takip: maç sırasında skor ve dakika kendiliğinden güncellenir; golde havai fişek
+• Fikstür, sonuçlar, son 5 maç formu, sezon özeti
+• Süper Lig puan durumu, kadro ve takım liderleri
+• Maç Merkezi: maç akışı, ilk 11’ler, istatistikler ve iki takımın geçmiş karşılaşmaları
 
 🍃 YAŞ ÇAY ALIM FİYATI
 • Resmî kaynaklarda ilan edilen güncel yaş çay alım fiyatı ve ilan tarihi
 • Teslim ettiğiniz miktarın tutarını hesaplayan hesaplayıcı
-• Yıllara göre fiyat karşılaştırması ve çay gündemi
+• Yıllara göre fiyat grafiği ve önceki yıla göre değişim
+
+💱 EKONOMİ
+• TCMB döviz kurları: dolar, euro, sterlin ve diğerleri (alış/satış)
+• Gram ve ons altın
+• Döviz çevirici; internet yokken son veriler
 
 🌦️ HAVA DURUMU
-• Rize’nin 12 ilçesi ve Ayder Yaylası için anlık, saatlik ve 7 günlük tahmin
+• Rize’nin 12 ilçesi, Ayder ve yaklaşık 480 köy, belde ve yayla için anlık, saatlik ve 7 günlük tahmin
+• Köyleri eski adlarıyla da arayabilirsiniz
+• Havaya göre canlanan ekran: güneş, ay ve yıldızlar, bulut, yağmur, kar, sis ve şimşek
+• İsteğe bağlı yağmur sesi
 
-🧭 RİZE’Yİ KEŞFET
-• Gezilecek yerler: yaylalar, şelaleler, kaleler ve müzeler; haritada açın, gezi listenize ekleyin
-• Rize lezzetleri: coğrafi işaretli ürünler ve yöresel tatlar
-• Kültür: Rize bezi, horon, kemençe, tulum ve yayla şenlikleri
-• Rize’nin tarihçesi ve çayın hikâyesi
-
-⚙️ SİZE GÖRE
-• Açık, koyu ve sistem teması; beş farklı renk
-• Büyük ve çok büyük yazı boyutu seçenekleri
-• Akıcı ve sade arayüz
+🎨 SİZE GÖRE
+• 6 tema: Klasik, Kâğıt, Yayla Sisi, Renk tonlu, Zifiri ve Yüksek kontrast; açık, koyu veya sistem
+• Her sekme için ayrı arka plan sahnesi: Yıldızlı Kaçkar, Karadeniz fırtınası, Yayla sisi, Tribün ışıkları, Demlik buharı, Altın tozu, Kaçkar sırtları ve daha fazlası
+• Beş vurgu rengi, büyük ve çok büyük yazı boyutu
+• Hareketli arka planları ve titreşimi isterseniz kapatın; açılış sekmesini siz seçin
 
 🔒 GİZLİLİK
 Hesap gerekmez. Reklam yoktur. Kişisel veri toplanmaz; ayarlarınız ve kaydettikleriniz yalnızca telefonunuzda saklanır.
 
 ℹ️ BİLGİLENDİRME
-Rize Haber bağımsız bir uygulamadır; herhangi bir kamu kurumu, Çaykur Rizespor veya ÇAYKUR ile bağlantılı değildir. Haber başlıkları Google Haberler üzerinden, kaynak yayın kuruluşları belirtilerek gösterilir; haberlerin hakları ilgili yayın kuruluşlarına aittir. Hava durumu verisi Open-Meteo’dan, maç ve puan durumu verileri ESPN’den alınır ve gecikmeli olabilir. Resmî bilgiler ilgili kurumların yayımladığı kaynaklardan derlenir ve uygulama içinde kaynak bağlantılarıyla sunulur.
+Rize Haber bağımsız bir uygulamadır; herhangi bir kamu kurumu, Çaykur Rizespor veya ÇAYKUR ile bağlantılı değildir. Haber başlıkları Google Haberler üzerinden, kaynak yayın kuruluşları belirtilerek gösterilir; haberlerin hakları ilgili yayın kuruluşlarına aittir. Hava durumu verisi Open-Meteo’dan, maç ve puan durumu verileri ESPN’den, döviz kurları TCMB’den, altın fiyatı gold-api.com’dan alınır ve gecikmeli olabilir. Piyasa bilgileri bilgi amaçlıdır, yatırım tavsiyesi değildir. Resmî bilgiler ilgili kurumların yayımladığı kaynaklardan derlenir ve uygulama içinde kaynak bağlantılarıyla sunulur.
 
 Görüş ve önerileriniz için: Ayarlar → İletişim

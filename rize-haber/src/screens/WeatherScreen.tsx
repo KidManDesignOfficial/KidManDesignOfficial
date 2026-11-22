@@ -1,17 +1,48 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 
-import { Icon } from '../components/Icon';
+import { Icon, type IconName } from '../components/Icon';
+import LocationPicker from '../components/LocationPicker';
+import { PressableScale, useScrollTopOnShow } from '../components/motion';
 import { HeroSkeleton } from '../components/Skeleton';
 import { Chip, ChipRow, PrimaryButton } from '../components/ui';
+import { useBackdrop } from '../components/Backdrop';
+import WeatherScene from '../components/WeatherScene';
+import type { WeatherStyle } from '../backdrops';
 import { WEATHER_LOCATIONS } from '../config';
+import { DISTRICT_PLACES, districtName, placeById, pushRecent, type Place } from '../places';
+import { pressFeedback } from '../haptics';
 import { loadCachedWeather, saveCachedWeather, savedAtLabel } from '../offline';
+import { useRainSound, useRainSoundPreference } from '../rainSound';
 import { useTheme } from '../theme';
 import { clockTime, dayLabel } from '../time';
 import { describeWeatherCode, fetchWeather, type Weather } from '../weather';
+import { sceneFor, skyChrome, type SkyChrome } from '../weatherScene';
 
-export default function WeatherScreen() {
-  const { colors, fs, settings } = useTheme();
+const WHITE = '#FFFFFF';
+const SOFT = 'rgba(255,255,255,0.78)';
+const GLASS = 'rgba(255,255,255,0.13)';
+const GLASS_BORDER = 'rgba(255,255,255,0.24)';
+/** Beyaz bulutun ya da parlak gökyüzünün önündeki yazılar için yumuşak gölge. */
+const SHADOW = {
+  textShadowColor: 'rgba(0,0,0,0.25)',
+  textShadowOffset: { width: 0, height: 1 },
+  textShadowRadius: 8,
+} as const;
+
+export default function WeatherScreen({
+  active = true,
+  onSkyColors,
+}: {
+  /** Ekran görünür mü? Değilse sahne animasyonları ve ses durur (pil tasarrufu). */
+  active?: boolean;
+  /** Üst başlık ve alt sekme çubuğunu gökyüzüne uydurmak için renkler; veri yokken null. */
+  onSkyColors?: (colors: SkyChrome | null) => void;
+}) {
+  const scrollRef = useScrollTopOnShow();
+  const { colors, fs, settings, updateSettings } = useTheme();
+  const [pickerOpen, setPickerOpen] = useState(false);
   // Kullanıcının bu ekranda seçtiği ilçe; Ayarlar'daki varsayılan değişirse geçersiz olur.
   const [choice, setChoice] = useState<{ base: string; id: string } | null>(null);
   const locationId = choice && choice.base === settings.weatherLocationId ? choice.id : settings.weatherLocationId;
@@ -22,7 +53,25 @@ export default function WeatherScreen() {
   const [error, setError] = useState<string | null>(null);
   const controller = useRef<AbortController | null>(null);
 
-  const location = WEATHER_LOCATIONS.find((l) => l.id === locationId) ?? WEATHER_LOCATIONS[0];
+  const location: Place = placeById(locationId) ?? placeById(WEATHER_LOCATIONS[0].id)!;
+  // Şeritte: önce son seçilen köy/yaylalar, sonra 12 ilçe ve Ayder.
+  // Seçili köy (ör. Ayarlar'da varsayılan yapılmışsa) son seçilenlerde olmasa da şeridin başında görünür.
+  const strip = useMemo(() => {
+    const list: Place[] = [location, ...settings.recentPlaces.map(placeById), ...DISTRICT_PLACES].filter(
+      (p): p is Place => !!p,
+    );
+    const villages = list.filter((p) => !DISTRICT_PLACES.includes(p));
+    return [...villages, ...DISTRICT_PLACES].filter((p, i, all) => all.findIndex((x) => x.id === p.id) === i);
+  }, [location, settings.recentPlaces]);
+  const choose = useCallback(
+    (place: Place) => {
+      setChoice({ base: settings.weatherLocationId, id: place.id });
+      if (!DISTRICT_PLACES.includes(place)) {
+        updateSettings({ recentPlaces: pushRecent(settings.recentPlaces, place.id) });
+      }
+    },
+    [settings.weatherLocationId, settings.recentPlaces, updateSettings],
+  );
   const weather = entry?.id === location.id ? entry.weather : null;
   const cachedAt = entry?.id === location.id ? entry.cachedAt : null;
 
@@ -61,242 +110,335 @@ export default function WeatherScreen() {
     setRefreshing(false);
   }, [load]);
 
+  const current = weather?.current;
+  const code = current?.code;
+  const isDay = current?.isDay ?? true;
+  const scene = useMemo(() => (code == null ? null : sceneFor(code, isDay)), [code, isDay]);
+  const variant = useBackdrop('weather').id as WeatherStyle;
+  const chrome = scene ? skyChrome(scene) : null;
+  const chromeHeader = chrome?.header ?? null;
+  const chromeFooter = chrome?.footer ?? null;
+
+  useEffect(() => {
+    onSkyColors?.(chromeHeader && chromeFooter ? { header: chromeHeader, footer: chromeFooter } : null);
+  }, [chromeHeader, chromeFooter, onSkyColors]);
+
+  const [soundOn, setSoundOn] = useRainSoundPreference();
+  const rainy = scene?.rainy ?? false;
+  useRainSound(soundOn && rainy && active);
+
   const styles = useMemo(
     () =>
       StyleSheet.create({
-        container: { flex: 1, backgroundColor: colors.background },
-        content: { paddingBottom: 24 },
+        root: { flex: 1, backgroundColor: scene ? scene.sky[1] : colors.background },
+        scroll: { flex: 1 },
+        content: { paddingBottom: 28 },
         center: { alignItems: 'center', justifyContent: 'center', padding: 48, gap: 12 },
         errorText: { color: colors.error, fontSize: fs(15), textAlign: 'center' },
-        offline: {
+        pill: {
           flexDirection: 'row',
           alignItems: 'center',
           gap: 6,
-          alignSelf: 'flex-start',
-          marginHorizontal: 16,
-          marginBottom: 8,
-          backgroundColor: colors.card,
+          alignSelf: 'center',
+          backgroundColor: GLASS,
           borderWidth: 1,
-          borderColor: colors.border,
+          borderColor: GLASS_BORDER,
           borderRadius: 999,
-          paddingHorizontal: 10,
-          paddingVertical: 4,
+          paddingHorizontal: 12,
+          paddingVertical: 6,
         },
-        offlineText: { color: colors.textMuted, fontSize: fs(12), fontWeight: '600' },
-        hero: {
-          marginHorizontal: 16,
-          borderRadius: 20,
-          backgroundColor: colors.header,
-          paddingVertical: 24,
-          paddingHorizontal: 16,
+        pillOn: { backgroundColor: WHITE, borderColor: WHITE },
+        pillText: { color: WHITE, fontSize: fs(13), fontWeight: '700' },
+        pillTextOn: { color: '#1D2B3A' },
+        hero: { alignItems: 'center', paddingTop: 18, paddingBottom: 22, paddingHorizontal: 16 },
+        placeRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+        place: { color: WHITE, fontSize: fs(20), fontWeight: '700', ...SHADOW },
+        placeSub: { color: 'rgba(255,255,255,0.85)', fontSize: fs(13), fontWeight: '600', marginTop: 2, ...SHADOW },
+        findChip: {
+          minHeight: 38,
+          flexDirection: 'row',
           alignItems: 'center',
-        },
-        heroPlace: { color: '#FFFFFF', fontSize: fs(18), fontWeight: '700' },
-        heroIcon: { fontSize: fs(56), marginTop: 8 },
-        heroTemp: { color: '#FFFFFF', fontSize: fs(64), fontWeight: '300', lineHeight: fs(72) },
-        heroLabel: { color: '#FFFFFF', fontSize: fs(18), fontWeight: '600' },
-        heroSub: { color: 'rgba(255,255,255,0.8)', fontSize: fs(14), marginTop: 6, textAlign: 'center' },
-        grid: { flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 12, marginTop: 12 },
-        stat: { width: '33.333%', padding: 4 },
-        statInner: {
-          backgroundColor: colors.card,
-          borderRadius: 12,
+          gap: 5,
+          paddingHorizontal: 13,
+          paddingVertical: 8,
+          borderRadius: 999,
+          backgroundColor: 'rgba(255,255,255,0.22)',
           borderWidth: 1,
-          borderColor: colors.border,
-          padding: 10,
-          gap: 2,
+          borderColor: 'rgba(255,255,255,0.45)',
         },
-        statLabel: { fontSize: fs(12), color: colors.textMuted },
-        statValue: { fontSize: fs(17), fontWeight: '700', color: colors.text },
-        sectionTitle: {
-          fontSize: fs(17),
-          fontWeight: '700',
-          color: colors.text,
+        findChipPlain: { backgroundColor: colors.primarySoft, borderColor: colors.primary },
+        findChipText: { color: WHITE, fontSize: fs(14), fontWeight: '700' },
+        temp: {
+          color: WHITE,
+          fontSize: fs(96),
+          lineHeight: fs(108),
+          fontWeight: '200',
+          marginLeft: fs(18), // derece işareti sağda; sayı ortada dursun
+          ...SHADOW,
+        },
+        label: { color: WHITE, fontSize: fs(20), fontWeight: '600', ...SHADOW },
+        hilo: { color: 'rgba(255,255,255,0.88)', fontSize: fs(15), fontWeight: '600', marginTop: 4, ...SHADOW },
+        actions: { flexDirection: 'row', justifyContent: 'center', gap: 8, marginTop: 14, flexWrap: 'wrap' },
+        glass: {
           marginHorizontal: 16,
-          marginTop: 20,
-          marginBottom: 8,
+          marginTop: 12,
+          borderRadius: 22,
+          backgroundColor: GLASS,
+          borderWidth: 1,
+          borderColor: GLASS_BORDER,
+          overflow: 'hidden',
         },
+        cardTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 16, paddingTop: 14, paddingBottom: 8 },
+        cardTitle: { color: SOFT, fontSize: fs(12), fontWeight: '800', letterSpacing: 1 },
+        divider: { height: StyleSheet.hairlineWidth, backgroundColor: GLASS_BORDER, marginHorizontal: 16 },
+        grid: { flexDirection: 'row', flexWrap: 'wrap', paddingVertical: 6 },
+        stat: { width: '33.333%', paddingVertical: 12, paddingHorizontal: 12, gap: 4 },
+        statLabelRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+        statLabel: { fontSize: fs(12), color: SOFT, fontWeight: '600', flexShrink: 1 },
+        statValue: { fontSize: fs(18), fontWeight: '700', color: WHITE },
         hourlyScroll: { flexGrow: 0, flexShrink: 0 },
-        hourly: { paddingHorizontal: 16, gap: 8 },
-        hour: {
-          width: 64 * (fs(100) / 100),
-          alignItems: 'center',
-          paddingVertical: 10,
-          gap: 4,
-          borderRadius: 14,
-          backgroundColor: colors.card,
-          borderWidth: 1,
-          borderColor: colors.border,
-        },
-        hourNow: { backgroundColor: colors.header, borderColor: colors.header },
-        hourNowText: { color: '#FFFFFF' },
-        hourTime: { fontSize: fs(13), fontWeight: '600', color: colors.textMuted },
-        hourIcon: { fontSize: fs(22) },
-        hourTemp: { fontSize: fs(16), fontWeight: '700', color: colors.text },
-        hourRain: { fontSize: fs(11), color: colors.textMuted },
-        forecast: {
-          marginHorizontal: 16,
-          backgroundColor: colors.card,
-          borderRadius: 14,
-          borderWidth: 1,
-          borderColor: colors.border,
-        },
-        dayRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, paddingVertical: 12 },
-        dayRowBorder: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: colors.border },
-        dayName: { flex: 1, fontSize: fs(15), fontWeight: '600', color: colors.text },
-        dayIcon: { fontSize: fs(22), width: fs(40), textAlign: 'center' },
-        dayRain: { width: fs(72), fontSize: fs(13), color: colors.textMuted, textAlign: 'center' },
-        dayTemps: { width: fs(88), textAlign: 'right' },
-        dayMax: { fontSize: fs(15), fontWeight: '700', color: colors.text },
-        dayMin: { fontSize: fs(15), color: colors.textMuted },
-        attribution: { fontSize: fs(12), color: colors.textMuted, textAlign: 'center', marginTop: 16 },
+        hourly: { paddingHorizontal: 10, paddingBottom: 14, gap: 4 },
+        hour: { width: 58 * (fs(100) / 100), alignItems: 'center', paddingVertical: 10, gap: 6, borderRadius: 16 },
+        hourNow: { backgroundColor: 'rgba(255,255,255,0.2)' },
+        hourTime: { fontSize: fs(13), fontWeight: '600', color: SOFT },
+        hourTimeNow: { color: WHITE, fontWeight: '800' },
+        hourIcon: { fontSize: fs(24) },
+        hourTemp: { fontSize: fs(17), fontWeight: '700', color: WHITE },
+        hourRain: { fontSize: fs(11), color: '#BFE3FF', fontWeight: '700' },
+        dayRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 11, gap: 8 },
+        dayName: { width: fs(84), fontSize: fs(15), fontWeight: '700', color: WHITE },
+        dayIcon: { fontSize: fs(22), width: fs(30), textAlign: 'center' },
+        dayRain: { width: fs(40), fontSize: fs(12), color: '#BFE3FF', fontWeight: '700' },
+        dayMin: { width: fs(34), fontSize: fs(15), color: SOFT, textAlign: 'right', fontWeight: '600' },
+        dayMax: { width: fs(34), fontSize: fs(15), color: WHITE, fontWeight: '800' },
+        track: { flex: 1, height: 5, borderRadius: 3, backgroundColor: 'rgba(255,255,255,0.18)', overflow: 'hidden' },
+        attribution: { fontSize: fs(12), color: SOFT, textAlign: 'center', marginTop: 18 },
       }),
-    [colors, fs],
+    [colors, fs, scene],
   );
 
-  const current = weather?.current;
   const now = current ? describeWeatherCode(current.code, current.isDay) : null;
   const today = weather?.daily[0];
+  const weekMin = weather ? Math.min(...weather.daily.map((d) => d.min)) : 0;
+  const weekMax = weather ? Math.max(...weather.daily.map((d) => d.max)) : 1;
+  const span = Math.max(1, weekMax - weekMin);
+
+  const toggleSound = () => {
+    pressFeedback();
+    setSoundOn(!soundOn);
+  };
 
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={styles.content}
-      refreshControl={
-        <RefreshControl
-          refreshing={refreshing}
-          onRefresh={onRefresh}
-          colors={[colors.primary]}
-          tintColor={colors.primary}
-          progressBackgroundColor={colors.card}
+    <View style={styles.root}>
+      {scene ? <WeatherScene scene={scene} active={active} variant={variant} /> : null}
+      <ScrollView
+        ref={scrollRef}
+        style={styles.scroll}
+        contentContainerStyle={styles.content}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={[colors.primary]}
+            tintColor={scene ? WHITE : colors.primary}
+            progressBackgroundColor={colors.card}
+          />
+        }
+      >
+        <ChipRow>
+          <PressableScale
+            onPress={() => {
+              pressFeedback();
+              setPickerOpen(true);
+            }}
+            style={[styles.findChip, !scene && styles.findChipPlain]}
+            accessibilityRole="button"
+            accessibilityLabel="Köy, yayla veya ilçe ara"
+          >
+            <Icon name="search" size={15} color={scene ? WHITE : colors.primary} />
+            <Text style={[styles.findChipText, !scene && { color: colors.primary }]}>Köy ara</Text>
+          </PressableScale>
+          {strip.map((l) => (
+            <Chip key={l.id} label={l.name} glass={!!scene} selected={l.id === locationId} onPress={() => choose(l)} />
+          ))}
+        </ChipRow>
+        <LocationPicker
+          visible={pickerOpen}
+          selectedId={locationId}
+          recentIds={settings.recentPlaces}
+          title="Hava durumu konumu"
+          onSelect={choose}
+          onClose={() => setPickerOpen(false)}
         />
-      }
-    >
-      <ChipRow>
-        {WEATHER_LOCATIONS.map((l) => (
-          <Chip key={l.id} label={l.name} selected={l.id === locationId} onPress={() => setChoice({ base: settings.weatherLocationId, id: l.id })} />
-        ))}
-      </ChipRow>
 
-      {loading && !weather && !refreshing ? (
-        <HeroSkeleton rows={3} />
-      ) : error && !weather ? (
-        <View style={styles.center}>
-          <Text style={styles.errorText}>{error}</Text>
-          <PrimaryButton label="Tekrar dene" onPress={load} />
-        </View>
-      ) : current && now && weather ? (
-        <>
-          {error && cachedAt ? (
-            <View style={styles.offline}>
-              <Icon name="cloud-offline-outline" size={16} color={colors.textMuted} />
-              <Text style={styles.offlineText}>Çevrimdışı · son güncelleme {savedAtLabel(cachedAt)}</Text>
-            </View>
-          ) : null}
-          <View style={styles.hero}>
-            <Text style={styles.heroPlace}>{location.name}</Text>
-            <Text style={styles.heroIcon}>{now.icon}</Text>
-            <Text style={styles.heroTemp}>{Math.round(current.temperature)}°</Text>
-            <Text style={styles.heroLabel}>{now.label}</Text>
-            {today ? (
-              <Text style={styles.heroSub}>
-                Hissedilen {Math.round(current.apparentTemperature)}° · En yüksek {Math.round(today.max)}° · En
-                düşük {Math.round(today.min)}°
-              </Text>
-            ) : null}
+        {loading && !weather && !refreshing ? (
+          <HeroSkeleton rows={3} />
+        ) : error && !weather ? (
+          <View style={styles.center}>
+            <Text style={styles.errorText}>{error}</Text>
+            <PrimaryButton label="Tekrar dene" onPress={load} />
           </View>
+        ) : current && now && weather ? (
+          <>
+            <View style={styles.hero} accessible accessibilityLabel={`${location.name}: ${Math.round(current.temperature)} derece, ${now.label}`}>
+              <View style={styles.placeRow}>
+                <Icon name="location-sharp" size={fs(16)} color={WHITE} />
+                <Text style={styles.place}>{location.name}</Text>
+              </View>
+              {location.kind !== 'ilce' && location.id !== 'ayder' ? (
+                <Text style={styles.placeSub}>
+                  {districtName(location.district)}
+                  {location.elevation != null ? ` · ${location.elevation.toLocaleString('tr-TR')} m` : ''}
+                </Text>
+              ) : null}
+              <Text style={styles.temp}>{Math.round(current.temperature)}°</Text>
+              <Text style={styles.label}>{now.label}</Text>
+              {today ? (
+                <Text style={styles.hilo}>
+                  En yüksek {Math.round(today.max)}° · En düşük {Math.round(today.min)}°
+                </Text>
+              ) : null}
+              <Text style={styles.hilo}>Hissedilen {Math.round(current.apparentTemperature)}°</Text>
 
-          <View style={styles.grid}>
-            <Stat styles={styles} label="Nem" value={`%${Math.round(current.humidity)}`} />
-            <Stat styles={styles} label="Rüzgâr" value={`${Math.round(current.windSpeed)} km/s`} />
-            <Stat styles={styles} label="Yağış" value={`${current.precipitation} mm`} />
-            <Stat styles={styles} label="Gün doğumu" value={clockTime(weather.sunrise)} />
-            <Stat styles={styles} label="Gün batımı" value={clockTime(weather.sunset)} />
-            <Stat
-              styles={styles}
-              label="Yağış ihtimali"
-              value={today?.precipitationProbability != null ? `%${today.precipitationProbability}` : '–'}
-            />
-          </View>
-
-          {weather.hourly.length > 0 ? (
-            <>
-              <Text style={styles.sectionTitle}>Saatlik tahmin</Text>
-              <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                style={styles.hourlyScroll}
-                contentContainerStyle={styles.hourly}
-              >
-                {weather.hourly.map((hour, i) => {
-                  const h = describeWeatherCode(hour.code, hour.isDay);
-                  const isNow = i === 0;
-                  return (
-                    <View key={hour.time} style={[styles.hour, isNow && styles.hourNow]}>
-                      <Text style={[styles.hourTime, isNow && styles.hourNowText]}>
-                        {isNow ? 'Şimdi' : clockTime(hour.time)}
+              {rainy || (error && cachedAt) ? (
+                <View style={styles.actions}>
+                  {rainy ? (
+                    <PressableScale
+                      onPress={toggleSound}
+                      style={[styles.pill, soundOn && styles.pillOn]}
+                      accessibilityRole="switch"
+                      accessibilityLabel="Yağmur sesi"
+                      accessibilityState={{ checked: soundOn }}
+                    >
+                      <Icon name={soundOn ? 'volume-high' : 'volume-mute-outline'} size={16} color={soundOn ? '#1D2B3A' : WHITE} />
+                      <Text style={[styles.pillText, soundOn && styles.pillTextOn]}>
+                        {soundOn ? 'Yağmur sesi açık' : 'Yağmur sesini aç'}
                       </Text>
-                      <Text style={styles.hourIcon} accessibilityLabel={h.label}>
-                        {h.icon}
-                      </Text>
-                      <Text style={[styles.hourTemp, isNow && styles.hourNowText]}>
-                        {Math.round(hour.temperature)}°
-                      </Text>
-                      <Text style={[styles.hourRain, isNow && styles.hourNowText]}>
-                        {hour.precipitationProbability ? `💧%${hour.precipitationProbability}` : ' '}
-                      </Text>
+                    </PressableScale>
+                  ) : null}
+                  {error && cachedAt ? (
+                    <View style={styles.pill}>
+                      <Icon name="cloud-offline-outline" size={16} color={WHITE} />
+                      <Text style={styles.pillText}>Çevrimdışı · {savedAtLabel(cachedAt)}</Text>
                     </View>
-                  );
-                })}
-              </ScrollView>
-            </>
-          ) : null}
-
-          <Text style={styles.sectionTitle}>7 günlük tahmin</Text>
-          <View style={styles.forecast}>
-            {weather.daily.map((day, i) => {
-              const d = describeWeatherCode(day.code);
-              return (
-                <View key={day.date} style={[styles.dayRow, i > 0 && styles.dayRowBorder]}>
-                  <Text style={styles.dayName}>{dayLabel(day.date, i)}</Text>
-                  <Text style={styles.dayIcon} accessibilityLabel={d.label}>
-                    {d.icon}
-                  </Text>
-                  <Text style={styles.dayRain}>
-                    {day.precipitationProbability != null ? `💧%${day.precipitationProbability}` : ''}
-                  </Text>
-                  <Text style={styles.dayTemps}>
-                    <Text style={styles.dayMax}>{Math.round(day.max)}°</Text>
-                    {'  '}
-                    <Text style={styles.dayMin}>{Math.round(day.min)}°</Text>
-                  </Text>
+                  ) : null}
                 </View>
-              );
-            })}
-          </View>
+              ) : null}
+            </View>
 
-          <Text style={styles.attribution}>Veri: Open-Meteo.com (CC BY 4.0)</Text>
-        </>
-      ) : null}
-    </ScrollView>
+            <View style={styles.glass}>
+              <View style={styles.grid}>
+                <Stat styles={styles} icon="water-outline" label="Nem" value={`%${Math.round(current.humidity)}`} />
+                <Stat styles={styles} icon="flag-outline" label="Rüzgâr" value={`${Math.round(current.windSpeed)} km/s`} />
+                <Stat styles={styles} icon="rainy-outline" label="Yağış" value={`${current.precipitation} mm`} />
+                <Stat styles={styles} icon="sunny-outline" label="Gün doğumu" value={clockTime(weather.sunrise)} />
+                <Stat styles={styles} icon="moon-outline" label="Gün batımı" value={clockTime(weather.sunset)} />
+                <Stat
+                  styles={styles}
+                  icon="umbrella-outline"
+                  label="Yağış ihtimali"
+                  value={today?.precipitationProbability != null ? `%${today.precipitationProbability}` : '–'}
+                />
+              </View>
+            </View>
+
+            {weather.hourly.length > 0 ? (
+              <View style={styles.glass}>
+                <View style={styles.cardTitleRow}>
+                  <Icon name="time-outline" size={14} color={SOFT} />
+                  <Text style={styles.cardTitle}>SAATLİK TAHMİN</Text>
+                </View>
+                <ScrollView
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  style={styles.hourlyScroll}
+                  contentContainerStyle={styles.hourly}
+                >
+                  {weather.hourly.map((hour, i) => {
+                    const h = describeWeatherCode(hour.code, hour.isDay);
+                    const isNow = i === 0;
+                    return (
+                      <View
+                        key={hour.time}
+                        style={[styles.hour, isNow && styles.hourNow]}
+                        accessible
+                        accessibilityLabel={`${isNow ? 'Şimdi' : clockTime(hour.time)}: ${Math.round(hour.temperature)} derece, ${h.label}`}
+                      >
+                        <Text style={[styles.hourTime, isNow && styles.hourTimeNow]}>{isNow ? 'Şimdi' : clockTime(hour.time)}</Text>
+                        <Text style={styles.hourIcon}>{h.icon}</Text>
+                        <Text style={styles.hourTemp}>{Math.round(hour.temperature)}°</Text>
+                        <Text style={styles.hourRain}>{hour.precipitationProbability ? `%${hour.precipitationProbability}` : ' '}</Text>
+                      </View>
+                    );
+                  })}
+                </ScrollView>
+              </View>
+            ) : null}
+
+            <View style={styles.glass}>
+              <View style={styles.cardTitleRow}>
+                <Icon name="calendar-outline" size={14} color={SOFT} />
+                <Text style={styles.cardTitle}>7 GÜNLÜK TAHMİN</Text>
+              </View>
+              {weather.daily.map((day, i) => {
+                const d = describeWeatherCode(day.code);
+                const left = ((day.min - weekMin) / span) * 100;
+                const width = Math.max(6, ((day.max - day.min) / span) * 100);
+                return (
+                  <View key={day.date}>
+                    <View style={styles.divider} />
+                    <View
+                      style={styles.dayRow}
+                      accessible
+                      accessibilityLabel={`${dayLabel(day.date, i)}: ${d.label}, en yüksek ${Math.round(day.max)}, en düşük ${Math.round(day.min)} derece`}
+                    >
+                      <Text style={styles.dayName}>{dayLabel(day.date, i)}</Text>
+                      <Text style={styles.dayIcon}>{d.icon}</Text>
+                      <Text style={styles.dayRain}>{day.precipitationProbability ? `%${day.precipitationProbability}` : ''}</Text>
+                      <Text style={styles.dayMin}>{Math.round(day.min)}°</Text>
+                      <View style={styles.track}>
+                        <LinearGradient
+                          colors={['#8FD3FF', '#FFD36B']}
+                          start={{ x: 0, y: 0 }}
+                          end={{ x: 1, y: 0 }}
+                          style={{ position: 'absolute', top: 0, bottom: 0, left: `${Math.min(left, 94)}%`, width: `${width}%`, borderRadius: 3 }}
+                        />
+                      </View>
+                      <Text style={styles.dayMax}>{Math.round(day.max)}°</Text>
+                    </View>
+                  </View>
+                );
+              })}
+            </View>
+
+            <Text style={styles.attribution}>Veri: Open-Meteo.com (CC BY 4.0)</Text>
+          </>
+        ) : null}
+      </ScrollView>
+    </View>
   );
 }
 
 function Stat({
   styles,
+  icon,
   label,
   value,
 }: {
-  styles: { stat: object; statInner: object; statLabel: object; statValue: object };
+  styles: { stat: object; statLabelRow: object; statLabel: object; statValue: object };
+  icon: IconName;
   label: string;
   value: string;
 }) {
   return (
-    <View style={styles.stat}>
-      <View style={styles.statInner}>
-        <Text style={styles.statLabel}>{label}</Text>
-        <Text style={styles.statValue}>{value}</Text>
+    <View style={styles.stat} accessible accessibilityLabel={`${label}: ${value}`}>
+      <View style={styles.statLabelRow}>
+        <Icon name={icon} size={13} color={SOFT} />
+        <Text style={styles.statLabel} numberOfLines={1}>
+          {label}
+        </Text>
       </View>
+      <Text style={styles.statValue}>{value}</Text>
     </View>
   );
 }

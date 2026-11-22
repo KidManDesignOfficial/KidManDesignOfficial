@@ -20,14 +20,14 @@ export function Card({ children, style }: { children: ReactNode; style?: StylePr
   return <View style={[styles.card, style]}>{children}</View>;
 }
 
-export function SectionTitle({ children, hint }: { children: ReactNode; hint?: string }) {
+export function SectionTitle({ children, hint, light = false }: { children: ReactNode; hint?: string; light?: boolean }) {
   const styles = useStyles();
   return (
     <View style={styles.sectionHeader}>
-      <Text style={styles.sectionTitle} accessibilityRole="header">
+      <Text style={[styles.sectionTitle, light && styles.sectionTitleLight]} accessibilityRole="header">
         {children}
       </Text>
-      {hint ? <Text style={styles.sectionHint}>{hint}</Text> : null}
+      {hint ? <Text style={[styles.sectionHint, light && styles.sectionHintLight]}>{hint}</Text> : null}
     </View>
   );
 }
@@ -36,20 +36,32 @@ export function Chip({
   label,
   selected,
   onPress,
+  glass = false,
 }: {
   label: string;
   selected: boolean;
   onPress: () => void;
+  /** Hava sahnesi gibi renkli arka planlar için yarı saydam (cam) görünüm. */
+  glass?: boolean;
 }) {
   const styles = useStyles();
   return (
     <Pressable
       onPress={onPress}
-      style={[styles.chip, selected && styles.chipActive]}
+      style={[styles.chip, selected && styles.chipActive, glass && styles.chipGlass, glass && selected && styles.chipGlassActive]}
       accessibilityRole="tab"
       accessibilityState={{ selected }}
     >
-      <Text style={[styles.chipText, selected && styles.chipTextActive]}>{label}</Text>
+      <Text
+        style={[
+          styles.chipText,
+          selected && styles.chipTextActive,
+          glass && styles.chipGlassText,
+          glass && selected && styles.chipGlassTextActive,
+        ]}
+      >
+        {label}
+      </Text>
     </Pressable>
   );
 }
@@ -69,18 +81,20 @@ export function ChipRow({ children }: { children: ReactNode }) {
   );
 }
 
-export function LinkRow({ label, url }: { label: string; url: string }) {
+export function LinkRow({ label, url, glass = false }: { label: string; url: string; glass?: boolean }) {
   const { colors } = useTheme();
   const styles = useStyles();
+  // Cam görünüm (koyu sahne üstü): açık yeşil yazı, ince beyaz ayraç.
+  const tint = glass ? '#9BE8B4' : colors.primary;
   return (
     <Pressable
       onPress={() => openUrl(url, colors)}
-      style={({ pressed }) => [styles.linkRow, pressed && styles.pressed]}
+      style={({ pressed }) => [styles.linkRow, glass && styles.linkRowGlass, pressed && styles.pressed]}
       accessibilityRole="link"
       accessibilityLabel={label}
     >
-      <Text style={styles.linkText}>{label}</Text>
-      <Icon name="open-outline" size={18} color={colors.primary} />
+      <Text style={[styles.linkText, glass && { color: tint }]}>{label}</Text>
+      <Icon name="open-outline" size={18} color={tint} />
     </Pressable>
   );
 }
@@ -113,6 +127,9 @@ function useStyles() {
         sectionHeader: { marginTop: 24, marginBottom: 10, gap: 2 },
         sectionTitle: { fontSize: fs(18), fontWeight: '800', color: colors.text },
         sectionHint: { fontSize: fs(13), color: colors.textMuted },
+        // Koyu sahnelerin (Rizespor stadyumu) üstünde beyaz başlık.
+        sectionTitleLight: { color: '#FFFFFF' },
+        sectionHintLight: { color: 'rgba(255,255,255,0.66)' },
         chipsScroll: { flexGrow: 0, flexShrink: 0 },
         chips: { paddingHorizontal: 16, paddingVertical: 12, gap: 8, alignItems: 'center' },
         chip: {
@@ -129,6 +146,10 @@ function useStyles() {
         chipActive: { backgroundColor: colors.primary, borderColor: colors.primary },
         chipText: { fontSize: fs(14), fontWeight: '600', color: colors.text },
         chipTextActive: { color: colors.isDark ? '#0F1311' : colors.onPrimary },
+        chipGlass: { backgroundColor: 'rgba(255,255,255,0.14)', borderColor: 'rgba(255,255,255,0.28)' },
+        chipGlassActive: { backgroundColor: '#FFFFFF', borderColor: '#FFFFFF' },
+        chipGlassText: { color: '#FFFFFF' },
+        chipGlassTextActive: { color: '#1D2B3A' },
         linkRow: {
           flexDirection: 'row',
           alignItems: 'center',
@@ -137,6 +158,7 @@ function useStyles() {
           borderTopWidth: StyleSheet.hairlineWidth,
           borderTopColor: colors.border,
         },
+        linkRowGlass: { borderTopColor: 'rgba(255,255,255,0.12)' },
         linkText: { flex: 1, fontSize: fs(15), color: colors.primary, fontWeight: '600' },
         linkArrow: { fontSize: fs(16), color: colors.primary },
         pressed: { opacity: 0.6 },

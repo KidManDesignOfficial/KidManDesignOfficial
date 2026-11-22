@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
+import { HeroCard } from '../components/HeroCard';
 import { Card, LinkRow, SectionTitle } from '../components/ui';
 import {
   RIZE_DISTRICTS,
@@ -12,17 +13,18 @@ import {
   type TimelineEntry,
 } from '../data/rize';
 import { useTheme } from '../theme';
+import { useScrollTopOnShow } from '../components/motion';
 
 export default function RizeScreen() {
+  const scrollRef = useScrollTopOnShow();
   const { colors, fs } = useTheme();
   const styles = useMemo(
     () =>
       StyleSheet.create({
         container: { flex: 1, backgroundColor: colors.background },
         content: { padding: 16, paddingBottom: 32 },
-        hero: { backgroundColor: colors.header, borderRadius: 20, padding: 20, gap: 6 },
-        heroTitle: { color: '#FFFFFF', fontSize: fs(24), fontWeight: '800' },
-        heroText: { color: 'rgba(255,255,255,0.85)', fontSize: fs(14), lineHeight: fs(20) },
+        heroTitle: { color: '#FFFFFF', fontSize: fs(34), fontWeight: '800', letterSpacing: -0.5 },
+        heroText: { color: 'rgba(255,255,255,0.9)', fontSize: fs(14), lineHeight: fs(20), maxWidth: 300, marginBottom: 28 },
         facts: { flexDirection: 'row', flexWrap: 'wrap', marginHorizontal: -4, marginTop: 12 },
         fact: { width: '50%', padding: 4, alignSelf: 'stretch' },
         factInner: {
@@ -51,13 +53,13 @@ export default function RizeScreen() {
   );
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <View style={styles.hero}>
+    <ScrollView ref={scrollRef} style={styles.container} contentContainerStyle={styles.content}>
+      <HeroCard watermark="compass-outline" eyebrow="DOĞU KARADENİZ · 53" eyebrowIcon="location-outline" mountains>
         <Text style={styles.heroTitle}>Rize</Text>
         <Text style={styles.heroText}>
           Doğu Karadeniz’in yeşil kıyı şehri; Türkiye çayının ana vatanı ve Kaçkar Dağları’nın kapısı.
         </Text>
-      </View>
+      </HeroCard>
 
       <View style={styles.facts}>
         {RIZE_FACTS.map((f) => (

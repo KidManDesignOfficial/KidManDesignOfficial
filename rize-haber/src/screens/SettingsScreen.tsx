@@ -14,21 +14,32 @@ import {
 } from 'react-native';
 import appConfig from '../../app.json';
 
+import BackdropPicker from '../components/BackdropPicker';
 import { Icon } from '../components/Icon';
 
-import { Card, Chip, ChipRow, LinkRow, SectionTitle, openUrl } from '../components/ui';
-import { PressableScale } from '../components/motion';
+import LocationPicker from '../components/LocationPicker';
+import { Card, Chip, LinkRow, SectionTitle, openUrl } from '../components/ui';
+import { PressableScale, useSystemReducedMotion, useScrollTopOnShow } from '../components/motion';
 import type { IconName } from '../components/Icon';
-import { CONTACT_EMAIL, DEVELOPER_NAME, WEATHER_LOCATIONS } from '../config';
+import { CONTACT_EMAIL, DEVELOPER_NAME } from '../config';
+import { placeById, placeSubtitle, pushRecent, DISTRICT_PLACES } from '../places';
 import { useFavorites } from '../favorites';
 import { disableNewsNotifications, enableNewsNotifications, setMatchFeature } from '../notifications';
 import { REMINDER_MINUTES, getMatchSettings } from '../rizespor/reminders';
 import { loadNotificationsEnabled } from '../storage';
+import { buildColors } from '../colors';
+import { tapFeedback } from '../haptics';
 import {
   ACCENTS,
+  DISCOVER_ENABLED,
+  PALETTES,
+  PALETTE_IDS,
   TEXT_SCALES,
   useTheme,
   type AccentId,
+  type PaletteId,
+  type Settings,
+  type TabId,
   type TextSize,
   type ThemeMode,
 } from '../theme';
@@ -51,9 +62,50 @@ const MODES: { id: ThemeMode; label: string }[] = [
   { id: 'dark', label: 'Koyu' },
 ];
 
+const START_TABS = ([
+  { id: 'news', label: 'Haberler' },
+  { id: 'rizespor', label: 'Rizespor' },
+  { id: 'tea', label: 'Çay' },
+  { id: 'economy', label: 'Ekonomi' },
+  { id: 'weather', label: 'Hava' },
+  { id: 'rize', label: 'Keşfet' },
+] as { id: TabId; label: string }[]).filter((t) => DISCOVER_ENABLED || t.id !== 'rize');
+
+type ToggleKey = 'uiMotion' | 'sceneMotion' | 'haptics' | 'rainSound';
+
+const TOGGLES: { key: ToggleKey; icon: IconName; label: string; hint: string }[] = [
+  {
+    key: 'uiMotion',
+    icon: 'sparkles-outline',
+    label: 'Arayüz animasyonları',
+    hint: 'Ekran geçişleri, açılıp kapanan kartlar, dokununca yaylanma ve gol kutlaması.',
+  },
+  {
+    key: 'sceneMotion',
+    icon: 'film-outline',
+    label: 'Hareketli arka planlar',
+    hint: 'Yağmur, kar, bulutlar, çay buharı, borsa şeridi ve stadyum ışıkları. Kapalıyken manzaralar durağan görünür; pil tasarrufu sağlar.',
+  },
+  {
+    key: 'haptics',
+    icon: 'phone-portrait-outline',
+    label: 'Titreşim',
+    hint: 'Sekme değiştirirken ve kaydederken hafif titreşim.',
+  },
+  {
+    key: 'rainSound',
+    icon: 'rainy-outline',
+    label: 'Yağmur sesi',
+    hint: 'Hava ekranında, seçili yerde yağmur yağarken hafif yağmur sesi çalar.',
+  },
+];
+
 const DATA_SOURCES = [
   { label: 'Haberler: Google Haberler', url: 'https://news.google.com' },
   { label: 'Hava durumu: Open-Meteo', url: 'https://open-meteo.com' },
+  { label: 'Köy ve yayla konumları: GeoNames (CC BY 4.0)', url: 'https://www.geonames.org' },
+  { label: 'Döviz kurları: TCMB', url: 'https://www.tcmb.gov.tr/kurlar/today.xml' },
+  { label: 'Altın fiyatı: gold-api.com', url: 'https://gold-api.com' },
   { label: 'Çay fiyatları: T.C. Tarım ve Orman Bakanlığı', url: 'https://www.tarimorman.gov.tr' },
   { label: 'Çay sektörü: ÇAYKUR', url: 'https://www.caykur.gov.tr' },
   { label: 'Tarihçe: Rize Valiliği', url: 'https://www.rize.gov.tr' },
@@ -61,8 +113,12 @@ const DATA_SOURCES = [
 ];
 
 export default function SettingsScreen() {
+  const scrollRef = useScrollTopOnShow();
   const { settings, updateSettings, colors, fs } = useTheme();
   const { favorites, clearFavorites } = useFavorites();
+  const systemReduced = useSystemReducedMotion();
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const defaultPlace = placeById(settings.weatherLocationId) ?? DISTRICT_PLACES[0];
   const styles = useMemo(
     () =>
       StyleSheet.create({
@@ -98,6 +154,7 @@ export default function SettingsScreen() {
         swatchSelected: { borderColor: colors.text },
         swatchCheck: { color: '#FFFFFF', fontSize: 18, fontWeight: '800' },
         swatchName: { fontSize: fs(11), color: colors.textMuted, textAlign: 'center' },
+        themeGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', rowGap: 12, marginTop: 12 },
         preview: { marginTop: 12, padding: 12, borderRadius: 12, backgroundColor: colors.primarySoft },
         previewText: { fontSize: fs(15), color: colors.text, lineHeight: fs(22) },
         switchRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
@@ -106,7 +163,38 @@ export default function SettingsScreen() {
         about: { fontSize: fs(14), color: colors.text, lineHeight: fs(21) },
         version: { fontSize: fs(13), color: colors.textMuted, marginTop: 8 },
         legal: { fontSize: fs(12), color: colors.textMuted, textAlign: 'center', marginTop: 20, lineHeight: fs(18) },
-        chipBleed: { marginHorizontal: -16, marginTop: 4 },
+        toggleRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+        toggleIcon: {
+          width: 36,
+          height: 36,
+          borderRadius: 10,
+          backgroundColor: colors.primarySoft,
+          alignItems: 'center',
+          justifyContent: 'center',
+        },
+        note: {
+          flexDirection: 'row',
+          gap: 8,
+          alignItems: 'flex-start',
+          padding: 10,
+          borderRadius: 10,
+          backgroundColor: colors.primarySoft,
+          marginBottom: 14,
+        },
+        noteText: { flex: 1, fontSize: fs(12.5), color: colors.text, lineHeight: fs(18) },
+        tabGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 10 },
+        placeRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+        placeName: { fontSize: fs(17), fontWeight: '800', color: colors.text },
+        changeButton: {
+          flexDirection: 'row',
+          alignItems: 'center',
+          gap: 5,
+          paddingHorizontal: 12,
+          paddingVertical: 8,
+          borderRadius: 999,
+          backgroundColor: colors.primary,
+        },
+        changeText: { fontSize: fs(13), fontWeight: '700', color: colors.isDark ? '#0F1311' : colors.onPrimary },
       }),
     [colors, fs],
   );
@@ -119,10 +207,27 @@ export default function SettingsScreen() {
   }, [favorites.length, clearFavorites]);
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+    <ScrollView ref={scrollRef} style={styles.container} contentContainerStyle={styles.content}>
       <SectionTitle>Görünüm</SectionTitle>
       <Card>
         <Text style={styles.rowLabel}>Tema</Text>
+        <Text style={styles.rowHint}>Zemin, kart ve yazı tonları. Renk ve açık/koyu seçimiyle birlikte çalışır.</Text>
+        <View style={styles.themeGrid} accessibilityRole="radiogroup">
+          {PALETTE_IDS.map((id) => (
+            <ThemeOption
+              key={id}
+              id={id}
+              selected={settings.palette === id}
+              accent={settings.accent}
+              isDark={colors.isDark}
+              onPress={() => updateSettings({ palette: id })}
+            />
+          ))}
+        </View>
+
+        <View style={styles.divider} />
+
+        <Text style={styles.rowLabel}>Açık / koyu</Text>
         <Text style={styles.rowHint}>“Sistem”, telefonunuzun açık/koyu ayarını izler.</Text>
         <Segmented
           styles={styles}
@@ -177,19 +282,88 @@ export default function SettingsScreen() {
         </View>
       </Card>
 
-      <SectionTitle hint="Hava Durumu ekranı bu konumla açılır">Varsayılan konum</SectionTitle>
-      <View style={styles.chipBleed}>
-        <ChipRow>
-          {WEATHER_LOCATIONS.map((l) => (
-            <Chip
-              key={l.id}
-              label={l.name}
-              selected={settings.weatherLocationId === l.id}
-              onPress={() => updateSettings({ weatherLocationId: l.id })}
+      <SectionTitle hint="Her sekmenin sahnesi ayrı seçilir">Arka planlar</SectionTitle>
+      <Card>
+        <BackdropPicker />
+      </Card>
+
+      <SectionTitle hint="Uygulamayı kendine göre ayarla">Özelleştirme</SectionTitle>
+      <Card>
+        {systemReduced ? (
+          <View style={styles.note}>
+            <Icon name="information-circle-outline" size={18} color={colors.primary} />
+            <Text style={styles.noteText}>
+              Telefonunuzda “Hareketi azalt” açık olduğu için animasyonlar bu ayarlardan bağımsız olarak kapalı.
+            </Text>
+          </View>
+        ) : null}
+        {TOGGLES.map((t, i) => (
+          <View key={t.key}>
+            {i > 0 ? <View style={styles.divider} /> : null}
+            <ToggleRow
+              styles={styles}
+              icon={t.icon}
+              label={t.label}
+              hint={t.hint}
+              value={settings[t.key]}
+              onChange={(v) => updateSettings({ [t.key]: v } as Partial<Settings>)}
             />
+          </View>
+        ))}
+
+        <View style={styles.divider} />
+
+        <Text style={styles.rowLabel}>Açılış ekranı</Text>
+        <Text style={styles.rowHint}>Uygulama açıldığında ve geri tuşuna basınca bu sekme gelir.</Text>
+        <View style={styles.tabGrid} accessibilityRole="radiogroup">
+          {START_TABS.map((t) => (
+            <Chip key={t.id} label={t.label} selected={settings.startTab === t.id} onPress={() => updateSettings({ startTab: t.id })} />
           ))}
-        </ChipRow>
-      </View>
+        </View>
+      </Card>
+
+      <SectionTitle hint="Hava Durumu ekranı bu konumla açılır">Varsayılan konum</SectionTitle>
+      <Card>
+        <PressableScale
+          onPress={() => setPickerOpen(true)}
+          scaleTo={0.98}
+          style={styles.placeRow}
+          accessibilityRole="button"
+          accessibilityLabel={`Varsayılan konum: ${defaultPlace.name}. Değiştir`}
+        >
+          <View style={styles.toggleIcon}>
+            <Icon name="location-outline" size={19} color={colors.primary} />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.placeName} numberOfLines={1}>
+              {defaultPlace.name}
+            </Text>
+            <Text style={styles.rowHint} numberOfLines={1}>
+              {placeSubtitle(defaultPlace)}
+            </Text>
+          </View>
+          <View style={styles.changeButton}>
+            <Icon name="search" size={14} color={colors.isDark ? '#0F1311' : colors.onPrimary} />
+            <Text style={styles.changeText}>Değiştir</Text>
+          </View>
+        </PressableScale>
+        <Text style={[styles.rowHint, { marginTop: 10 }]}>
+          12 ilçe ve bunlara bağlı yaklaşık 480 köy, belde ve yayla arasından seçebilirsin.
+        </Text>
+      </Card>
+      <LocationPicker
+        visible={pickerOpen}
+        selectedId={settings.weatherLocationId}
+        recentIds={settings.recentPlaces}
+        title="Varsayılan konum"
+        onSelect={(p) =>
+          updateSettings({
+            weatherLocationId: p.id,
+            recentPlaces: DISTRICT_PLACES.includes(p) ? settings.recentPlaces : pushRecent(settings.recentPlaces, p.id),
+          })
+        }
+        onClose={() => setPickerOpen(false)}
+      />
 
       <SectionTitle>Bildirimler</SectionTitle>
       <Card>
@@ -282,6 +456,85 @@ export default function SettingsScreen() {
   );
 }
 
+/** Tema seçeneği: seçili renk ve açık/koyu görünümle küçük bir ekran önizlemesi. */
+function ThemeOption({
+  id,
+  selected,
+  accent,
+  isDark,
+  onPress,
+}: {
+  id: PaletteId;
+  selected: boolean;
+  accent: AccentId;
+  isDark: boolean;
+  onPress: () => void;
+}) {
+  const { colors, fs } = useTheme();
+  const c = useMemo(() => buildColors(accent, isDark, id), [accent, isDark, id]);
+  const bar = (w: `${number}%`, color: string, h = 5) => <View style={{ width: w, height: h, borderRadius: 3, backgroundColor: color }} />;
+  return (
+    <PressableScale
+      onPress={() => {
+        tapFeedback();
+        onPress();
+      }}
+      scaleTo={0.97}
+      containerStyle={{ width: '48%' }}
+      accessibilityRole="radio"
+      accessibilityState={{ selected }}
+      accessibilityLabel={`${PALETTES[id].name} teması. ${PALETTES[id].hint}`}
+    >
+      <View
+        style={{
+          borderRadius: 14,
+          borderWidth: selected ? 2.5 : 1,
+          borderColor: selected ? colors.primary : colors.border,
+          overflow: 'hidden',
+          backgroundColor: c.background,
+        }}
+      >
+        <View style={{ height: 16, backgroundColor: c.header }} />
+        <View style={{ padding: 8, gap: 6 }}>
+          <View
+            style={{ backgroundColor: c.card, borderRadius: 8, padding: 7, gap: 5, borderWidth: StyleSheet.hairlineWidth, borderColor: c.border }}
+          >
+            {bar('85%', c.text)}
+            {bar('60%', c.textMuted, 4)}
+          </View>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+            <View style={{ width: 22, height: 10, borderRadius: 5, backgroundColor: c.primary }} />
+            {bar('40%', c.textMuted, 4)}
+          </View>
+        </View>
+        {selected ? (
+          <View
+            style={{
+              position: 'absolute',
+              top: 3,
+              right: 4,
+              width: 18,
+              height: 18,
+              borderRadius: 9,
+              backgroundColor: '#FFFFFF',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <Icon name="checkmark" size={13} color={colors.primary} />
+          </View>
+        ) : null}
+      </View>
+      <Text style={{ marginTop: 6, fontSize: fs(13), fontWeight: selected ? '800' : '600', color: colors.text }} numberOfLines={1}>
+        {PALETTES[id].name}
+      </Text>
+      <Text style={{ fontSize: fs(11), color: colors.textMuted, lineHeight: fs(15) }} numberOfLines={2}>
+        {PALETTES[id].hint}
+      </Text>
+    </PressableScale>
+  );
+}
+
 function Segmented<T extends string>({
   styles,
   options,
@@ -309,6 +562,42 @@ function Segmented<T extends string>({
           </Pressable>
         );
       })}
+    </View>
+  );
+}
+
+function ToggleRow({
+  styles,
+  icon,
+  label,
+  hint,
+  value,
+  onChange,
+}: {
+  styles: Record<string, object>;
+  icon: IconName;
+  label: string;
+  hint: string;
+  value: boolean;
+  onChange: (value: boolean) => void;
+}) {
+  const { colors } = useTheme();
+  return (
+    <View style={styles.toggleRow}>
+      <View style={styles.toggleIcon}>
+        <Icon name={icon} size={19} color={colors.primary} />
+      </View>
+      <View style={{ flex: 1 }}>
+        <Text style={styles.rowLabel}>{label}</Text>
+        <Text style={styles.rowHint}>{hint}</Text>
+      </View>
+      <Switch
+        value={value}
+        onValueChange={onChange}
+        trackColor={{ true: colors.primary, false: colors.border }}
+        thumbColor="#FFFFFF"
+        accessibilityLabel={label}
+      />
     </View>
   );
 }

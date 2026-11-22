@@ -4,8 +4,10 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Card, LinkRow, SectionTitle, openUrl } from '../../components/ui';
 import { CULTURE, DISCOVER_SOURCES, FESTIVALS, PRACTICAL } from '../../data/discover';
 import { useTheme } from '../../theme';
+import { useScrollTopOnShow } from '../../components/motion';
 
 export default function CultureView() {
+  const scrollRef = useScrollTopOnShow();
   const { colors, fs } = useTheme();
   const styles = useMemo(
     () =>
@@ -38,7 +40,7 @@ export default function CultureView() {
   );
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+    <ScrollView ref={scrollRef} style={styles.container} contentContainerStyle={styles.content}>
       <SectionTitle hint="El sanatları, müzik ve oyunlar">Gelenekler</SectionTitle>
       <View style={styles.grid}>
         {CULTURE.map((c) => (

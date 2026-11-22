@@ -1,51 +1,66 @@
-/** Rizespor bölümleri: Maçlar, Puan durumu, Kadro, Haberler. */
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+/** Rizespor bölümleri: Maçlar, Puan durumu, Kadro. Haberler yalnızca Haberler sekmesinde (Spor kategorisi). */
+import { useMemo, useState } from 'react';
 import { RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 
-import { NewsCard } from '../../components/NewsCard';
-import { FadeInView, PressableScale } from '../../components/motion';
-import { NewsSkeleton } from '../../components/Skeleton';
-import { Card, Chip, ChipRow, PrimaryButton, SectionTitle } from '../../components/ui';
-import { googleNewsRssUrl } from '../../config';
+import { FadeInView, PressableScale, useScrollTopOnShow } from '../../components/motion';
+import { Card, SectionTitle } from '../../components/ui';
 import { latestResults, nextMatch, type ClubData } from '../../rizespor/api';
-import { signed } from '../../rizespor/format';
-import { CLUB_COLORS, POSITION_GROUPS, RIZESPOR_ID, flagEmoji } from '../../rizespor/names';
+import { clock, signed } from '../../rizespor/format';
+import { CLUB_COLORS, POSITION_GROUPS, RIZESPOR_ID, flagEmoji, shortTeamName } from '../../rizespor/names';
+import { GLASS } from '../../rizespor/stadium';
 import { recentForm, type Match } from '../../rizespor/parse';
-import { fetchRss, type NewsItem } from '../../rss';
+import { seasonSummary, streakText, teamLeaders, type Record3 } from '../../rizespor/season';
 import { useTheme } from '../../theme';
 import NextMatchHero from './NextMatchHero';
-import { MatchRow, ResultPill } from './shared';
+import { LivePulse, MatchRow, RESULT_COLORS, ResultPill } from './shared';
 
-type ViewProps = { data: ClubData; refreshing: boolean; onRefresh: () => void; onOpenMatch: (m: Match) => void };
+type ViewProps = {
+  data: ClubData;
+  /** Ekranın son "şimdi"si (dakikada bir ve her veri gelişinde güncellenir). */
+  now: number;
+  /** Verinin geldiği an (canlı dakikayı ilerletmek için). */
+  dataAt: number;
+  refreshing: boolean;
+  onRefresh: () => void;
+  onOpenMatch: (m: Match) => void;
+};
 
 function ClubRefresh(props: { refreshing: boolean; onRefresh: () => void }) {
-  return <RefreshControl {...props} colors={[CLUB_COLORS.green]} tintColor={CLUB_COLORS.green} />;
+  return <RefreshControl {...props} colors={[CLUB_COLORS.green]} tintColor={GLASS.text} progressBackgroundColor="#0B2A1C" />;
 }
 
 function useBaseStyles() {
-  const { colors, fs } = useTheme();
+  const { fs } = useTheme();
   return useMemo(
     () =>
       StyleSheet.create({
-        container: { flex: 1, backgroundColor: colors.background },
+        // Arka plandaki stadyum sahnesi görünsün diye zemin saydam; yüzeyler cam.
+        container: { flex: 1, backgroundColor: 'transparent' },
         content: { paddingBottom: 32 },
         pad: { paddingHorizontal: 16 },
         list: { gap: 8 },
-        muted: { color: colors.textMuted, fontSize: fs(14), textAlign: 'center', padding: 16 },
-        link: { color: CLUB_COLORS.green, fontWeight: '800', fontSize: fs(14), textAlign: 'center', paddingVertical: 10 },
+        glass: { backgroundColor: GLASS.surface, borderColor: GLASS.border },
+        muted: { color: GLASS.soft, fontSize: fs(14), textAlign: 'center', padding: 16 },
+        link: { color: GLASS.accent, fontWeight: '800', fontSize: fs(14), textAlign: 'center', paddingVertical: 10 },
       }),
-    [colors, fs],
+    [fs],
   );
 }
 
-export function MatchesView({ data, refreshing, onRefresh, onOpenMatch }: ViewProps) {
-  const { colors, fs } = useTheme();
+export function MatchesView({ data, now, dataAt, refreshing, onRefresh, onOpenMatch }: ViewProps) {
+  const scrollRef = useScrollTopOnShow();
+  const { fs } = useTheme();
   const base = useBaseStyles();
   const [showAllFixtures, setShowAllFixtures] = useState(false);
 
   const upcoming = useMemo(() => data.fixtures.filter((m) => m.state !== 'post'), [data.fixtures]);
   const results = useMemo(() => latestResults(data), [data]);
-  const featured = nextMatch(data);
+  const featured = nextMatch(data, now);
+  const season = useMemo(() => seasonSummary(results), [results]);
+  const others = useMemo(
+    () => data.today.filter((m) => m.home.id !== RIZESPOR_ID && m.away.id !== RIZESPOR_ID),
+    [data.today],
+  );
   const mode = featured?.state === 'in' ? 'live' : featured ? 'next' : 'last';
   const hero = featured ?? results[0] ?? null;
   const form = recentForm([...results].reverse());
@@ -55,25 +70,25 @@ export function MatchesView({ data, refreshing, onRefresh, onOpenMatch }: ViewPr
     () =>
       StyleSheet.create({
         formCard: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-        formTitle: { fontSize: fs(13), color: colors.textMuted, fontWeight: '700', marginBottom: 8 },
+        formTitle: { fontSize: fs(13), color: GLASS.soft, fontWeight: '700', marginBottom: 8 },
         pills: { flexDirection: 'row', gap: 6 },
         statBlock: { alignItems: 'center', minWidth: 54 },
-        statNum: { fontSize: fs(22), fontWeight: '900', color: colors.text },
-        statLabel: { fontSize: fs(11), color: colors.textMuted, fontWeight: '700' },
+        statNum: { fontSize: fs(22), fontWeight: '900', color: GLASS.text },
+        statLabel: { fontSize: fs(11), color: GLASS.soft, fontWeight: '700' },
         stats: { flexDirection: 'row', gap: 4 },
       }),
-    [colors, fs],
+    [fs],
   );
 
   return (
-    <ScrollView style={base.container} contentContainerStyle={base.content} refreshControl={<ClubRefresh refreshing={refreshing} onRefresh={onRefresh} />}>
-      {hero ? <NextMatchHero match={hero} mode={mode} onOpen={() => onOpenMatch(hero)} /> : null}
+    <ScrollView ref={scrollRef} style={base.container} contentContainerStyle={base.content} refreshControl={<ClubRefresh refreshing={refreshing} onRefresh={onRefresh} />}>
+      {hero ? <NextMatchHero match={hero} mode={mode} dataAt={dataAt} onOpen={() => onOpenMatch(hero)} /> : null}
 
       <View style={base.pad}>
         {form.length > 0 || row ? (
           <>
-            <SectionTitle>Form ve sıralama</SectionTitle>
-            <Card>
+            <SectionTitle light>Form ve sıralama</SectionTitle>
+            <Card style={base.glass}>
               <View style={styles.formCard}>
                 <View>
                   <Text style={styles.formTitle}>Son {form.length} maç · eskiden yeniye →</Text>
@@ -100,7 +115,20 @@ export function MatchesView({ data, refreshing, onRefresh, onOpenMatch }: ViewPr
           </>
         ) : null}
 
-        <SectionTitle hint="Süper Lig">Fikstür</SectionTitle>
+        {others.length > 0 ? (
+          <>
+            <SectionTitle light hint={others.some((m) => m.state === 'in') ? 'Canlı skorlar' : 'Diğer maçlar'}>
+              Süper Lig’de bugün
+            </SectionTitle>
+            <Card style={[base.glass, { gap: 10 }]}>
+              {others.map((m) => (
+                <MiniScore key={m.id} match={m} />
+              ))}
+            </Card>
+          </>
+        ) : null}
+
+        <SectionTitle light hint="Süper Lig">Fikstür</SectionTitle>
         {upcoming.length === 0 ? (
           <Text style={base.muted}>Yaklaşan maç bulunamadı.</Text>
         ) : (
@@ -116,7 +144,16 @@ export function MatchesView({ data, refreshing, onRefresh, onOpenMatch }: ViewPr
           </View>
         )}
 
-        <SectionTitle hint="En yeniden eskiye">Sonuçlar</SectionTitle>
+        {season.all.played > 0 ? (
+          <>
+            <SectionTitle light hint={season.streak ? streakText(season.streak) : undefined}>
+              Sezon özeti
+            </SectionTitle>
+            <SeasonCard season={season} />
+          </>
+        ) : null}
+
+        <SectionTitle light hint="En yeniden eskiye">Sonuçlar</SectionTitle>
         {results.length === 0 ? (
           <Text style={base.muted}>Henüz oynanmış maç yok.</Text>
         ) : (
@@ -132,29 +169,31 @@ export function MatchesView({ data, refreshing, onRefresh, onOpenMatch }: ViewPr
 }
 
 export function StandingsView({ data, refreshing, onRefresh }: ViewProps) {
-  const { colors, fs } = useTheme();
+  const scrollRef = useScrollTopOnShow();
+  const { fs } = useTheme();
   const base = useBaseStyles();
   const styles = useMemo(
     () =>
       StyleSheet.create({
-        table: { backgroundColor: colors.card, borderRadius: 16, borderWidth: 1, borderColor: colors.border, overflow: 'hidden' },
+        table: { backgroundColor: GLASS.surface, borderRadius: 16, borderWidth: 1, borderColor: GLASS.border, overflow: 'hidden' },
         row: { flexDirection: 'row', alignItems: 'center', paddingVertical: 10, paddingRight: 10 },
-        rowBorder: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: colors.border },
-        us: { backgroundColor: colors.isDark ? '#12331F' : '#E3F4EA' },
+        headRow: { backgroundColor: 'rgba(255,255,255,0.05)' },
+        rowBorder: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: GLASS.divider },
+        us: { backgroundColor: GLASS.highlight },
         zone: { width: 4, alignSelf: 'stretch', marginRight: 8 },
-        rank: { width: 24, fontSize: fs(13), fontWeight: '800', color: colors.text, textAlign: 'center' },
-        team: { flex: 1, fontSize: fs(14), color: colors.text, fontWeight: '600', paddingLeft: 6 },
-        teamUs: { fontWeight: '900', color: colors.isDark ? '#6FD39A' : CLUB_COLORS.greenDark },
-        cell: { width: fs(26), fontSize: fs(13), color: colors.textMuted, textAlign: 'center', fontVariant: ['tabular-nums'] },
+        rank: { width: 24, fontSize: fs(13), fontWeight: '800', color: GLASS.text, textAlign: 'center' },
+        team: { flex: 1, fontSize: fs(14), color: GLASS.text, fontWeight: '600', paddingLeft: 6 },
+        teamUs: { fontWeight: '900', color: GLASS.accent },
+        cell: { width: fs(26), fontSize: fs(13), color: GLASS.soft, textAlign: 'center', fontVariant: ['tabular-nums'] },
         gd: { width: fs(34) },
-        pts: { width: fs(30), fontSize: fs(14), fontWeight: '900', color: colors.text, textAlign: 'center' },
-        head: { color: colors.textMuted, fontWeight: '800', fontSize: fs(11) },
+        pts: { width: fs(30), fontSize: fs(14), fontWeight: '900', color: GLASS.text, textAlign: 'center' },
+        head: { color: GLASS.faint, fontWeight: '800', fontSize: fs(11) },
         legend: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginTop: 12 },
         legendItem: { flexDirection: 'row', alignItems: 'center', gap: 6 },
         legendDot: { width: 10, height: 10, borderRadius: 3 },
-        legendText: { fontSize: fs(12), color: colors.textMuted },
+        legendText: { fontSize: fs(12), color: GLASS.soft },
       }),
-    [colors, fs],
+    [fs],
   );
 
   const zones = useMemo(() => {
@@ -164,13 +203,13 @@ export function StandingsView({ data, refreshing, onRefresh }: ViewProps) {
   }, [data.standings]);
 
   return (
-    <ScrollView style={base.container} contentContainerStyle={[base.content, base.pad]} refreshControl={<ClubRefresh refreshing={refreshing} onRefresh={onRefresh} />}>
-      <SectionTitle hint="Trendyol Süper Lig 2026-27">Puan durumu</SectionTitle>
+    <ScrollView ref={scrollRef} style={base.container} contentContainerStyle={[base.content, base.pad]} refreshControl={<ClubRefresh refreshing={refreshing} onRefresh={onRefresh} />}>
+      <SectionTitle light hint="Trendyol Süper Lig 2026-27">Puan durumu</SectionTitle>
       {data.standings.length === 0 ? (
         <Text style={base.muted}>Puan durumu yüklenemedi.</Text>
       ) : (
         <FadeInView style={styles.table}>
-          <View style={styles.row}>
+          <View style={[styles.row, styles.headRow]}>
             <View style={styles.zone} />
             <Text style={[styles.rank, styles.head]}>#</Text>
             <Text style={[styles.team, styles.head]}>Takım</Text>
@@ -220,13 +259,24 @@ export function StandingsView({ data, refreshing, onRefresh }: ViewProps) {
   );
 }
 
+/** "11 maç · 4 gol · 1 asist" (kaleciler için kurtarış). */
+function playerLine(p: ClubData['roster'][number]): string {
+  const parts = [`${p.stats.apps} maç`];
+  if (p.group === 'GK' && p.stats.saves) parts.push(`${p.stats.saves} kurtarış`);
+  if (p.stats.goals) parts.push(`${p.stats.goals} gol`);
+  if (p.stats.assists) parts.push(`${p.stats.assists} asist`);
+  if (p.stats.red) parts.push(`${p.stats.red} kırmızı`);
+  return parts.join(' · ');
+}
+
 export function SquadView({ data, refreshing, onRefresh }: ViewProps) {
-  const { colors, fs } = useTheme();
+  const scrollRef = useScrollTopOnShow();
+  const { fs } = useTheme();
   const base = useBaseStyles();
   const styles = useMemo(
     () =>
       StyleSheet.create({
-        summary: { fontSize: fs(13), color: colors.textMuted, marginTop: -4 },
+        summary: { fontSize: fs(13), color: GLASS.soft, marginTop: -4 },
         grid: { flexDirection: 'row', flexWrap: 'wrap', marginHorizontal: -4 },
         cellWrap: { width: '50%', padding: 4, alignSelf: 'stretch' },
         cell: {
@@ -235,10 +285,10 @@ export function SquadView({ data, refreshing, onRefresh }: ViewProps) {
           flexDirection: 'row',
           alignItems: 'center',
           gap: 10,
-          backgroundColor: colors.card,
+          backgroundColor: GLASS.surface,
           borderRadius: 14,
           borderWidth: 1,
-          borderColor: colors.border,
+          borderColor: GLASS.border,
           padding: 10,
         },
         jersey: {
@@ -253,11 +303,11 @@ export function SquadView({ data, refreshing, onRefresh }: ViewProps) {
         },
         jerseyText: { color: '#FFFFFF', fontSize: fs(13), fontWeight: '900' },
         info: { flex: 1, gap: 2 },
-        name: { fontSize: fs(14), fontWeight: '700', color: colors.text },
-        meta: { fontSize: fs(12), color: colors.textMuted },
-        injured: { color: '#D64545', fontWeight: '700' },
+        name: { fontSize: fs(14), fontWeight: '700', color: GLASS.text },
+        meta: { fontSize: fs(12), color: GLASS.soft },
+        injured: { color: '#FF7A7A', fontWeight: '700' },
       }),
-    [colors, fs],
+    [fs],
   );
 
   const ages = data.roster.map((p) => p.age).filter((a): a is number => a !== null);
@@ -265,8 +315,8 @@ export function SquadView({ data, refreshing, onRefresh }: ViewProps) {
   const foreign = data.roster.filter((p) => p.nationality && p.nationality !== 'TUR').length;
 
   return (
-    <ScrollView style={base.container} contentContainerStyle={[base.content, base.pad]} refreshControl={<ClubRefresh refreshing={refreshing} onRefresh={onRefresh} />}>
-      <SectionTitle>Kadro</SectionTitle>
+    <ScrollView ref={scrollRef} style={base.container} contentContainerStyle={[base.content, base.pad]} refreshControl={<ClubRefresh refreshing={refreshing} onRefresh={onRefresh} />}>
+      <SectionTitle light>Kadro</SectionTitle>
       {data.roster.length === 0 ? (
         <Text style={base.muted}>Kadro yüklenemedi.</Text>
       ) : (
@@ -274,12 +324,13 @@ export function SquadView({ data, refreshing, onRefresh }: ViewProps) {
           <Text style={styles.summary}>
             {data.roster.length} oyuncu{avgAge ? ` · yaş ortalaması ${avgAge}` : ''} · {foreign} yabancı
           </Text>
+          <LeadersCard roster={data.roster} />
           {POSITION_GROUPS.map((g) => {
             const players = data.roster.filter((p) => p.group === g.id);
             if (players.length === 0) return null;
             return (
               <View key={g.id}>
-                <SectionTitle hint={`${players.length} oyuncu`}>{g.label}</SectionTitle>
+                <SectionTitle light hint={`${players.length} oyuncu`}>{g.label}</SectionTitle>
                 <FadeInView style={styles.grid}>
                   {players.map((p) => {
                     const flag = flagEmoji(p.nationality);
@@ -301,6 +352,11 @@ export function SquadView({ data, refreshing, onRefresh }: ViewProps) {
                               {p.age !== null ? `${p.age} yaş` : ''}
                               {p.injured ? <Text style={styles.injured}> · Sakat</Text> : null}
                             </Text>
+                            {p.stats.apps > 0 ? (
+                              <Text style={styles.meta} numberOfLines={1}>
+                                {playerLine(p)}
+                              </Text>
+                            ) : null}
                           </View>
                         </View>
                       </View>
@@ -316,73 +372,147 @@ export function SquadView({ data, refreshing, onRefresh }: ViewProps) {
   );
 }
 
-const NEWS_FILTERS = [
-  { id: 'all', label: 'Tümü', query: '"Rizespor" when:7d' },
-  { id: 'transfer', label: '🔄 Transfer', query: '"Rizespor" (transfer OR imza OR "sözleşme" OR "anlaşma") when:30d' },
-  { id: 'match', label: '⚽ Maç', query: '"Rizespor" (maç OR gol OR "maç sonu" OR "teknik direktör") when:7d' },
-] as const;
-
-export function ClubNewsView() {
-  const base = useBaseStyles();
-  const [filter, setFilter] = useState<(typeof NEWS_FILTERS)[number]['id']>('all');
-  // Haberler filtreye bağlı tutulur: filtre değişince eski liste bir an bile görünmez.
-  const [entry, setEntry] = useState<{ filter: string; items: NewsItem[] } | null>(null);
-  const items = entry?.filter === filter ? entry.items : null;
-  const [error, setError] = useState(false);
-  const [refreshing, setRefreshing] = useState(false);
-  const controller = useRef<AbortController | null>(null);
-
-  const load = useCallback(async () => {
-    controller.current?.abort();
-    const c = new AbortController();
-    controller.current = c;
-    setError(false);
-    try {
-      const q = NEWS_FILTERS.find((f) => f.id === filter)!.query;
-      const result = await fetchRss(googleNewsRssUrl(q), c.signal);
-      if (!c.signal.aborted) setEntry({ filter, items: result });
-    } catch {
-      if (!c.signal.aborted) setError(true);
-    }
-  }, [filter]);
-
-  useEffect(() => {
-    // Açılışta / filtre değişince haberleri indir (veri çekme deseni).
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    load();
-    return () => controller.current?.abort();
-  }, [load]);
-
-  const onRefresh = useCallback(async () => {
-    setRefreshing(true);
-    await load();
-    setRefreshing(false);
-  }, [load]);
-
+/** Günün diğer lig maçlarından biri: tek satır, canlıysa dakika kırmızı. */
+function MiniScore({ match }: { match: Match }) {
+  const { fs } = useTheme();
+  const live = match.state === 'in';
+  const score = match.state === 'pre' ? clock(match.date) : `${match.homeScore ?? 0} - ${match.awayScore ?? 0}`;
   return (
-    <ScrollView style={base.container} contentContainerStyle={base.content} refreshControl={<ClubRefresh refreshing={refreshing} onRefresh={onRefresh} />}>
-      <ChipRow>
-        {NEWS_FILTERS.map((f) => (
-          <Chip key={f.id} label={f.label} selected={filter === f.id} onPress={() => setFilter(f.id)} />
-        ))}
-      </ChipRow>
-      <View style={base.pad}>
-        {items === null && !error ? <NewsSkeleton count={4} /> : null}
-        {error ? (
-          <>
-            <Text style={base.muted}>Haberler yüklenemedi. İnternet bağlantınızı kontrol edin.</Text>
-            <PrimaryButton label="Tekrar dene" onPress={load} />
-          </>
-        ) : null}
-        {items && items.length === 0 ? <Text style={base.muted}>Bu konuda yakın tarihli haber yok.</Text> : null}
-        {items && items.length > 0 ? (
-          <FadeInView key={filter} style={base.list}>
-            {items.map((item) => (
-              <NewsCard key={item.id} item={item} />
-            ))}
-          </FadeInView>
-        ) : null}
+    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }} accessibilityLabel={`${match.home.name} ${score} ${match.away.name}, ${match.status}`}>
+      <Text style={{ flex: 1, color: GLASS.text, fontSize: fs(13), textAlign: 'right' }} numberOfLines={1}>
+        {shortTeamName(match.home.name)}
+      </Text>
+      <Text style={{ width: fs(58), color: GLASS.text, fontSize: fs(14), fontWeight: '900', textAlign: 'center', fontVariant: ['tabular-nums'] }}>{score}</Text>
+      <Text style={{ flex: 1, color: GLASS.text, fontSize: fs(13) }} numberOfLines={1}>
+        {shortTeamName(match.away.name)}
+      </Text>
+      <View style={{ width: fs(52), flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', gap: 4 }}>
+        {live ? <LivePulse size={7} /> : null}
+        <Text style={{ color: live ? '#FF6B61' : GLASS.soft, fontSize: fs(11), fontWeight: '800' }} numberOfLines={1}>
+          {match.state === 'pre' ? '' : match.status}
+        </Text>
       </View>
-    </ScrollView>
+    </View>
+  );
+}
+
+function SeasonCard({ season }: { season: ReturnType<typeof seasonSummary> }) {
+  const { fs } = useTheme();
+  const base = useBaseStyles();
+  const a = season.all;
+  const avg = (n: number) => (a.played ? (n / a.played).toFixed(1).replace('.', ',') : '0');
+  const tiles: [string, string][] = [
+    [`${a.won}-${a.drawn}-${a.lost}`, 'G-B-M'],
+    [`${a.goalsFor}:${a.goalsAgainst}`, 'ATTIĞI:YEDİĞİ'],
+    [avg(a.goalsFor), 'GOL / MAÇ'],
+    [String(season.cleanSheets), 'GOL YEMEDİ'],
+  ];
+  const split = (label: string, r: Record3) => (
+    <View style={{ flex: 1, gap: 4 }}>
+      <Text style={{ color: GLASS.soft, fontSize: fs(12), fontWeight: '700' }}>{label}</Text>
+      <Text style={{ color: GLASS.text, fontSize: fs(15), fontWeight: '900' }}>
+        {r.won}G {r.drawn}B {r.lost}M
+      </Text>
+      <Text style={{ color: GLASS.soft, fontSize: fs(12) }}>
+        {r.points} puan · {r.goalsFor}:{r.goalsAgainst}
+      </Text>
+      <WinBar r={r} />
+    </View>
+  );
+  return (
+    <Card style={[base.glass, { gap: 16 }]}>
+      <View style={{ flexDirection: 'row' }}>
+        {tiles.map(([v, l]) => (
+          <View key={l} style={{ flex: 1, alignItems: 'center', gap: 2 }}>
+            <Text style={{ color: GLASS.text, fontSize: fs(19), fontWeight: '900' }} adjustsFontSizeToFit numberOfLines={1}>
+              {v}
+            </Text>
+            <Text style={{ color: GLASS.soft, fontSize: fs(10), fontWeight: '800', textAlign: 'center' }}>{l}</Text>
+          </View>
+        ))}
+      </View>
+      <View style={{ height: StyleSheet.hairlineWidth, backgroundColor: GLASS.divider }} />
+      <View style={{ flexDirection: 'row', gap: 16 }}>
+        {split('🏟️ İç saha', season.home)}
+        {split('🚌 Deplasman', season.away)}
+      </View>
+      {season.biggestWin ? (
+        <Text style={{ color: GLASS.soft, fontSize: fs(12) }}>
+          En farklı galibiyet: {season.biggestWin.home.name} {season.biggestWin.homeScore}-{season.biggestWin.awayScore} {season.biggestWin.away.name}
+        </Text>
+      ) : null}
+    </Card>
+  );
+}
+
+/** Galibiyet / beraberlik / mağlubiyet oranı: üç renkli ince şerit. */
+function WinBar({ r }: { r: Record3 }) {
+  if (r.played === 0) return null;
+  return (
+    <View style={{ flexDirection: 'row', height: 6, borderRadius: 3, overflow: 'hidden', marginTop: 2, backgroundColor: GLASS.divider }}>
+      {(['G', 'B', 'M'] as const).map((k) => {
+        const n = k === 'G' ? r.won : k === 'B' ? r.drawn : r.lost;
+        return n > 0 ? <View key={k} style={{ flex: n, backgroundColor: RESULT_COLORS[k] }} /> : null;
+      })}
+    </View>
+  );
+}
+
+/** Takım liderleri: gol, asist, maç, kurtarış, kart — ilk 3'ler. */
+function LeadersCard({ roster }: { roster: ClubData['roster'] }) {
+  const { fs } = useTheme();
+  const base = useBaseStyles();
+  const boards = useMemo(() => teamLeaders(roster), [roster]);
+  const [selected, setSelected] = useState<string>('goals');
+  if (boards.length === 0) return null;
+  const board = boards.find((b) => b.id === selected) ?? boards[0];
+  const max = board.leaders[0]?.value ?? 1;
+  return (
+    <>
+      <SectionTitle light hint="Sezon, tüm maçlar">Takım liderleri</SectionTitle>
+      <Card style={[base.glass, { gap: 12 }]}>
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
+          {boards.map((b) => {
+            const on = b.id === board.id;
+            return (
+              <PressableScale
+                key={b.id}
+                onPress={() => setSelected(b.id)}
+                accessibilityRole="button"
+                accessibilityState={{ selected: on }}
+                style={{
+                  paddingHorizontal: 12,
+                  paddingVertical: 6,
+                  borderRadius: 999,
+                  backgroundColor: on ? CLUB_COLORS.green : GLASS.surfaceStrong,
+                  borderWidth: 1,
+                  borderColor: on ? CLUB_COLORS.green : GLASS.border,
+                }}
+              >
+                <Text style={{ color: GLASS.text, fontSize: fs(12), fontWeight: '800' }}>{b.label}</Text>
+              </PressableScale>
+            );
+          })}
+        </View>
+        {board.leaders.map((l, i) => (
+          <View key={l.player.id} style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+            <Text style={{ width: 22, color: i === 0 ? '#FFD447' : GLASS.soft, fontSize: fs(16), fontWeight: '900', textAlign: 'center' }}>{i + 1}</Text>
+            <View style={{ flex: 1, gap: 4 }}>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: 8 }}>
+                <Text style={{ color: GLASS.text, fontSize: fs(14), fontWeight: '800', flex: 1 }} numberOfLines={1}>
+                  {l.player.name}
+                </Text>
+                <Text style={{ color: GLASS.text, fontSize: fs(14), fontWeight: '900' }}>
+                  {l.value} <Text style={{ color: GLASS.soft, fontWeight: '600', fontSize: fs(12) }}>{board.unit}</Text>
+                </Text>
+              </View>
+              <View style={{ height: 5, borderRadius: 3, backgroundColor: GLASS.divider, overflow: 'hidden' }}>
+                <View style={{ width: `${(l.value / max) * 100}%`, height: '100%', backgroundColor: i === 0 ? GLASS.accent : 'rgba(123,224,166,0.55)' }} />
+              </View>
+            </View>
+          </View>
+        ))}
+      </Card>
+    </>
   );
 }

@@ -2,7 +2,7 @@
   "expo": {
     "name": "Rize Haber",
     "slug": "rize-haber",
-    "version": "1.5.1",
+    "version": "1.17.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
@@ -19,11 +19,18 @@
       },
       "predictiveBackGestureEnabled": false,
       "package": "com.kidmandesign.rizehaber",
-      "versionCode": 9,
+      "versionCode": 28,
       "blockedPermissions": [
         "android.permission.READ_EXTERNAL_STORAGE",
         "android.permission.WRITE_EXTERNAL_STORAGE",
-        "android.permission.SYSTEM_ALERT_WINDOW"
+        "android.permission.SYSTEM_ALERT_WINDOW",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK",
+        "android.permission.FOREGROUND_SERVICE_MICROPHONE",
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_BACKGROUND_LOCATION",
+        "com.google.android.gms.permission.AD_ID"
       ]
     },
     "web": {
@@ -61,7 +68,25 @@
           }
         }
       ],
-      "./plugins/withReleaseSigning"
+      "./plugins/withReleaseSigning",
+      [
+        "expo-audio",
+        {
+          "microphonePermission": false,
+          "recordAudioAndroid": false,
+          "enableBackgroundPlayback": false,
+          "enableBackgroundRecording": false
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Yakınınızdaki gezi yerlerini ve lezzet duraklarını sıralamak için yaklaşık konumunuz kullanılır; konum telefondan dışarı gönderilmez.",
+          "isAndroidBackgroundLocationEnabled": false,
+          "isAndroidForegroundServiceEnabled": false,
+          "isIosBackgroundLocationEnabled": false
+        }
+      ]
     ]
   }
 }

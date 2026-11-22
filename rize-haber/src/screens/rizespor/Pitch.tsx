@@ -1,7 +1,8 @@
 /**
  * İki takımın ilk 11'ini dizilişlerine göre gösteren saha.
  * Ev sahibi alttan yukarı, deplasman üstten aşağı hücum eder. Oyuncular kaleden ileriye doğru
- * sırayla sahaya "çıkar"; canlı maçta orta noktada nabız atar.
+ * sırayla sahaya "çıkar"; canlı maçta orta noktada nabız atar. Gol atan oyuncunun yanında top,
+ * kart görenin yanında sarı/kırmızı kart işareti görünür.
  */
 import { useEffect, useMemo, useState } from 'react';
 import { Animated, Easing, StyleSheet, Text, View } from 'react-native';
@@ -195,6 +196,17 @@ function PlayerDot({ p, pitchW, pitchH, reduced }: { p: Placed; pitchW: number; 
             <Text style={{ color: '#FFFFFF', fontSize: 9, fontWeight: '900' }}>↓</Text>
           </View>
         ) : null}
+        {p.player.goals > 0 ? (
+          <View style={[badge.base, badge.goal]} accessibilityLabel={`${p.player.goals} gol`}>
+            <Text style={badge.goalText}>⚽{p.player.goals > 1 ? `×${p.player.goals}` : ''}</Text>
+          </View>
+        ) : null}
+        {p.player.red > 0 || p.player.yellow > 0 ? (
+          <View
+            style={[badge.card, { backgroundColor: p.player.red > 0 ? '#E53935' : '#FDD835' }]}
+            accessibilityLabel={p.player.red > 0 ? 'Kırmızı kart' : 'Sarı kart'}
+          />
+        ) : null}
       </View>
       <Text
         numberOfLines={1}
@@ -214,3 +226,21 @@ function PlayerDot({ p, pitchW, pitchH, reduced }: { p: Placed; pitchW: number; 
     </Animated.View>
   );
 }
+
+/** Oyuncu noktasının köşelerindeki gol ve kart işaretleri. */
+const badge = StyleSheet.create({
+  base: { position: 'absolute', alignItems: 'center', justifyContent: 'center' },
+  goal: {
+    left: -10,
+    top: -7,
+    minWidth: 17,
+    height: 17,
+    paddingHorizontal: 2,
+    borderRadius: 9,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: 'rgba(0,0,0,0.25)',
+  },
+  goalText: { fontSize: 9, fontWeight: '900', color: '#1E2228' },
+  card: { position: 'absolute', left: -6, bottom: -5, width: 9, height: 12, borderRadius: 2, borderWidth: 1, borderColor: 'rgba(0,0,0,0.3)' },
+});

@@ -3,39 +3,46 @@ import { FlatList, StyleSheet, Text, View } from 'react-native';
 
 import { NewsCard } from '../components/NewsCard';
 import { Icon } from '../components/Icon';
+import { useScrollTopOnShow } from '../components/motion';
+import { NewsBackdrop, useTabChrome } from '../components/TabBackdrop';
 import { useFavorites } from '../favorites';
+import { NEWS_GLASS as G, rizeSkyFor, type RizeSky } from '../rizeScene';
 import { useTheme } from '../theme';
 
-export default function SavedScreen() {
+/** Kaydedilen haberler: Haberler sekmesinin parçası, aynı Rize manzarası üstünde cam kartlar. */
+export default function SavedScreen({ sky = rizeSkyFor(new Date().getHours()), active = true }: { sky?: RizeSky; active?: boolean }) {
   const { favorites } = useFavorites();
-  const { colors, fs } = useTheme();
+  const listRef = useScrollTopOnShow<FlatList<(typeof favorites)[number]>>();
+  const { fs } = useTheme();
+  const chrome = useTabChrome('news', sky);
   const styles = useMemo(
     () =>
       StyleSheet.create({
-        container: { flex: 1, backgroundColor: colors.background },
+        container: { flex: 1, backgroundColor: chrome.footer },
         list: { padding: 16, gap: 10, flexGrow: 1 },
-        count: { fontSize: fs(13), color: colors.textMuted, fontWeight: '600' },
+        count: { fontSize: fs(13), color: G.soft, fontWeight: '600' },
         empty: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32, gap: 8 },
-        emptyIcon: { fontSize: fs(44), color: colors.primary },
-        emptyTitle: { fontSize: fs(17), fontWeight: '700', color: colors.text },
-        emptyText: { fontSize: fs(14), color: colors.textMuted, textAlign: 'center', lineHeight: fs(20) },
+        emptyTitle: { fontSize: fs(17), fontWeight: '700', color: G.text },
+        emptyText: { fontSize: fs(14), color: G.soft, textAlign: 'center', lineHeight: fs(20) },
       }),
-    [colors, fs],
+    [fs, chrome],
   );
 
   return (
+    <View style={styles.container}>
+    <NewsBackdrop sky={sky} active={active} />
     <FlatList
-      style={styles.container}
+      ref={listRef}
       data={favorites}
       keyExtractor={(item) => item.id}
-      renderItem={({ item }) => <NewsCard item={item} />}
+      renderItem={({ item }) => <NewsCard item={item} glass />}
       contentContainerStyle={styles.list}
       ListHeaderComponent={
         favorites.length > 0 ? <Text style={styles.count}>{favorites.length} kayıtlı haber</Text> : undefined
       }
       ListEmptyComponent={
         <View style={styles.empty}>
-          <Icon name="star-outline" size={fs(44)} color={colors.primary} />
+          <Icon name="star-outline" size={fs(44)} color={G.accent} />
           <Text style={styles.emptyTitle}>Henüz kaydedilen haber yok</Text>
           <Text style={styles.emptyText}>
             Bir haberin altındaki “Kaydet” düğmesine dokunun; burada saklanır ve internet yokken de listede
@@ -44,5 +51,6 @@ export default function SavedScreen() {
         </View>
       }
     />
+    </View>
   );
 }
