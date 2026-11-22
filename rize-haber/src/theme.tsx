@@ -30,7 +30,9 @@ export type ThemeMode = 'system' | 'light' | 'dark';
 export type TabId = 'news' | 'rizespor' | 'tea' | 'economy' | 'weather' | 'rize';
 /**
  * Keşfet sekmesi şimdilik kapalı: sekme çubuğunda, açılış sekmesi seçiminde ve tanıtımda görünmez.
- * Kodu duruyor; geri açmak için `true` yapmak yeterli.
+ * Kodu duruyor; geri açmak için `true` yapın ve app.json → android.blockedPermissions listesinden
+ * `ACCESS_COARSE_LOCATION`ı çıkarın (Keşfet'in “Konumumu kullan” düğmesi bu izni ister). Kapalıyken izin
+ * bilerek engellenir: mağaza sürümü kullanmadığı bir konum iznini istemesin (test/store.test.ts denetler).
  */
 export const DISCOVER_ENABLED = false;
 export const TAB_IDS: TabId[] = (['news', 'rizespor', 'tea', 'economy', 'weather', 'rize'] as TabId[]).filter(

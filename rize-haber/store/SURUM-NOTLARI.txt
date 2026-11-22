@@ -1,10 +1,9 @@
 <tr-TR>
-Rize Haber’in ilk sürümü 🍃
-• Rize ve ilçelerinden güncel haberler, kaydet ve paylaş
-• Çaykur Rizespor: fikstür, puan durumu, kadro ve Maç Merkezi
-• “Çayını demle” maç hatırlatması
+Rize Haber yayında 🍃
+• Rize ve ilçelerinden güncel haberler; kaydet, paylaş, bildirim
+• Çaykur Rizespor: canlı takip, Maç Merkezi, puan durumu, kadro
 • Güncel yaş çay alım fiyatı ve tutar hesaplayıcı
-• Canlı hava durumu: havaya göre değişen ekran ve isteğe bağlı yağmur sesi
-• Rize’yi keşfet: yaylalar, lezzetler, kültür ve tarih
-• Koyu tema ve büyük yazı seçenekleri
+• Ekonomi: TCMB döviz kurları, altın ve çevirici
+• Canlı hava durumu: ilçeler, köyler ve yaylalar
+• 6 tema ve her sekme için seçilebilir arka plan sahnesi
 </tr-TR>

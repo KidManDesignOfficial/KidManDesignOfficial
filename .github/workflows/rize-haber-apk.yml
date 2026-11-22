@@ -96,6 +96,17 @@ jobs:
             echo "⚠️ APK hata ayıklama anahtarıyla imzalandı (kalıcı anahtar tanımlı değil)."
           fi
 
+      # Play Console → Veri güvenliği / Reklam kimliği beyanları bu listeye göre doldurulur (store/MAGAZA.md).
+      - name: İzinleri listele
+        run: |
+          APK=$(ls android/app/build/outputs/apk/release/*.apk | head -1)
+          AAPT2=$(ls "$ANDROID_HOME"/build-tools/*/aapt2 | sort -V | tail -1)
+          "$AAPT2" dump permissions "$APK" | tee izinler.txt
+          if grep -qE "LOCATION|AD_ID|RECORD_AUDIO" izinler.txt; then
+            echo "::error::Beklenmeyen izin (konum, reklam kimliği ya da mikrofon) pakete girdi; mağaza beyanları bununla çelişir."
+            exit 1
+          fi
+
       - uses: actions/upload-artifact@v4
         with:
           name: rize-haber-apk

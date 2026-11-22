@@ -6,12 +6,25 @@ Bu klasör Play Console’a girilecek her şeyi içerir. Sırayla ilerleyin; her
 |---|---|
 | `uygulama-simgesi-512.png` | Mağaza simgesi (512×512) |
 | `one-cikan-gorsel-1024x500.png` | Öne çıkan görsel |
-| `ekran-goruntuleri/01…08.png` | Telefon ekran görüntüleri (1080×1920, 8 adet) |
+| `ekran-goruntuleri/01…08.png` | Telefon ekran görüntüleri (1080×1920, 8 adet; 1.17 arayüzü) |
 | `ACIKLAMA.txt` | Tam açıklama (kopyala-yapıştır) |
 | `SURUM-NOTLARI.txt` | “Bu sürümdeki yenilikler” |
 
 Yüklenecek paket: GitHub → Actions → son başarılı **Rize Haber APK** çalışması → Artifacts →
 **`rize-haber-aab-google-play`** (içinden çıkan `.aab` dosyası). APK değil, **AAB** yüklenir.
+AAB 90 gün saklanır; süresi geçtiyse aynı sayfada **Re-run all jobs** ile yeniden üretin.
+
+**Güncel paket:** sürüm adı **1.17.1**, sürüm kodu **28**, hedef Android 16 (API 36), Play’in yeni uygulama
+şartını karşılar. Paket kalıcı **Rize Haber** anahtarıyla imzalanır (derleme kaydında “✅ AAB kalıcı Rize Haber
+anahtarıyla imzalandı” satırı görünmelidir).
+
+### Başlamadan önce (5 dakika)
+
+- [ ] İmza anahtarının (`.jks`) ve şifresinin **en az iki ayrı yerde** yedeği var (ör. USB bellek + şifreli bulut).
+      Bu anahtar kaybolursa uygulama güncellenemez; Play’de anahtar sıfırlama talebi günler sürer.
+- [ ] GitHub → Settings → Secrets’ta `RIZE_KEYSTORE_BASE64` ve `RIZE_KEYSTORE_PASSWORD` tanımlı (derleme bunu doğrular).
+- [ ] 12’den fazla testçi adayınızın Gmail adresi hazır (aile, arkadaş, Rizespor/Rize grupları).
+- [ ] Ödeme için banka/kredi kartı (25 $ tek seferlik kayıt ücreti) ve kimlik kartı/pasaport.
 
 ---
 
@@ -47,8 +60,8 @@ Tavsiye: güvenlik payı için **15–20 kişi** davet edin.
 | Alan | Değer |
 |---|---|
 | Uygulama adı (en fazla 30) | `Rize Haber` |
-| Kısa açıklama (en fazla 80) | `Rize’nin haberleri, yaş çay fiyatı, Rizespor, hava durumu ve gezi rehberi.` (74 karakter) |
-| Tam açıklama (en fazla 4000) | `ACIKLAMA.txt` dosyasının tamamı (2.300 karakter) |
+| Kısa açıklama (en fazla 80) | `Rize’nin haberleri, yaş çay fiyatı, Rizespor, döviz-altın ve hava durumu.` (73 karakter) |
+| Tam açıklama (en fazla 4000) | `ACIKLAMA.txt` dosyasının tamamı (2.836 karakter) |
 | Uygulama simgesi | `uygulama-simgesi-512.png` |
 | Öne çıkan görsel | `one-cikan-gorsel-1024x500.png` |
 | Telefon ekran görüntüleri | `ekran-goruntuleri/` içindeki 8 dosya, numara sırasıyla |
@@ -64,6 +77,10 @@ Web sitesi (isteğe bağlı) `https://github.com/KidManDesignOfficial/KidManDesi
 ### Reklamlar
 **Hayır**, uygulamam reklam içermiyor.
 
+### Reklam kimliği (Advertising ID)
+**Hayır**, uygulama reklam kimliğini kullanmıyor. (`AD_ID` izni pakette bilerek engellenmiştir; derleme
+kaydındaki “İzinleri listele” adımı bunu her sürümde denetler.)
+
 ### Uygulama erişimi
 **Tüm işlevler özel erişim gerektirmeden kullanılabilir** (hesap/giriş yok).
 
@@ -71,7 +88,7 @@ Web sitesi (isteğe bağlı) `https://github.com/KidManDesignOfficial/KidManDesi
 - E-posta: cikskral03@gmail.com · Kategori: **Referans, Haber veya Eğitim**
 - Sorulara uygulamaya göre dürüstçe yanıt verin. Uygulamanın gerçek durumu:
   - Kullanıcılar birbirleriyle **iletişim kuramaz**, içerik **paylaşamaz/yükleyemez** (paylaş düğmesi yalnızca telefonun paylaşım menüsünü açar).
-  - **Konum paylaşımı yok**, **uygulama içi satın alma yok**, **kumar yok**, **reklam yok**.
+  - **Konum izni yok**, **uygulama içi satın alma yok**, **kumar yok**, **reklam yok**.
   - Uygulama kendi şiddet/cinsellik içeriği üretmez; üçüncü taraf haber başlıkları gösterir (asayiş haberleri olabilir).
 
 ### Hedef kitle ve içerik
@@ -95,12 +112,18 @@ durumla yanıtlayın. Uygulama zaten kurallara uyuyor: her haberde kaynak var, i
 |---|---|
 | Uygulama gerekli kullanıcı veri türlerinden herhangi birini topluyor ya da paylaşıyor mu? | **Hayır** |
 
-Gerekçe (form açıklaması isterse): Uygulamada hesap, analitik veya reklam yoktur. Ayarlar, kaydedilen
-haberler ve gezi listesi yalnızca cihazda saklanır. İçerik (haber, hava, maç, çay fiyatı) herkese açık
-servislerden okunur; bu isteklerde kullanıcıya ait veri gönderilmez. Tüm bağlantılar HTTPS’tir.
+Gerekçe (form açıklaması isterse): Uygulamada hesap, analitik, reklam ve konum izni yoktur. Ayarlar ve
+kaydedilen haberler yalnızca cihazda saklanır. İçerik (haber, hava, maç, çay fiyatı, döviz ve altın) herkese
+açık servislerden okunur; bu isteklerde kullanıcıya ait veri gönderilmez (hava isteğinde yalnızca listeden
+seçilen yerin bilinen koordinatı gider, telefonun konumu değil). Tüm bağlantılar HTTPS’tir.
+
+Paketteki izinler (derleme kaydı → “İzinleri listele”): İnternet, bildirim, titreşim, ses ayarları (yağmur
+sesi), açılışta başlama ve arka plan işi (bildirimler için). Konum, mikrofon, kamera, depolama ve reklam
+kimliği **yoktur**.
 
 ### Diğer beyanlar
-Devlet uygulaması: **Hayır** · Finansal özellikler: **Yok** · Sağlık: **Hayır** ·
+Devlet uygulaması: **Hayır** · Finansal özellikler: **Yok** (Ekonomi sekmesi yalnızca TCMB kurlarını ve altın
+fiyatını bilgi amaçlı gösterir; para transferi, yatırım, kredi ya da ödeme hizmeti yoktur) · Sağlık: **Hayır** ·
 COVID-19 izleme: **Hayır** · Fotoğraf/video izni: **Kullanılmıyor**
 
 ## 5. Kapalı test (Test → Kapalı test)
@@ -109,7 +132,7 @@ COVID-19 izleme: **Hayır** · Fotoğraf/video izni: **Kullanılmıyor**
    kullanıcılarının Gmail adreslerini ekleyin (en az 12, öneri 15–20).
 2. **Ülkeler/bölgeler:** Türkiye (isterseniz tümü).
 3. **Yeni sürüm oluştur** → Play Uygulama İmzalama’yı kabul edin → `.aab` dosyasını yükleyin →
-   Sürüm adı `1.10.0` · Sürüm notları: `SURUM-NOTLARI.txt`.
+   Sürüm adı `1.17.1` · Sürüm notları: `SURUM-NOTLARI.txt`.
 4. **İncelemeye gönder.** Onaylanınca “Katılım bağlantısı”nı testçilere gönderin (aşağıdaki mesaj).
 5. Testçiler bağlantıdan **teste katılmalı ve uygulamayı Play Store’dan indirmeli**. 14 gün boyunca
    testten ayrılmamalılar; arada uygulamayı açıp kullanmaları yeterli.
@@ -117,7 +140,7 @@ COVID-19 izleme: **Hayır** · Fotoğraf/video izni: **Kullanılmıyor**
 ### Testçi davet mesajı (WhatsApp vb. için)
 
 > Merhaba! Rize için bir uygulama hazırladım: **Rize Haber** 🍃
-> Rize’nin haberleri, yaş çay fiyatı, Rizespor maçları ve hava durumu tek yerde.
+> Rize’nin haberleri, yaş çay fiyatı, Rizespor maçları, döviz-altın ve hava durumu tek yerde.
 > Google Play’de yayınlayabilmem için 14 gün test etmen gerekiyor. 2 dakikalık iş:
 > 1) Şu bağlantıdan teste katıl: [KATILIM BAĞLANTISI]
 > 2) Aynı sayfadaki “Google Play’den indir” ile uygulamayı yükle
@@ -126,6 +149,10 @@ COVID-19 izleme: **Hayır** · Fotoğraf/video izni: **Kullanılmıyor**
 
 ## 6. Üretime (herkese açık) geçiş
 
+İpucu: Google, testçilerin uygulamayı gerçekten kullanmasına da bakar. 14 gün içinde 1–2 kez testçilere
+hatırlatma atın ve en az bir küçük güncelleme (ör. 1.17.2) kapalı teste yükleyin; “geri bildirime göre
+geliştirildi” diyebilmek üretim başvurusunu kolaylaştırır.
+
 14 gün dolunca Play Console’da **Kontrol paneli → Üretim erişimine başvur**. Kısa bir anket gelir
 (testçilerin geri bildirimi, uygulamanın hazır olduğu vb.). Onay genellikle **7 gün içinde** gelir.
 Ardından **Üretim → Yeni sürüm** → aynı AAB’yi seçin → yayınlayın.
@@ -133,9 +160,22 @@ Ardından **Üretim → Yeni sürüm** → aynı AAB’yi seçin → yayınlayı
 ## 7. Sonraki güncellemeler
 
 1. Kodda değişiklik → GitHub derlemesi otomatik çalışır → yeni `rize-haber-aab-google-play`.
-2. Her güncellemede `app.json` içindeki `version` (ör. 1.5.2) ve `android.versionCode` (bir öncekinden
+2. Her güncellemede `app.json` içindeki `version` (ör. 1.17.2) ve `android.versionCode` (bir öncekinden
    büyük tam sayı) artırılmalıdır.
 3. Play Console → Üretim → Yeni sürüm → AAB’yi yükleyin → sürüm notları → yayınlayın.
 
 **İmza anahtarını kaybetmeyin.** Play Uygulama İmzalama, ilk yüklediğiniz AAB’yi imzalayan anahtarı
 “yükleme anahtarı” olarak kaydeder; sonraki tüm sürümler aynı anahtarla imzalanmalıdır.
+
+## 8. İleride para kazanma: şimdiden bilinmesi gerekenler
+
+- **“Ücretsiz” seçimi geri alınamaz.** Ücretsiz yayınlanan uygulama sonradan ücretliye çevrilemez (yalnızca
+  yeni paket adıyla, sıfırdan). Reklam, uygulama içi satın alma ve abonelik ise sonradan eklenebilir.
+- **Reklam (AdMob) eklenirse** bu dosyadaki beyanlar değişir: Reklamlar → Evet, Reklam kimliği → Evet
+  (`AD_ID` engeli kaldırılır), Veri güvenliği → “cihaz kimlikleri” ve “uygulama etkileşimleri” toplanır ve
+  reklam ortağıyla paylaşılır; gizlilik politikası ve KVKK/GDPR izin ekranı güncellenir.
+- **Satın alma/abonelik eklenirse** Play Console’da ödeme profili (satıcı hesabı) ve vergi bilgileri istenir;
+  ödeme Google Play Faturalandırma ile alınır.
+- **Veri kaynakları:** Ticari kullanıma geçmeden önce Google Haberler RSS, ESPN ve gold-api.com kullanım
+  koşulları yeniden kontrol edilmeli; Open-Meteo koşullarına göre reklamlı/abonelikli uygulama ücretsiz
+  kullanımdadır (CC BY 4.0, atıf zorunlu; günde 10.000 istek sınırı).
