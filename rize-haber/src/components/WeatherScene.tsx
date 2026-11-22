@@ -13,7 +13,9 @@ import { useEffect, useMemo } from 'react';
 import { Animated, Easing, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 
+import { weatherLandscape, type WeatherStyle } from '../backdrops';
 import { seeded, skyChrome, type Scene } from '../weatherScene';
+import { Layer } from './Backdrop';
 import { useAnimatedValue, useSceneStill } from './motion';
 
 const FILL = { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 } as const;
@@ -38,10 +40,17 @@ function cycle(clock: Animated.Value, speed: number, phase: number) {
   return Animated.modulo(Animated.add(Animated.multiply(clock, speed), phase), 1);
 }
 
-export default function WeatherScene({ scene, active }: { scene: Scene; active: boolean }) {
+/**
+ * @param variant Ayarlar → Arka planlar → Hava: `kackar` / `kiyi` gökyüzünün önüne manzara ekler,
+ *   `sade` yalnızca havanın rengini (ve güneş/ay) çizer; bulut, yağmur, kar ve hareket olmaz.
+ */
+export default function WeatherScene({ scene, active, variant = 'canli' }: { scene: Scene; active: boolean; variant?: WeatherStyle }) {
   const reduced = useSceneStill();
-  const running = active && !reduced;
+  const plain = variant === 'sade';
+  const running = active && !reduced && !plain;
   const { width, height } = useWindowDimensions();
+  const landscape = useMemo(() => weatherLandscape(variant, scene.sky), [variant, scene.sky]);
+  const box = { width, height, running };
   const fade = useAnimatedValue(0);
   const sceneKey = `${scene.kind}-${scene.isDay}-${scene.particles}-${scene.clouds}`;
 
@@ -63,18 +72,25 @@ export default function WeatherScene({ scene, active }: { scene: Scene; active: 
       <Animated.View style={[FILL, { opacity: fade }]}>
         {scene.showSun && night ? <Stars width={width} height={height} running={running} /> : null}
         {scene.showSun ? night ? <Moon width={width} /> : <Sun width={width} running={running} /> : null}
-        {scene.clouds > 0 ? (
+        {!plain && scene.clouds > 0 ? (
           <Clouds count={scene.clouds} shade={scene.cloudShade} night={night} width={width} height={height} running={running} />
         ) : null}
-        {scene.kind === 'fog' ? <Fog width={width} height={height} running={running} /> : null}
-        {scene.kind === 'rain' || scene.kind === 'storm' ? (
+        {landscape.map((e, i) => (
+          <Layer key={`${e.type}-${i}`} effect={e} box={box} salt={200 + i * 17} />
+        ))}
+        {plain ? null : (
           <>
-            <Rain count={scene.particles} width={width} height={height} running={running} />
-            <GlassDrops count={scene.particles > 80 ? 14 : 9} width={width} running={running} />
+            {scene.kind === 'fog' ? <Fog width={width} height={height} running={running} /> : null}
+            {scene.kind === 'rain' || scene.kind === 'storm' ? (
+              <>
+                <Rain count={scene.particles} width={width} height={height} running={running} />
+                <GlassDrops count={scene.particles > 80 ? 14 : 9} width={width} running={running} />
+              </>
+            ) : null}
+            {scene.kind === 'snow' ? <Snow count={scene.particles} width={width} height={height} running={running} /> : null}
+            {scene.kind === 'storm' ? <Lightning running={running} /> : null}
           </>
-        ) : null}
-        {scene.kind === 'snow' ? <Snow count={scene.particles} width={width} height={height} running={running} /> : null}
-        {scene.kind === 'storm' ? <Lightning running={running} /> : null}
+        )}
       </Animated.View>
       {/* Alt kısımda hafif koyulaşma: kartlardaki beyaz yazılar her gökyüzünde okunur kalır. */}
       <LinearGradient colors={['rgba(0,0,0,0)', 'rgba(0,0,0,0.28)']} start={{ x: 0, y: 0.35 }} end={{ x: 0, y: 1 }} style={FILL} />

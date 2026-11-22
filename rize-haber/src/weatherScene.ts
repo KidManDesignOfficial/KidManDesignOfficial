@@ -85,7 +85,8 @@ export function skyChrome(scene: Scene): SkyChrome {
   return { header: scene.sky[0], footer };
 }
 
-function darken(hex: string, t: number): string {
+/** Rengi `t` oranında (0–1) karartır. */
+export function darken(hex: string, t: number): string {
   const n = parseInt(hex.slice(1), 16);
   const c = (v: number) => Math.round(v * (1 - t)).toString(16).padStart(2, '0').toUpperCase();
   return `#${c((n >> 16) & 255)}${c((n >> 8) & 255)}${c(n & 255)}`;

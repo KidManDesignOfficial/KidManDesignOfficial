@@ -229,7 +229,7 @@ function Floodlight({ side, width, height, running, live }: { side: 'left' | 'ri
 const SPARKS = 14;
 const FIREWORK_COLORS = ['#7BE0A6', '#5AA9FF', '#FFFFFF'];
 
-function Fireworks({ width, height }: { width: number; height: number }) {
+export function Fireworks({ width, height }: { width: number; height: number }) {
   const [bursts] = useState(() =>
     [0, 1, 2].map((i) => ({
       x: width * (0.2 + 0.3 * i + (seeded(i, 81) - 0.5) * 0.1),

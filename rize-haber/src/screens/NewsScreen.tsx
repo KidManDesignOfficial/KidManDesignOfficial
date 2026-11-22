@@ -17,8 +17,8 @@ import { useAppActive } from '../appState';
 import { Icon } from '../components/Icon';
 import { EASE_OUT, useAnimatedValue, useReducedMotion, useScrollTopOnShow } from '../components/motion';
 import { NewsCard } from '../components/NewsCard';
-import RizeScene from '../components/RizeScene';
 import { NewsSkeleton } from '../components/Skeleton';
+import { NewsBackdrop, useTabChrome } from '../components/TabBackdrop';
 import { Chip, ChipRow, PrimaryButton } from '../components/ui';
 import { NEWS_CATEGORIES, googleNewsRssUrl } from '../config';
 import { tapFeedback } from '../haptics';
@@ -71,11 +71,12 @@ export default function NewsScreen({ active = true, sky = rizeSkyFor(new Date().
 
   const state = byCategory[categoryId] ?? EMPTY;
   const { colors, fs } = useTheme();
+  const chrome = useTabChrome('news', sky);
   const styles = useMemo(
     () =>
       StyleSheet.create({
         // Arka plandaki Rize manzarası görünsün diye zemin sahnenin alt rengi; yüzeyler cam.
-        container: { flex: 1, backgroundColor: sky.chrome.footer },
+        container: { flex: 1, backgroundColor: chrome.footer },
         searchBox: { paddingHorizontal: 16, paddingTop: 12 },
         searchField: {
           flexDirection: 'row',
@@ -137,7 +138,7 @@ export default function NewsScreen({ active = true, sky = rizeSkyFor(new Date().
         },
         pillText: { color: '#0B2A1C', fontSize: fs(13), fontWeight: '800' },
       }),
-    [fs, sky],
+    [fs, chrome],
   );
 
   const load = useCallback(async (id: string) => {
@@ -275,7 +276,7 @@ export default function NewsScreen({ active = true, sky = rizeSkyFor(new Date().
 
   return (
     <View style={styles.container}>
-      <RizeScene sky={sky} active={live} />
+      <NewsBackdrop sky={sky} active={live} />
       <View style={styles.searchBox}>
         <View style={styles.searchField}>
           <Icon name="search" size={18} color={G.faint} />
@@ -318,7 +319,7 @@ export default function NewsScreen({ active = true, sky = rizeSkyFor(new Date().
               onRefresh={onRefresh}
               colors={[colors.primary]}
               tintColor={G.text}
-              progressBackgroundColor={sky.chrome.footer}
+              progressBackgroundColor={chrome.footer}
             />
           }
           ListHeaderComponent={

@@ -4,7 +4,7 @@ import { FlatList, StyleSheet, Text, View } from 'react-native';
 import { NewsCard } from '../components/NewsCard';
 import { Icon } from '../components/Icon';
 import { useScrollTopOnShow } from '../components/motion';
-import RizeScene from '../components/RizeScene';
+import { NewsBackdrop, useTabChrome } from '../components/TabBackdrop';
 import { useFavorites } from '../favorites';
 import { NEWS_GLASS as G, rizeSkyFor, type RizeSky } from '../rizeScene';
 import { useTheme } from '../theme';
@@ -14,22 +14,23 @@ export default function SavedScreen({ sky = rizeSkyFor(new Date().getHours()), a
   const { favorites } = useFavorites();
   const listRef = useScrollTopOnShow<FlatList<(typeof favorites)[number]>>();
   const { fs } = useTheme();
+  const chrome = useTabChrome('news', sky);
   const styles = useMemo(
     () =>
       StyleSheet.create({
-        container: { flex: 1, backgroundColor: sky.chrome.footer },
+        container: { flex: 1, backgroundColor: chrome.footer },
         list: { padding: 16, gap: 10, flexGrow: 1 },
         count: { fontSize: fs(13), color: G.soft, fontWeight: '600' },
         empty: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32, gap: 8 },
         emptyTitle: { fontSize: fs(17), fontWeight: '700', color: G.text },
         emptyText: { fontSize: fs(14), color: G.soft, textAlign: 'center', lineHeight: fs(20) },
       }),
-    [fs, sky],
+    [fs, chrome],
   );
 
   return (
     <View style={styles.container}>
-    <RizeScene sky={sky} active={active} />
+    <NewsBackdrop sky={sky} active={active} />
     <FlatList
       ref={listRef}
       data={favorites}

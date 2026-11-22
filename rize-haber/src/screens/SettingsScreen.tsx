@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 import appConfig from '../../app.json';
 
+import BackdropPicker from '../components/BackdropPicker';
 import { Icon } from '../components/Icon';
 
 import LocationPicker from '../components/LocationPicker';
@@ -279,6 +280,11 @@ export default function SettingsScreen() {
         <View style={styles.preview}>
           <Text style={styles.previewText}>Önizleme: Rize’de bugün hava parçalı bulutlu.</Text>
         </View>
+      </Card>
+
+      <SectionTitle hint="Her sekmenin sahnesi ayrı seçilir">Arka planlar</SectionTitle>
+      <Card>
+        <BackdropPicker />
       </Card>
 
       <SectionTitle hint="Uygulamayı kendine göre ayarla">Özelleştirme</SectionTitle>

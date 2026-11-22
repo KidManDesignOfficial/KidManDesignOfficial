@@ -3,13 +3,13 @@ import { AppState, StyleSheet, Text, View } from 'react-native';
 
 import { FadeInView } from '../components/motion';
 import { HeroSkeleton } from '../components/Skeleton';
-import StadiumScene from '../components/StadiumScene';
+import { RizesporBackdrop, useTabChrome } from '../components/TabBackdrop';
 import { SegmentedTabs, type Segment } from '../components/SegmentedTabs';
 import { PrimaryButton } from '../components/ui';
 import { fetchClubData, fetchScoreboard, loadCachedClubData, mergeClubData, type ClubData } from '../rizespor/api';
 import { LIVE_POLL_MS, detectMoments, inMatchWindow, momentText, pollDelay, type LiveMoment } from '../rizespor/live';
 import { CLUB_COLORS } from '../rizespor/names';
-import { GLASS, STADIUM_CHROME } from '../rizespor/stadium';
+import { GLASS } from '../rizespor/stadium';
 import type { Match } from '../rizespor/parse';
 import { syncMatchReminders } from '../rizespor/reminders';
 import { useTheme } from '../theme';
@@ -44,6 +44,7 @@ function pickMoment(moments: LiveMoment[]): LiveMoment | null {
 
 export default function RizesporScreen({ openMatchId, active = true }: { openMatchId?: string | null; active?: boolean }) {
   const { fs } = useTheme();
+  const chrome = useTabChrome('rizespor');
   const [section, setSection] = useState<Section>('matches');
   const [visited, setVisited] = useState<Set<Section>>(() => new Set(['matches']));
   const [data, setData] = useState<ClubData>(EMPTY);
@@ -180,12 +181,12 @@ export default function RizesporScreen({ openMatchId, active = true }: { openMat
   const styles = useMemo(
     () =>
       StyleSheet.create({
-        container: { flex: 1, backgroundColor: STADIUM_CHROME.footer },
+        container: { flex: 1, backgroundColor: chrome.footer },
         page: { flex: 1 },
         center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32, gap: 12 },
         error: { color: GLASS.text, fontSize: fs(15), textAlign: 'center', lineHeight: fs(22) },
       }),
-    [fs],
+    [fs, chrome],
   );
 
   const live = allMatches(data).some((m) => m.state === 'in' || inMatchWindow(m, now));
@@ -193,7 +194,7 @@ export default function RizesporScreen({ openMatchId, active = true }: { openMat
 
   return (
     <View style={styles.container}>
-      <StadiumScene active={active} live={live} cheer={cheer} />
+      <RizesporBackdrop active={active} live={live} cheer={cheer} />
       <SegmentedTabs segments={SECTIONS} value={section} onChange={select} activeColor={CLUB_COLORS.green} glass />
 
       {state === 'loading' ? (

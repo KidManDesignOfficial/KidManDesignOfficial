@@ -13,10 +13,11 @@ import { tapFeedback } from './src/haptics';
 import { openUrl } from './src/components/ui';
 import { FavoritesProvider } from './src/favorites';
 import { CLUB_COLORS } from './src/rizespor/names';
-import { GLASS, STADIUM_CHROME } from './src/rizespor/stadium';
+import { GLASS } from './src/rizespor/stadium';
 import { useRizeSky } from './src/components/RizeScene';
-import { ECON_CHROME, MARKET } from './src/economyScene';
-import { TEA_CHROME, TEA_GLASS } from './src/teaScene';
+import { useTabChrome } from './src/components/TabBackdrop';
+import { MARKET } from './src/economyScene';
+import { TEA_GLASS } from './src/teaScene';
 import DiscoverScreen from './src/screens/DiscoverScreen';
 import EconomyScreen from './src/screens/EconomyScreen';
 import NewsScreen from './src/screens/NewsScreen';
@@ -132,16 +133,21 @@ function Main() {
   // Hava sekmesinde başlık ve sekme çubuğu gökyüzünün rengini alır; sahneyle kesintisiz birleşir.
   // Rizespor sekmesinde de aynısı: başlık gece göğüne, sekme çubuğu stadyumun çimine karışır.
   // Haberler, Çay ve Ekonomi sekmelerinde de başlık ve sekme çubuğu kendi sahnelerinin renklerini alır.
+  // Ayarlar → Arka planlar'dan başka bir sahne seçildiyse çerçeve o sahnenin renklerini alır.
+  const newsChrome = useTabChrome('news', rizeSky);
+  const clubChrome = useTabChrome('rizespor');
+  const teaChrome = useTabChrome('tea');
+  const economyChrome = useTabChrome('economy');
   const skyChrome = weatherVisible
     ? weatherChrome
     : club
-      ? STADIUM_CHROME
+      ? clubChrome
       : newsVisible
-        ? rizeSky.chrome
+        ? newsChrome
         : teaVisible
-          ? TEA_CHROME
+          ? teaChrome
           : economyVisible
-            ? ECON_CHROME
+            ? economyChrome
             : null;
   const sky = skyChrome?.header ?? null;
   const styles = useMemo(

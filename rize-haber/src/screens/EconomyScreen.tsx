@@ -9,13 +9,13 @@ import { Animated, Easing, Pressable, RefreshControl, ScrollView, StyleSheet, Te
 import { LinearGradient } from 'expo-linear-gradient';
 
 import { useAppActive } from '../appState';
-import EconomyScene from '../components/EconomyScene';
+import { EconomyBackdrop, useTabChrome } from '../components/TabBackdrop';
 import { HeroCard } from '../components/HeroCard';
 import { Icon } from '../components/Icon';
 import { useAnimatedValue, useSceneStill, useScrollTopOnShow } from '../components/motion';
 import { HeroSkeleton } from '../components/Skeleton';
 import { Card, Chip, ChipRow, PrimaryButton, SectionTitle } from '../components/ui';
-import { ECON_CHROME, ECON_GLASS as G, FLAGS, MARKET } from '../economyScene';
+import { ECON_GLASS as G, FLAGS, MARKET } from '../economyScene';
 import { tapFeedback } from '../haptics';
 import { convert, fetchMarkets, formatRate, gramGoldTry, type Markets } from '../markets';
 import { loadCachedMarkets, saveCachedMarkets, savedAtLabel } from '../offline';
@@ -38,6 +38,7 @@ type Props = {
 export default function EconomyScreen({ active = true, onOpenTea }: Props) {
   const scrollRef = useScrollTopOnShow();
   const { fs } = useTheme();
+  const chrome = useTabChrome('economy');
   const appActive = useAppActive();
   const [markets, setMarkets] = useState<Markets | null>(null);
   const [state, setState] = useState<'loading' | 'ready' | 'error'>('loading');
@@ -105,7 +106,7 @@ export default function EconomyScreen({ active = true, onOpenTea }: Props) {
   const styles = useMemo(
     () =>
       StyleSheet.create({
-        root: { flex: 1, backgroundColor: ECON_CHROME.footer },
+        root: { flex: 1, backgroundColor: chrome.footer },
         container: { flex: 1, backgroundColor: 'transparent' },
         content: { padding: 16, paddingBottom: 32 },
         card: { backgroundColor: G.surface, borderColor: G.border },
@@ -225,7 +226,7 @@ export default function EconomyScreen({ active = true, onOpenTea }: Props) {
         errorText: { color: G.text, fontSize: fs(15), textAlign: 'center' },
         footer: { fontSize: fs(12), color: G.faint, textAlign: 'center', marginTop: 16, lineHeight: fs(17) },
       }),
-    [fs],
+    [fs, chrome],
   );
 
   const running = active && appActive;
@@ -233,7 +234,7 @@ export default function EconomyScreen({ active = true, onOpenTea }: Props) {
   if (!markets) {
     return (
       <View style={styles.root}>
-        <EconomyScene active={running} />
+        <EconomyBackdrop active={running} />
         {state === 'loading' ? (
           <HeroSkeleton rows={5} glass />
         ) : (
@@ -263,7 +264,7 @@ export default function EconomyScreen({ active = true, onOpenTea }: Props) {
 
   return (
     <View style={styles.root}>
-      <EconomyScene active={running} />
+      <EconomyBackdrop active={running} />
       <Ticker items={ticker} running={running} />
       <ScrollView
         ref={scrollRef}
@@ -276,7 +277,7 @@ export default function EconomyScreen({ active = true, onOpenTea }: Props) {
             onRefresh={onRefresh}
             colors={[MARKET.gold]}
             tintColor={MARKET.gold}
-            progressBackgroundColor={ECON_CHROME.header}
+            progressBackgroundColor={chrome.header}
           />
         }
       >

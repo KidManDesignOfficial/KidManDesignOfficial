@@ -19,6 +19,7 @@ import {
   type PaletteId,
   type TextSize,
 } from './colors';
+import { DEFAULT_BACKDROPS, sanitizeBackdrops, type BackdropChoice } from './backdrops';
 import { WEATHER_LOCATIONS } from './config';
 import { setHapticsEnabled } from './haptics';
 import { placeById } from './places';
@@ -57,6 +58,8 @@ export type Settings = {
   rainSound: boolean;
   /** Uygulama açıldığında gösterilen sekme. */
   startTab: TabId;
+  /** Her sekmenin arka plan sahnesi (Ayarlar → Arka planlar). */
+  backdrops: BackdropChoice;
 };
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -71,6 +74,7 @@ export const DEFAULT_SETTINGS: Settings = {
   haptics: true,
   rainSound: false,
   startTab: 'news',
+  backdrops: DEFAULT_BACKDROPS,
 };
 
 /** Telefonda saklı (eski sürümden kalma ya da bozuk olabilecek) ayarları güvenli hâle getirir. */
@@ -89,6 +93,7 @@ export function sanitizeSettings(stored: Partial<Settings> | null | undefined): 
     haptics: bool(s.haptics, true),
     rainSound: bool(s.rainSound, false),
     startTab: TAB_IDS.includes(s.startTab) ? s.startTab : DEFAULT_SETTINGS.startTab,
+    backdrops: sanitizeBackdrops(s.backdrops),
   };
 }
 

@@ -9,11 +9,11 @@ import { LinearGradient } from 'expo-linear-gradient';
 
 import { HeroCard } from '../components/HeroCard';
 import { loopPhase, useLoopClock, useSceneStill, useScrollTopOnShow } from '../components/motion';
-import TeaScene from '../components/TeaScene';
+import { TeaBackdrop, useTabChrome } from '../components/TabBackdrop';
 import { Card, LinkRow, SectionTitle } from '../components/ui';
 import { formatDateTr, formatLira, formatNumber, parseKg, yearOverYearChange, type TeaData } from '../tea';
 import { BUNDLED_TEA_DATA, fetchRemoteTeaData, loadLocalTeaData } from '../teaData';
-import { TEA_CHROME, TEA_GLASS as G } from '../teaScene';
+import { TEA_GLASS as G } from '../teaScene';
 import { useTheme } from '../theme';
 
 /** Vitrin kartı: üst solda taze yaprak yeşili, alt sağda koyu bahçe yeşili (cam). */
@@ -22,6 +22,7 @@ const HERO_GRADIENT = ['rgba(155,232,180,0.28)', 'rgba(6,40,24,0.55)'] as const;
 export default function TeaScreen({ active = true }: { active?: boolean }) {
   const scrollRef = useScrollTopOnShow();
   const { fs } = useTheme();
+  const chrome = useTabChrome('tea');
   const [data, setData] = useState<TeaData>(BUNDLED_TEA_DATA);
   const [refreshing, setRefreshing] = useState(false);
   const [kgInput, setKgInput] = useState('');
@@ -61,7 +62,7 @@ export default function TeaScreen({ active = true }: { active?: boolean }) {
   const styles = useMemo(
     () =>
       StyleSheet.create({
-        root: { flex: 1, backgroundColor: TEA_CHROME.footer },
+        root: { flex: 1, backgroundColor: chrome.footer },
         container: { flex: 1, backgroundColor: 'transparent' },
         content: { padding: 16, paddingBottom: 32 },
         card: { backgroundColor: G.surface, borderColor: G.border },
@@ -118,14 +119,14 @@ export default function TeaScreen({ active = true }: { active?: boolean }) {
         body: { fontSize: fs(14), color: G.soft, lineHeight: fs(21), marginBottom: 4 },
         updated: { fontSize: fs(12), color: G.faint, textAlign: 'center', marginTop: 16 },
       }),
-    [fs],
+    [fs, chrome],
   );
 
   const currentYear = data.current.year;
 
   return (
     <View style={styles.root}>
-      <TeaScene active={active} />
+      <TeaBackdrop active={active} />
       <ScrollView
         ref={scrollRef}
         style={styles.container}
@@ -137,7 +138,7 @@ export default function TeaScreen({ active = true }: { active?: boolean }) {
             onRefresh={onRefresh}
             colors={[G.accent]}
             tintColor={G.accent}
-            progressBackgroundColor={TEA_CHROME.header}
+            progressBackgroundColor={chrome.header}
           />
         }
       >

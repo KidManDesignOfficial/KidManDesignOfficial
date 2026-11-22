@@ -7,7 +7,9 @@ import LocationPicker from '../components/LocationPicker';
 import { PressableScale, useScrollTopOnShow } from '../components/motion';
 import { HeroSkeleton } from '../components/Skeleton';
 import { Chip, ChipRow, PrimaryButton } from '../components/ui';
+import { useBackdrop } from '../components/Backdrop';
 import WeatherScene from '../components/WeatherScene';
+import type { WeatherStyle } from '../backdrops';
 import { WEATHER_LOCATIONS } from '../config';
 import { DISTRICT_PLACES, districtName, placeById, pushRecent, type Place } from '../places';
 import { pressFeedback } from '../haptics';
@@ -112,6 +114,7 @@ export default function WeatherScreen({
   const code = current?.code;
   const isDay = current?.isDay ?? true;
   const scene = useMemo(() => (code == null ? null : sceneFor(code, isDay)), [code, isDay]);
+  const variant = useBackdrop('weather').id as WeatherStyle;
   const chrome = scene ? skyChrome(scene) : null;
   const chromeHeader = chrome?.header ?? null;
   const chromeFooter = chrome?.footer ?? null;
@@ -227,7 +230,7 @@ export default function WeatherScreen({
 
   return (
     <View style={styles.root}>
-      {scene ? <WeatherScene scene={scene} active={active} /> : null}
+      {scene ? <WeatherScene scene={scene} active={active} variant={variant} /> : null}
       <ScrollView
         ref={scrollRef}
         style={styles.scroll}
