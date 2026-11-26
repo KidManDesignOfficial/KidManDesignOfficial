@@ -6,7 +6,7 @@ Bu klasör Play Console’a girilecek her şeyi içerir. Sırayla ilerleyin; her
 |---|---|
 | `uygulama-simgesi-512.png` | Mağaza simgesi (512×512) |
 | `one-cikan-gorsel-1024x500.png` | Öne çıkan görsel |
-| `ekran-goruntuleri/01…08.png` | Telefon ekran görüntüleri (1080×1920, 8 adet; 1.17 arayüzü) |
+| `ekran-goruntuleri/01…08.png` | Telefon ekran görüntüleri (1080×1920, 8 adet; 01–07 1.17, 08 1.18 arayüzü — 01–07’nin görünümü 1.18’de değişmedi) |
 | `ACIKLAMA.txt` | Tam açıklama (kopyala-yapıştır) |
 | `SURUM-NOTLARI.txt` | “Bu sürümdeki yenilikler” |
 
@@ -61,7 +61,7 @@ Tavsiye: güvenlik payı için **15–20 kişi** davet edin.
 |---|---|
 | Uygulama adı (en fazla 30) | `Rize Haber` |
 | Kısa açıklama (en fazla 80) | `Rize’nin haberleri, yaş çay fiyatı, Rizespor, döviz-altın ve hava durumu.` (73 karakter) |
-| Tam açıklama (en fazla 4000) | `ACIKLAMA.txt` dosyasının tamamı (2.836 karakter) |
+| Tam açıklama (en fazla 4000) | `ACIKLAMA.txt` dosyasının tamamı (2.927 karakter) |
 | Uygulama simgesi | `uygulama-simgesi-512.png` |
 | Öne çıkan görsel | `one-cikan-gorsel-1024x500.png` |
 | Telefon ekran görüntüleri | `ekran-goruntuleri/` içindeki 8 dosya, numara sırasıyla |
