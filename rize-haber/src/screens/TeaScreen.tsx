@@ -14,14 +14,14 @@ import { Card, LinkRow, SectionTitle } from '../components/ui';
 import { formatDateTr, formatLira, formatNumber, parseKg, yearOverYearChange, type TeaData } from '../tea';
 import { BUNDLED_TEA_DATA, fetchRemoteTeaData, loadLocalTeaData } from '../teaData';
 import { TEA_GLASS as G } from '../teaScene';
-import { useTheme } from '../theme';
+import { useTheme, tint } from '../theme';
 
 /** Vitrin kartı: üst solda taze yaprak yeşili, alt sağda koyu bahçe yeşili (cam). */
 const HERO_GRADIENT = ['rgba(155,232,180,0.28)', 'rgba(6,40,24,0.55)'] as const;
 
 export default function TeaScreen({ active = true }: { active?: boolean }) {
   const scrollRef = useScrollTopOnShow();
-  const { fs } = useTheme();
+  const { colors, fs } = useTheme();
   const chrome = useTabChrome('tea');
   const [data, setData] = useState<TeaData>(BUNDLED_TEA_DATA);
   const [refreshing, setRefreshing] = useState(false);
@@ -66,7 +66,7 @@ export default function TeaScreen({ active = true }: { active?: boolean }) {
         container: { flex: 1, backgroundColor: 'transparent' },
         content: { padding: 16, paddingBottom: 32 },
         card: { backgroundColor: G.surface, borderColor: G.border },
-        heroShell: { borderWidth: 1, borderColor: 'rgba(155,232,180,0.32)' },
+        heroShell: { borderWidth: 1, borderColor: tint(colors, 'rgba(155,232,180,0.32)') },
         heroLabel: { color: G.soft, fontSize: fs(14), fontWeight: '600' },
         heroPriceRow: { flexDirection: 'row', alignItems: 'baseline', gap: 6, marginTop: 4 },
         heroPrice: { color: G.text, fontSize: fs(48), fontWeight: '800', letterSpacing: -1 },
@@ -104,7 +104,7 @@ export default function TeaScreen({ active = true }: { active?: boolean }) {
           borderTopColor: G.divider,
         },
         resultLabel: { fontSize: fs(15), color: G.soft },
-        resultValue: { fontSize: fs(26), fontWeight: '800', color: G.accent, flexShrink: 1 },
+        resultValue: { fontSize: fs(26), fontWeight: '800', color: tint(colors, G.accent), flexShrink: 1 },
         hint: { fontSize: fs(12), color: G.faint, marginTop: 8, lineHeight: fs(17) },
         barRow: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 6 },
         barYear: { width: fs(48), fontSize: fs(15), fontWeight: '700', color: G.soft },
@@ -112,14 +112,14 @@ export default function TeaScreen({ active = true }: { active?: boolean }) {
         barTrack: { flex: 1, height: 14, borderRadius: 7, backgroundColor: 'rgba(255,255,255,0.09)', overflow: 'hidden' },
         barFill: { height: '100%', borderRadius: 7, overflow: 'hidden' },
         barValue: { width: fs(92), textAlign: 'right', fontSize: fs(14), fontWeight: '700', color: G.soft },
-        barValueCurrent: { color: G.amber },
+        barValueCurrent: { color: tint(colors, G.amber) },
         note: { fontSize: fs(14), color: G.text, lineHeight: fs(21) },
         noteRow: { flexDirection: 'row', gap: 8, paddingVertical: 4 },
-        bullet: { color: G.accent, fontSize: fs(14), fontWeight: '800' },
+        bullet: { color: tint(colors, G.accent), fontSize: fs(14), fontWeight: '800' },
         body: { fontSize: fs(14), color: G.soft, lineHeight: fs(21), marginBottom: 4 },
         updated: { fontSize: fs(12), color: G.faint, textAlign: 'center', marginTop: 16 },
       }),
-    [fs, chrome],
+    [colors, fs, chrome],
   );
 
   const currentYear = data.current.year;
@@ -136,14 +136,14 @@ export default function TeaScreen({ active = true }: { active?: boolean }) {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            colors={[G.accent]}
-            tintColor={G.accent}
+            colors={[tint(colors, G.accent)]}
+            tintColor={tint(colors, G.accent)}
             progressBackgroundColor={chrome.header}
           />
         }
       >
         <HeroCard
-          gradient={HERO_GRADIENT}
+          gradient={[tint(colors, HERO_GRADIENT[0]), tint(colors, HERO_GRADIENT[1])]}
           style={styles.heroShell}
           watermark="leaf"
           eyebrow={`ÇAYKUR · ${data.current.year} SEZONU`}
@@ -209,7 +209,7 @@ export default function TeaScreen({ active = true }: { active?: boolean }) {
                 <View style={styles.barTrack}>
                   <View style={[styles.barFill, { width: `${(h.pricePerKg / maxPrice) * 100}%` }]}>
                     <LinearGradient
-                      colors={current ? ['#5FD08F', G.amber] : ['rgba(95,208,143,0.55)', 'rgba(155,232,180,0.8)']}
+                      colors={current ? [tint(colors, '#5FD08F'), tint(colors, G.amber)] : [tint(colors, 'rgba(95,208,143,0.55)'), tint(colors, 'rgba(155,232,180,0.8)')]}
                       start={{ x: 0, y: 0.5 }}
                       end={{ x: 1, y: 0.5 }}
                       style={StyleSheet.absoluteFill}
@@ -263,6 +263,7 @@ export default function TeaScreen({ active = true }: { active?: boolean }) {
 // ——— Vitrin kartındaki ince belli çay bardağı ve tüten buhar ———
 
 function TeaGlass({ running }: { running: boolean }) {
+  const { colors } = useTheme();
   const reduced = useSceneStill();
   const moving = running && !reduced;
   const clock = useLoopClock(3600, moving);
@@ -286,14 +287,14 @@ function TeaGlass({ running }: { running: boolean }) {
       {/* Bardak: geniş ağız, ince bel, dolgun gövde; içinde demli çay */}
       <View style={glassStyles.rim} />
       <View style={glassStyles.upper}>
-        <LinearGradient colors={G.tea} style={[StyleSheet.absoluteFill, { top: 5 }]} />
+        <LinearGradient colors={[tint(colors, G.tea[0]), tint(colors, G.tea[1])]} style={[StyleSheet.absoluteFill, { top: 5 }]} />
         <View style={glassStyles.shine} />
       </View>
       <View style={glassStyles.waist}>
-        <LinearGradient colors={[G.tea[1], G.tea[1]]} style={StyleSheet.absoluteFill} />
+        <LinearGradient colors={[tint(colors, G.tea[1]), tint(colors, G.tea[1])]} style={StyleSheet.absoluteFill} />
       </View>
       <View style={glassStyles.lower}>
-        <LinearGradient colors={[G.tea[1], '#5E1A0B']} style={StyleSheet.absoluteFill} />
+        <LinearGradient colors={[tint(colors, G.tea[1]), tint(colors, '#5E1A0B')]} style={StyleSheet.absoluteFill} />
       </View>
       <View style={glassStyles.saucer} />
     </View>

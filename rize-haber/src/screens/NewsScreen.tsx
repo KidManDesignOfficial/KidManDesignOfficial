@@ -1,8 +1,9 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Animated,
   FlatList,
+  Platform,
   Pressable,
   RefreshControl,
   StyleSheet,
@@ -25,8 +26,9 @@ import { tapFeedback } from '../haptics';
 import { AUTO_REFRESH_MS, buildFeed, isStale, newArrivals, updatedLabel, type FeedRow } from '../newsFeed';
 import { loadCachedNews, saveCachedNews, savedAtLabel } from '../offline';
 import { NEWS_GLASS as G, rizeSkyFor, type RizeSky } from '../rizeScene';
-import { fetchRss, type NewsItem } from '../rss';
-import { useTheme } from '../theme';
+import { friendlyError } from '../net';
+import { fetchRss, keepRelevant, type NewsItem } from '../rss';
+import { useTheme, tint } from '../theme';
 
 type CategoryState = {
   items: NewsItem[];
@@ -114,7 +116,7 @@ export default function NewsScreen({ active = true, sky = rizeSkyFor(new Date().
         },
         offlineText: { color: G.soft, fontSize: fs(12), fontWeight: '600' },
         status: { flexDirection: 'row', alignItems: 'center', gap: 7, paddingHorizontal: 2, paddingBottom: 2 },
-        liveDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: '#3DDC84' },
+        liveDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: tint(colors, '#3DDC84') },
         statusText: { color: G.soft, fontSize: fs(12), fontWeight: '600' },
         sectionRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 10, marginBottom: 2 },
         sectionTitle: { color: G.text, fontSize: fs(13), fontWeight: '800', letterSpacing: 0.4 },
@@ -136,9 +138,9 @@ export default function NewsScreen({ active = true, sky = rizeSkyFor(new Date().
           shadowRadius: 8,
           shadowOffset: { width: 0, height: 3 },
         },
-        pillText: { color: '#0B2A1C', fontSize: fs(13), fontWeight: '800' },
+        pillText: { color: tint(colors, '#0B2A1C'), fontSize: fs(13), fontWeight: '800' },
       }),
-    [fs, chrome],
+    [colors, fs, chrome],
   );
 
   const load = useCallback(async (id: string) => {
@@ -161,7 +163,7 @@ export default function NewsScreen({ active = true, sky = rizeSkyFor(new Date().
       );
     });
     try {
-      const items = await fetchRss(googleNewsRssUrl(category.query), controller.signal);
+      const items = keepRelevant(await fetchRss(googleNewsRssUrl(category.query), controller.signal));
       saveCachedNews(id, items);
       const previous = stateRef.current[id]?.items ?? [];
       // Önbellekten gösterilen liste de "önceki" sayılır: çevrimdışı sonrası gelenler YENİ olarak işaretlenir.
@@ -174,10 +176,7 @@ export default function NewsScreen({ active = true, sky = rizeSkyFor(new Date().
       }));
     } catch (e) {
       if (controller.signal.aborted) return;
-      const message =
-        e instanceof Error && e.message.startsWith('Haber')
-          ? e.message
-          : 'Haberler yüklenemedi. İnternet bağlantınızı kontrol edin.';
+      const message = friendlyError(e, 'Haberler');
       setByCategory((prev) => ({
         ...prev,
         [id]: { ...(prev[id] ?? EMPTY), loading: false, error: message },
@@ -241,18 +240,21 @@ export default function NewsScreen({ active = true, sky = rizeSkyFor(new Date().
     setRefreshing(false);
   }, [categoryId, load]);
 
+  // Arama, yazarken klavyeyi bekletmesin: süzme bir sonraki boş karede yapılır.
+  const query = useDeferredValue(search);
   const visibleItems = useMemo(() => {
-    const q = search.trim().toLocaleLowerCase('tr-TR');
+    const q = query.trim().toLocaleLowerCase('tr-TR');
     if (!q) return state.items;
     return state.items.filter((item) =>
       `${item.title} ${item.summary} ${item.source}`.toLocaleLowerCase('tr-TR').includes(q),
     );
-  }, [state.items, search]);
+  }, [state.items, query]);
 
   const rows = useMemo(
-    () => buildFeed(visibleItems, { lead: !search.trim(), now: new Date(now) }),
-    [visibleItems, search, now],
+    () => buildFeed(visibleItems, { lead: !query.trim(), now: new Date(now) }),
+    [visibleItems, query, now],
   );
+  const minute = Math.floor(now / 60_000);
   const newSet = useMemo(() => new Set(state.newIds ?? []), [state.newIds]);
 
   const renderRow = useCallback(
@@ -266,9 +268,11 @@ export default function NewsScreen({ active = true, sky = rizeSkyFor(new Date().
           </View>
         );
       }
-      return <NewsCard item={row.item} variant={row.kind === 'lead' ? 'lead' : 'default'} isNew={newSet.has(row.item.id)} glass />;
+      return (
+        <NewsCard item={row.item} variant={row.kind === 'lead' ? 'lead' : 'default'} isNew={newSet.has(row.item.id)} glass minute={minute} />
+      );
     },
-    [newSet, styles],
+    [newSet, styles, minute],
   );
 
   const showFullScreenLoader = state.loading && state.items.length === 0 && !refreshing;
@@ -311,6 +315,11 @@ export default function NewsScreen({ active = true, sky = rizeSkyFor(new Date().
           renderItem={renderRow}
           onScroll={onScroll}
           scrollEventThrottle={100}
+          // Sanallaştırma: ekranda görünenler ve yakın çevresi çizilir; uzun listede bellek ve pil korunur.
+          initialNumToRender={6}
+          maxToRenderPerBatch={6}
+          windowSize={9}
+          removeClippedSubviews={Platform.OS === 'android'}
           contentContainerStyle={styles.list}
           keyboardShouldPersistTaps="handled"
           refreshControl={
@@ -373,7 +382,7 @@ export default function NewsScreen({ active = true, sky = rizeSkyFor(new Date().
           accessibilityRole="button"
           accessibilityLabel={`${pendingNew} yeni haber, en üste git`}
         >
-          <Icon name="arrow-up" size={15} color="#0B2A1C" />
+          <Icon name="arrow-up" size={15} color={tint(colors, '#0B2A1C')} />
           <Text style={styles.pillText}>{pendingNew} yeni haber</Text>
         </Pressable>
       </Animated.View>

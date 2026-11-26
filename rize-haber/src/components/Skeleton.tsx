@@ -39,7 +39,8 @@ export function Bone({
   glass?: boolean;
 }) {
   const { colors } = useTheme();
-  const color = glass ? 'rgba(255,255,255,0.14)' : colors.isDark ? '#2A332E' : '#E3E8E5';
+  // Temanın çizgi rengi: Kâğıt, Yayla Sisi gibi paletlerde de zeminle uyumlu kalır.
+  const color = glass ? 'rgba(255,255,255,0.14)' : colors.border;
   return <View style={[{ width, height, borderRadius: radius, backgroundColor: color }, style]} />;
 }
 

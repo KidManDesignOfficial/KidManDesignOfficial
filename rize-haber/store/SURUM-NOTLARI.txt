@@ -1,9 +1,9 @@
 <tr-TR>
-Rize Haber yayında 🍃
-• Rize ve ilçelerinden güncel haberler; kaydet, paylaş, bildirim
-• Çaykur Rizespor: canlı takip, Maç Merkezi, puan durumu, kadro
-• Güncel yaş çay alım fiyatı ve tutar hesaplayıcı
-• Ekonomi: TCMB döviz kurları, altın ve çevirici
-• Canlı hava durumu: ilçeler, köyler ve yaylalar
-• 6 tema ve her sekme için seçilebilir arka plan sahnesi
+Rize Haber 1.18 🍃
+• Yeni: Tek renk düzeni; uygulamanın tamamı seçtiğiniz renkte, Grafit ile siyah-beyaz
+• Yeni renkler: Fırtına Deresi ve Grafit
+• Haberlerde tekrar eden ve Rize dışı haberler ayıklanır
+• Zayıf bağlantıda daha dayanıklı veri yükleme, daha anlaşılır hata mesajları
+• Hava durumu açık kaldıkça kendini yeniler
+• Akıcı sekme geçişleri ve daha hızlı haber listesi
 </tr-TR>

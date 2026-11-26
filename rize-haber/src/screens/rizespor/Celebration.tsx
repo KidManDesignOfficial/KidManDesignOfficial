@@ -16,6 +16,7 @@ import { useReducedMotion, useAnimatedValue } from '../../components/motion';
 import { alertFeedback, goalFeedback, pressFeedback } from '../../haptics';
 import type { LiveMoment } from '../../rizespor/live';
 import { CLUB_COLORS } from '../../rizespor/names';
+import { tint, useTheme } from '../../theme';
 import { seeded } from '../../weatherScene';
 
 export type CelebrationKind = 'goal-us' | 'goal-them' | 'whistle' | 'win' | 'red';
@@ -25,6 +26,12 @@ export type CelebrationData = { id: number; kind: CelebrationKind; title: string
 const CONFETTI = 44;
 const BURST = 18;
 const PALETTE = [CLUB_COLORS.green, CLUB_COLORS.blue, '#FFFFFF', '#7BE0A6', '#5AA9FF', '#FFD447'];
+
+/** Konfeti renkleri; "Tek renk" düzeninde seçilen rengin tonları (beyaz olduğu gibi kalır). */
+function usePalette(): string[] {
+  const { colors } = useTheme();
+  return useMemo(() => PALETTE.map((c) => tint(colors, c)), [colors]);
+}
 
 export default function Celebration({ data, onDone }: { data: CelebrationData; onDone: () => void }) {
   const reduced = useReducedMotion();
@@ -48,6 +55,8 @@ export default function Celebration({ data, onDone }: { data: CelebrationData; o
 // ——— Rizespor golü ———
 
 function GoalSplash({ data, reduced, onDone }: { data: CelebrationData; reduced: boolean; onDone: () => void }) {
+  const { colors } = useTheme();
+  const palette = usePalette();
   const { width } = useWindowDimensions();
   const flash = useAnimatedValue(reduced ? 0 : 1);
   const pop = useAnimatedValue(0);
@@ -89,6 +98,7 @@ function GoalSplash({ data, reduced, onDone }: { data: CelebrationData; reduced:
         <Animated.View
           style={[
             styles.ring,
+            { borderColor: tint(colors, '#7BE0A6') },
             { width: size, height: size, borderRadius: size / 2, opacity: ringOpacity, transform: [{ scale: ringScale }] },
           ]}
         />
@@ -106,13 +116,13 @@ function GoalSplash({ data, reduced, onDone }: { data: CelebrationData; reduced:
                 key={i}
                 style={[
                   styles.particle,
-                  { backgroundColor: PALETTE[i % PALETTE.length], opacity: o, transform: [{ translateX: tx }, { translateY: ty }, { rotate: rot }] },
+                  { backgroundColor: palette[i % palette.length], opacity: o, transform: [{ translateX: tx }, { translateY: ty }, { rotate: rot }] },
                 ]}
               />
             );
           })
         : null}
-      <Animated.View style={[styles.badge, { transform: [{ translateX: shake }, { scale }] }]}>
+      <Animated.View style={[styles.badge, { backgroundColor: tint(colors, CLUB_COLORS.green), transform: [{ translateX: shake }, { scale }] }]}>
         <Text style={styles.ball}>⚽</Text>
         <Text style={styles.goal} adjustsFontSizeToFit numberOfLines={1}>
           {data.title}
@@ -148,7 +158,10 @@ function Banner({ data, reduced, onDone }: { data: CelebrationData; reduced: boo
     return () => anim.stop();
   }, [fade, onDone, reduced, slide]);
   const translateY = slide.interpolate({ inputRange: [0, 1], outputRange: [-140, 0] });
-  const look = BANNER_STYLE[data.kind as Exclude<CelebrationKind, 'goal-us'>] ?? BANNER_STYLE.whistle;
+  const { colors } = useTheme();
+  const base = BANNER_STYLE[data.kind as Exclude<CelebrationKind, 'goal-us'>] ?? BANNER_STYLE.whistle;
+  // Kırmızı kart ve rakip golü anlam taşır, olduğu gibi kalır; düdük ve galibiyet şeridi renk düzenine uyar.
+  const look = data.kind === 'whistle' || data.kind === 'win' ? { ...base, bg: tint(colors, base.bg) } : base;
   return (
     <SafeAreaView edges={['top']} style={styles.bannerWrap}>
       <Animated.View
@@ -173,6 +186,7 @@ function Banner({ data, reduced, onDone }: { data: CelebrationData; reduced: boo
 // ——— Konfeti yağmuru: her parça kendi gecikmesi, salınımı ve dönüşüyle düşer ———
 
 function ConfettiRain() {
+  const palette = usePalette();
   const { width, height } = useWindowDimensions();
   const t = useAnimatedValue(0);
   useEffect(() => {
@@ -190,7 +204,7 @@ function ConfettiRain() {
         const mid = (start + end) / 2;
         return {
           key: i,
-          color: PALETTE[i % PALETTE.length],
+          color: palette[i % palette.length],
           w: 6 + seeded(i, 65) * 6,
           h: 10 + seeded(i, 66) * 8,
           x,
@@ -200,7 +214,7 @@ function ConfettiRain() {
           opacity: t.interpolate({ inputRange: [0, start, start + 0.02, end - 0.05, end], outputRange: [0, 0, 1, 1, 0] }),
         };
       }),
-    [height, t, width],
+    [height, palette, t, width],
   );
   return (
     <>
@@ -228,7 +242,7 @@ const styles = StyleSheet.create({
   layer: { zIndex: 60, elevation: 60 },
   center: { alignItems: 'center', justifyContent: 'center' },
   dim: { position: 'absolute', top: 0, right: 0, bottom: 0, left: 0, backgroundColor: 'rgba(0,0,0,0.42)' },
-  ring: { position: 'absolute', borderWidth: 6, borderColor: '#7BE0A6' },
+  ring: { position: 'absolute', borderWidth: 6 },
   particle: { position: 'absolute', width: 10, height: 16, borderRadius: 3 },
   badge: {
     alignItems: 'center',

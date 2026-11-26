@@ -24,7 +24,7 @@ import {
   setMatchSetting,
   syncMatchReminders,
 } from './rizespor/reminders';
-import { fetchRss } from './rss';
+import { fetchRss, keepRelevant } from './rss';
 import {
   clearSeenIds,
   loadNotificationsEnabled,
@@ -50,7 +50,8 @@ Notifications.setNotificationHandler({
 
 /** Yeni haberleri kontrol eder ve gerekirse bildirim gösterir. Bildirilen haber sayısını döner. */
 export async function checkForNewNews(): Promise<number> {
-  const items = await fetchRss(googleNewsRssUrl(NEWS_CATEGORIES[0].query));
+  // Arka plan görevinin süresi kısıtlıdır: tek deneme, 20 sn sınır.
+  const items = keepRelevant(await fetchRss(googleNewsRssUrl(NEWS_CATEGORIES[0].query), undefined, { retries: 0, timeoutMs: 20_000 }));
   const { fresh, seenIds } = diffNews(items, await loadSeenIds());
   await saveSeenIds(seenIds);
 

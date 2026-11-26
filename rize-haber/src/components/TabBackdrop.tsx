@@ -2,6 +2,7 @@
  * Sekmelerin arka planı: kullanıcının Ayarlar → Arka planlar'da seçtiği sahne, seçilmediyse sekmenin
  * özgün sahnesi. Ekranlar ve Ayarlar'daki önizleme aynı bileşenleri kullanır.
  */
+import { useMemo } from 'react';
 import { useWindowDimensions } from 'react-native';
 
 import type { BackdropTab } from '../backdrops';
@@ -9,6 +10,7 @@ import type { RizeSky } from '../rizeScene';
 import { ECON_CHROME } from '../economyScene';
 import { STADIUM_CHROME } from '../rizespor/stadium';
 import { TEA_CHROME } from '../teaScene';
+import { sceneTint, useTheme } from '../theme';
 import type { SkyChrome } from '../weatherScene';
 import BackdropView, { useBackdrop } from './Backdrop';
 import { useSceneStill } from './motion';
@@ -29,9 +31,21 @@ const FIXED_CHROME: Record<Exclude<BackdropTab, 'news' | 'weather'>, SkyChrome> 
  */
 export function useTabChrome(tab: Exclude<BackdropTab, 'weather'>, newsSky?: RizeSky): SkyChrome {
   const backdrop = useBackdrop(tab);
-  if (backdrop.scene) return backdrop.scene.chrome;
-  if (tab === 'news') return newsSky!.chrome;
-  return FIXED_CHROME[tab];
+  const raw = backdrop.scene ? backdrop.scene.chrome : tab === 'news' ? newsSky!.chrome : FIXED_CHROME[tab];
+  return useToneChrome(raw);
+}
+
+/** "Tek renk" düzeninde çerçeve renklerini sahne filtresiyle aynı tona çevirir; başlık ile sahne dikişsiz birleşir. */
+export function useToneChrome<T extends SkyChrome | null>(chrome: T): T {
+  const { colors } = useTheme();
+  const header = chrome?.header;
+  const footer = chrome?.footer;
+  return useMemo(() => {
+    if (!colors.mono || header == null || footer == null) return chrome;
+    return { header: sceneTint(colors, header), footer: sceneTint(colors, footer) } as T;
+    // `chrome` nesnesi her çizimde yeni olabilir; renkleri yeterli.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [colors, header, footer]);
 }
 
 export function NewsBackdrop({ sky, active }: { sky: RizeSky; active: boolean }) {

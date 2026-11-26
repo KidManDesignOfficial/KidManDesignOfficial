@@ -14,7 +14,7 @@ Yüklenecek paket: GitHub → Actions → son başarılı **Rize Haber APK** ça
 **`rize-haber-aab-google-play`** (içinden çıkan `.aab` dosyası). APK değil, **AAB** yüklenir.
 AAB 90 gün saklanır; süresi geçtiyse aynı sayfada **Re-run all jobs** ile yeniden üretin.
 
-**Güncel paket:** sürüm adı **1.17.1**, sürüm kodu **28**, hedef Android 16 (API 36), Play’in yeni uygulama
+**Güncel paket:** sürüm adı **1.18.0**, sürüm kodu **29**, hedef Android 16 (API 36), Play’in yeni uygulama
 şartını karşılar. Paket kalıcı **Rize Haber** anahtarıyla imzalanır (derleme kaydında “✅ AAB kalıcı Rize Haber
 anahtarıyla imzalandı” satırı görünmelidir).
 
@@ -132,7 +132,7 @@ COVID-19 izleme: **Hayır** · Fotoğraf/video izni: **Kullanılmıyor**
    kullanıcılarının Gmail adreslerini ekleyin (en az 12, öneri 15–20).
 2. **Ülkeler/bölgeler:** Türkiye (isterseniz tümü).
 3. **Yeni sürüm oluştur** → Play Uygulama İmzalama’yı kabul edin → `.aab` dosyasını yükleyin →
-   Sürüm adı `1.17.1` · Sürüm notları: `SURUM-NOTLARI.txt`.
+   Sürüm adı `1.18.0` · Sürüm notları: `SURUM-NOTLARI.txt`.
 4. **İncelemeye gönder.** Onaylanınca “Katılım bağlantısı”nı testçilere gönderin (aşağıdaki mesaj).
 5. Testçiler bağlantıdan **teste katılmalı ve uygulamayı Play Store’dan indirmeli**. 14 gün boyunca
    testten ayrılmamalılar; arada uygulamayı açıp kullanmaları yeterli.

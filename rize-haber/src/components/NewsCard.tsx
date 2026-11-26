@@ -5,8 +5,9 @@ import { useFavorites } from '../favorites';
 import { NEWS_GLASS as G } from '../rizeScene';
 import { sourceBadge } from '../newsFeed';
 import type { NewsItem } from '../rss';
-import { useTheme } from '../theme';
+import { useTheme, tint } from '../theme';
 import { timeAgo } from '../time';
+import { PressableScale } from './motion';
 import { pressFeedback } from '../haptics';
 import { HeroCard } from './HeroCard';
 import { Icon } from './Icon';
@@ -21,7 +22,10 @@ function shareArticle(item: NewsItem) {
 
 /** Kaynağın baş harfleriyle renkli yuvarlak rozet (beslemede görsel olmadığında kartı tanınır kılar). */
 function SourceBadge({ source, size, ring }: { source: string; size: number; ring?: boolean }) {
-  const { initials, color } = sourceBadge(source || 'Haber');
+  const { colors } = useTheme();
+  const { initials, color: raw } = sourceBadge(source || 'Haber');
+  // "Tek renk" düzeninde rozetler seçilen rengin farklı açıklıklarıyla ayrışır.
+  const color = tint(colors, raw);
   return (
     <View
       style={{
@@ -48,12 +52,18 @@ type Props = {
   isNew?: boolean;
   /** Rize manzarası gibi koyu sahnelerin üstünde yarı saydam cam kart. */
   glass?: boolean;
+  /**
+   * Göreli zamanın ("5 dk önce") yenilenmesi için dakika sayacı. Kart `memo` ile sarılı olduğundan
+   * yalnızca bu değer değişince yeniden çizilir; liste kaydırılırken gereksiz çizim olmaz.
+   */
+  minute?: number;
 };
 
 /** Cam manşet kartının geçişi: üstte daha belirgin, altta sahneyi gösteren saydamlık. */
 const GLASS_LEAD: readonly [string, string] = ['rgba(255,255,255,0.2)', 'rgba(255,255,255,0.05)'];
 
-function NewsCardBase({ item, variant = 'default', isNew = false, glass = false }: Props) {
+function NewsCardBase({ item, variant = 'default', isNew = false, glass = false, minute }: Props) {
+  const now = minute ? new Date(minute * 60_000) : undefined;
   const { isFavorite, toggleFavorite } = useFavorites();
   const { colors, fs } = useTheme();
   const styles = useMemo(
@@ -131,9 +141,9 @@ function NewsCardBase({ item, variant = 'default', isNew = false, glass = false 
 
   if (variant === 'lead') {
     return (
-      <Pressable
+      <PressableScale
         onPress={() => openUrl(item.link, colors)}
-        style={({ pressed }) => pressed && { opacity: 0.92 }}
+        scaleTo={0.985}
         accessibilityRole="link"
         accessibilityLabel={`Manşet: ${item.title}, ${item.source}`}
       >
@@ -155,7 +165,7 @@ function NewsCardBase({ item, variant = 'default', isNew = false, glass = false 
           <View style={styles.leadFooter}>
             {item.source ? <SourceBadge source={item.source} size={26} ring /> : null}
             <Text style={styles.leadMeta} numberOfLines={1}>
-              {[item.source, timeAgo(item.publishedAt)].filter(Boolean).join(' · ')}
+              {[item.source, timeAgo(item.publishedAt, now)].filter(Boolean).join(' · ')}
             </Text>
             <Pressable
               onPress={() => {
@@ -181,7 +191,7 @@ function NewsCardBase({ item, variant = 'default', isNew = false, glass = false 
             </Pressable>
           </View>
         </HeroCard>
-      </Pressable>
+      </PressableScale>
     );
   }
 
@@ -207,7 +217,7 @@ function NewsCardBase({ item, variant = 'default', isNew = false, glass = false 
             <Text style={[styles.meta, g?.meta]} numberOfLines={1}>
               {item.source ? <Text style={[styles.metaSource, g?.metaSource]}>{item.source}</Text> : null}
               {item.source && item.publishedAt ? ' · ' : ''}
-              {timeAgo(item.publishedAt)}
+              {timeAgo(item.publishedAt, now)}
             </Text>
             {isNew ? (
               <View style={[styles.newBadge, g?.newBadge]}>

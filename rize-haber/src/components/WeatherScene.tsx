@@ -16,7 +16,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { weatherLandscape, type WeatherStyle } from '../backdrops';
 import { seeded, skyChrome, type Scene } from '../weatherScene';
 import { Layer } from './Backdrop';
-import { useAnimatedValue, useSceneStill } from './motion';
+import { useAnimatedValue, useSceneFilter, useSceneStill } from './motion';
 
 const FILL = { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 } as const;
 
@@ -46,6 +46,7 @@ function cycle(clock: Animated.Value, speed: number, phase: number) {
  */
 export default function WeatherScene({ scene, active, variant = 'canli' }: { scene: Scene; active: boolean; variant?: WeatherStyle }) {
   const reduced = useSceneStill();
+  const tone = useSceneFilter();
   const plain = variant === 'sade';
   const running = active && !reduced && !plain;
   const { width, height } = useWindowDimensions();
@@ -63,7 +64,7 @@ export default function WeatherScene({ scene, active, variant = 'canli' }: { sce
   const footer = skyChrome(scene).footer;
   return (
     <View
-      style={[FILL, styles.clip]}
+      style={[FILL, styles.clip, tone]}
       pointerEvents="none"
       accessibilityElementsHidden
       importantForAccessibility="no-hide-descendants"

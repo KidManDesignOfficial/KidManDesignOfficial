@@ -14,6 +14,8 @@ import {
   PALETTE_IDS,
   TEXT_SCALES,
   buildColors,
+  sceneTint,
+  tint,
   type AccentId,
   type Colors,
   type PaletteId,
@@ -38,13 +40,18 @@ export const DISCOVER_ENABLED = false;
 export const TAB_IDS: TabId[] = (['news', 'rizespor', 'tea', 'economy', 'weather', 'rize'] as TabId[]).filter(
   (id) => DISCOVER_ENABLED || id !== 'rize',
 );
-export { ACCENTS, PALETTES, PALETTE_IDS, TEXT_SCALES };
+export { ACCENTS, PALETTES, PALETTE_IDS, TEXT_SCALES, sceneTint, tint };
 export type { AccentId, Colors, PaletteId, TextSize };
 
 export type Settings = {
   accent: AccentId;
   /** Zemin/kart/metin paleti (Klasik, Kâğıt, Yayla Sisi…). */
   palette: PaletteId;
+  /**
+   * "Tek renk" düzeni: her sekmenin kendi renkleri (stadyum yeşili, altın sarısı, gökyüzü mavisi)
+   * yerine sahneler, başlıklar ve vurgular seçilen rengin tonlarına bürünür.
+   */
+  monochrome: boolean;
   mode: ThemeMode;
   textSize: TextSize;
   weatherLocationId: string;
@@ -67,6 +74,7 @@ export type Settings = {
 export const DEFAULT_SETTINGS: Settings = {
   accent: 'cay',
   palette: 'klasik',
+  monochrome: false,
   mode: 'system',
   textSize: 'normal',
   weatherLocationId: WEATHER_LOCATIONS[0].id,
@@ -86,6 +94,7 @@ export function sanitizeSettings(stored: Partial<Settings> | null | undefined): 
   return {
     accent: s.accent in ACCENTS ? s.accent : DEFAULT_SETTINGS.accent,
     palette: PALETTE_IDS.includes(s.palette) ? s.palette : DEFAULT_SETTINGS.palette,
+    monochrome: bool(s.monochrome, false),
     mode: s.mode === 'light' || s.mode === 'dark' || s.mode === 'system' ? s.mode : DEFAULT_SETTINGS.mode,
     textSize: s.textSize in TEXT_SCALES ? s.textSize : DEFAULT_SETTINGS.textSize,
     weatherLocationId: placeById(String(s.weatherLocationId)) ? s.weatherLocationId : DEFAULT_SETTINGS.weatherLocationId,
@@ -135,7 +144,10 @@ export function ThemeProvider({ children, initial }: { children: ReactNode; init
   }, []);
 
   const isDark = settings.mode === 'dark' || (settings.mode === 'system' && systemScheme === 'dark');
-  const colors = useMemo(() => buildColors(settings.accent, isDark, settings.palette), [settings.accent, isDark, settings.palette]);
+  const colors = useMemo(
+    () => buildColors(settings.accent, isDark, settings.palette, settings.monochrome),
+    [settings.accent, isDark, settings.palette, settings.monochrome],
+  );
   const scale = TEXT_SCALES[settings.textSize].scale;
   const fs = useCallback((size: number) => Math.round(size * scale), [scale]);
 

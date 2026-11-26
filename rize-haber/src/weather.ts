@@ -3,6 +3,7 @@
  * https://open-meteo.com/en/docs
  */
 import type { WeatherLocation } from './config';
+import { requestJson } from './net.ts';
 
 export type CurrentWeather = {
   temperature: number;
@@ -58,7 +59,7 @@ export function describeWeatherCode(code: number, isDay = true): { label: string
   return { label: 'Bilinmiyor', icon: '🌡️' };
 }
 
-export async function fetchWeather(location: WeatherLocation, signal?: AbortSignal): Promise<Weather> {
+export function weatherUrl(location: WeatherLocation): string {
   const params = new URLSearchParams({
     latitude: String(location.latitude),
     longitude: String(location.longitude),
@@ -68,46 +69,65 @@ export async function fetchWeather(location: WeatherLocation, signal?: AbortSign
     daily: 'weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,sunrise,sunset',
     timezone: 'Europe/Istanbul',
     forecast_days: '7',
+    // Rüzgâr km/sa, sıcaklık °C (varsayılanlar; açıkça istenir ki servis değişse de birim kaymasın).
+    wind_speed_unit: 'kmh',
+    temperature_unit: 'celsius',
   });
-  const response = await fetch(`https://api.open-meteo.com/v1/forecast?${params}`, { signal });
-  if (!response.ok) {
-    throw new Error(`Hava durumu servisi yanıt vermedi (HTTP ${response.status}).`);
-  }
-  const data = await response.json();
-  const c = data.current;
-  const d = data.daily;
-  const h = data.hourly;
+  return `https://api.open-meteo.com/v1/forecast?${params}`;
+}
 
+export async function fetchWeather(location: WeatherLocation, signal?: AbortSignal): Promise<Weather> {
+  return parseWeather(await requestJson(weatherUrl(location), { signal }));
+}
+
+const finite = (v: unknown): v is number => typeof v === 'number' && Number.isFinite(v);
+const numOr = (v: unknown, d: number): number => (finite(v) ? v : d);
+const pct = (v: unknown): number | null => (finite(v) ? Math.min(100, Math.max(0, Math.round(v))) : null);
+const arr = (v: unknown): unknown[] => (Array.isArray(v) ? v : []);
+
+/**
+ * Open-Meteo yanıtını doğrulayarak okur. Zorunlu alanlar (anlık sıcaklık, hava kodu) yoksa hata verir;
+ * eksik ya da bozuk saatlik/günlük değerler atlanır, böylece ekranda "NaN°" ya da boş satır görünmez.
+ */
+export function parseWeather(json: unknown): Weather {
+  const data = (json ?? {}) as Record<string, any>;
+  const c = data.current ?? {};
+  if (!finite(c.temperature_2m) || !finite(c.weather_code)) throw new Error('Hava durumu verisi eksik geldi.');
+  const h = data.hourly ?? {};
+  const d = data.daily ?? {};
+
+  const hours: HourlyForecast[] = [];
+  arr(h.time).forEach((time, i) => {
+    const temperature = h.temperature_2m?.[i];
+    const code = h.weather_code?.[i];
+    if (typeof time !== 'string' || !finite(temperature) || !finite(code)) return;
+    hours.push({ time, temperature, code, precipitationProbability: pct(h.precipitation_probability?.[i]), isDay: h.is_day?.[i] === 1 });
+  });
+
+  const daily: DailyForecast[] = [];
+  arr(d.time).forEach((date, i) => {
+    const max = d.temperature_2m_max?.[i];
+    const min = d.temperature_2m_min?.[i];
+    const code = d.weather_code?.[i];
+    if (typeof date !== 'string' || !finite(max) || !finite(min) || !finite(code)) return;
+    daily.push({ date, code, max, min, precipitationProbability: pct(d.precipitation_probability_max?.[i]) });
+  });
+
+  const currentTime = typeof c.time === 'string' ? c.time : (hours[0]?.time ?? '');
   return {
     current: {
       temperature: c.temperature_2m,
-      apparentTemperature: c.apparent_temperature,
-      humidity: c.relative_humidity_2m,
-      windSpeed: c.wind_speed_10m,
-      precipitation: c.precipitation,
+      apparentTemperature: numOr(c.apparent_temperature, c.temperature_2m),
+      humidity: Math.min(100, Math.max(0, numOr(c.relative_humidity_2m, 0))),
+      windSpeed: Math.max(0, numOr(c.wind_speed_10m, 0)),
+      precipitation: Math.max(0, numOr(c.precipitation, 0)),
       code: c.weather_code,
       isDay: c.is_day === 1,
     },
-    hourly: nextHours(
-      (h.time as string[]).map((time, i) => ({
-        time,
-        temperature: h.temperature_2m[i],
-        code: h.weather_code[i],
-        precipitationProbability: h.precipitation_probability?.[i] ?? null,
-        isDay: h.is_day?.[i] === 1,
-      })),
-      c.time,
-      24,
-    ),
-    daily: (d.time as string[]).map((date, i) => ({
-      date,
-      code: d.weather_code[i],
-      max: d.temperature_2m_max[i],
-      min: d.temperature_2m_min[i],
-      precipitationProbability: d.precipitation_probability_max?.[i] ?? null,
-    })),
-    sunrise: d.sunrise?.[0] ?? null,
-    sunset: d.sunset?.[0] ?? null,
+    hourly: nextHours(hours, currentTime, 24),
+    daily,
+    sunrise: typeof d.sunrise?.[0] === 'string' ? d.sunrise[0] : null,
+    sunset: typeof d.sunset?.[0] === 'string' ? d.sunset[0] : null,
   };
 }
 

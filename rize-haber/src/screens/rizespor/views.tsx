@@ -10,7 +10,7 @@ import { CLUB_COLORS, POSITION_GROUPS, RIZESPOR_ID, flagEmoji, shortTeamName } f
 import { GLASS } from '../../rizespor/stadium';
 import { recentForm, type Match } from '../../rizespor/parse';
 import { seasonSummary, streakText, teamLeaders, type Record3 } from '../../rizespor/season';
-import { useTheme } from '../../theme';
+import { useTheme, tint } from '../../theme';
 import NextMatchHero from './NextMatchHero';
 import { LivePulse, MatchRow, RESULT_COLORS, ResultPill } from './shared';
 
@@ -26,11 +26,12 @@ type ViewProps = {
 };
 
 function ClubRefresh(props: { refreshing: boolean; onRefresh: () => void }) {
-  return <RefreshControl {...props} colors={[CLUB_COLORS.green]} tintColor={GLASS.text} progressBackgroundColor="#0B2A1C" />;
+  const { colors } = useTheme();
+  return <RefreshControl {...props} colors={[tint(colors, CLUB_COLORS.green)]} tintColor={GLASS.text} progressBackgroundColor="#0B2A1C" />;
 }
 
 function useBaseStyles() {
-  const { fs } = useTheme();
+  const { colors, fs } = useTheme();
   return useMemo(
     () =>
       StyleSheet.create({
@@ -41,9 +42,9 @@ function useBaseStyles() {
         list: { gap: 8 },
         glass: { backgroundColor: GLASS.surface, borderColor: GLASS.border },
         muted: { color: GLASS.soft, fontSize: fs(14), textAlign: 'center', padding: 16 },
-        link: { color: GLASS.accent, fontWeight: '800', fontSize: fs(14), textAlign: 'center', paddingVertical: 10 },
+        link: { color: tint(colors, GLASS.accent), fontWeight: '800', fontSize: fs(14), textAlign: 'center', paddingVertical: 10 },
       }),
-    [fs],
+    [colors, fs],
   );
 }
 
@@ -170,7 +171,7 @@ export function MatchesView({ data, now, dataAt, refreshing, onRefresh, onOpenMa
 
 export function StandingsView({ data, refreshing, onRefresh }: ViewProps) {
   const scrollRef = useScrollTopOnShow();
-  const { fs } = useTheme();
+  const { colors, fs } = useTheme();
   const base = useBaseStyles();
   const styles = useMemo(
     () =>
@@ -179,11 +180,11 @@ export function StandingsView({ data, refreshing, onRefresh }: ViewProps) {
         row: { flexDirection: 'row', alignItems: 'center', paddingVertical: 10, paddingRight: 10 },
         headRow: { backgroundColor: 'rgba(255,255,255,0.05)' },
         rowBorder: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: GLASS.divider },
-        us: { backgroundColor: GLASS.highlight },
+        us: { backgroundColor: tint(colors, GLASS.highlight) },
         zone: { width: 4, alignSelf: 'stretch', marginRight: 8 },
         rank: { width: 24, fontSize: fs(13), fontWeight: '800', color: GLASS.text, textAlign: 'center' },
         team: { flex: 1, fontSize: fs(14), color: GLASS.text, fontWeight: '600', paddingLeft: 6 },
-        teamUs: { fontWeight: '900', color: GLASS.accent },
+        teamUs: { fontWeight: '900', color: tint(colors, GLASS.accent) },
         cell: { width: fs(26), fontSize: fs(13), color: GLASS.soft, textAlign: 'center', fontVariant: ['tabular-nums'] },
         gd: { width: fs(34) },
         pts: { width: fs(30), fontSize: fs(14), fontWeight: '900', color: GLASS.text, textAlign: 'center' },
@@ -193,7 +194,7 @@ export function StandingsView({ data, refreshing, onRefresh }: ViewProps) {
         legendDot: { width: 10, height: 10, borderRadius: 3 },
         legendText: { fontSize: fs(12), color: GLASS.soft },
       }),
-    [fs],
+    [colors, fs],
   );
 
   const zones = useMemo(() => {
@@ -271,7 +272,7 @@ function playerLine(p: ClubData['roster'][number]): string {
 
 export function SquadView({ data, refreshing, onRefresh }: ViewProps) {
   const scrollRef = useScrollTopOnShow();
-  const { fs } = useTheme();
+  const { colors, fs } = useTheme();
   const base = useBaseStyles();
   const styles = useMemo(
     () =>
@@ -295,9 +296,9 @@ export function SquadView({ data, refreshing, onRefresh }: ViewProps) {
           width: 38,
           height: 38,
           borderRadius: 19,
-          backgroundColor: CLUB_COLORS.blue,
+          backgroundColor: tint(colors, CLUB_COLORS.blue),
           borderWidth: 2.5,
-          borderColor: CLUB_COLORS.green,
+          borderColor: tint(colors, CLUB_COLORS.green),
           alignItems: 'center',
           justifyContent: 'center',
         },
@@ -307,7 +308,7 @@ export function SquadView({ data, refreshing, onRefresh }: ViewProps) {
         meta: { fontSize: fs(12), color: GLASS.soft },
         injured: { color: '#FF7A7A', fontWeight: '700' },
       }),
-    [fs],
+    [colors, fs],
   );
 
   const ages = data.roster.map((p) => p.age).filter((a): a is number => a !== null);
@@ -460,7 +461,7 @@ function WinBar({ r }: { r: Record3 }) {
 
 /** Takım liderleri: gol, asist, maç, kurtarış, kart — ilk 3'ler. */
 function LeadersCard({ roster }: { roster: ClubData['roster'] }) {
-  const { fs } = useTheme();
+  const { colors, fs } = useTheme();
   const base = useBaseStyles();
   const boards = useMemo(() => teamLeaders(roster), [roster]);
   const [selected, setSelected] = useState<string>('goals');
@@ -484,9 +485,9 @@ function LeadersCard({ roster }: { roster: ClubData['roster'] }) {
                   paddingHorizontal: 12,
                   paddingVertical: 6,
                   borderRadius: 999,
-                  backgroundColor: on ? CLUB_COLORS.green : GLASS.surfaceStrong,
+                  backgroundColor: on ? tint(colors, CLUB_COLORS.green) : GLASS.surfaceStrong,
                   borderWidth: 1,
-                  borderColor: on ? CLUB_COLORS.green : GLASS.border,
+                  borderColor: on ? tint(colors, CLUB_COLORS.green) : GLASS.border,
                 }}
               >
                 <Text style={{ color: GLASS.text, fontSize: fs(12), fontWeight: '800' }}>{b.label}</Text>
@@ -496,7 +497,7 @@ function LeadersCard({ roster }: { roster: ClubData['roster'] }) {
         </View>
         {board.leaders.map((l, i) => (
           <View key={l.player.id} style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-            <Text style={{ width: 22, color: i === 0 ? '#FFD447' : GLASS.soft, fontSize: fs(16), fontWeight: '900', textAlign: 'center' }}>{i + 1}</Text>
+            <Text style={{ width: 22, color: i === 0 ? tint(colors, '#FFD447') : GLASS.soft, fontSize: fs(16), fontWeight: '900', textAlign: 'center' }}>{i + 1}</Text>
             <View style={{ flex: 1, gap: 4 }}>
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: 8 }}>
                 <Text style={{ color: GLASS.text, fontSize: fs(14), fontWeight: '800', flex: 1 }} numberOfLines={1}>
@@ -507,7 +508,7 @@ function LeadersCard({ roster }: { roster: ClubData['roster'] }) {
                 </Text>
               </View>
               <View style={{ height: 5, borderRadius: 3, backgroundColor: GLASS.divider, overflow: 'hidden' }}>
-                <View style={{ width: `${(l.value / max) * 100}%`, height: '100%', backgroundColor: i === 0 ? GLASS.accent : 'rgba(123,224,166,0.55)' }} />
+                <View style={{ width: `${(l.value / max) * 100}%`, height: '100%', backgroundColor: i === 0 ? tint(colors, GLASS.accent) : 'rgba(123,224,166,0.55)' }} />
               </View>
             </View>
           </View>

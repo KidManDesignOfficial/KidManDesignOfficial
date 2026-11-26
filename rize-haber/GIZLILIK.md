@@ -19,7 +19,7 @@ nasıl kullandığını açıklar.
 
 Aşağıdakiler yalnızca telefonunuzun uygulama depolamasında tutulur, hiçbir sunucuya gönderilmez:
 
-- Görünüm ayarları (tema, renk, sekme arka planları, yazı boyutu, açılış sekmesi) ve varsayılan hava durumu konumu
+- Görünüm ayarları (tema, renk, renk düzeni, sekme arka planları, yazı boyutu, açılış sekmesi) ve varsayılan hava durumu konumu
 - Kaydettiğiniz haberler
 - Bildirim tercihleriniz
 - Çevrimdışı kullanım için son indirilen haber, hava durumu, çay fiyatı, döviz/altın ve Rizespor verileri

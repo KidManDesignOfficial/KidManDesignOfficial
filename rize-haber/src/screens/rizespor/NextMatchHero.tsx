@@ -11,7 +11,7 @@ import { liveMinute, matchProgress } from '../../rizespor/live';
 import { CLUB_COLORS, RIZESPOR_ID } from '../../rizespor/names';
 import type { Match } from '../../rizespor/parse';
 import { REMINDER_MINUTES, getMatchSettings } from '../../rizespor/reminders';
-import { useTheme } from '../../theme';
+import { useTheme, tint } from '../../theme';
 import { LivePulse, ProgressBar, ResultPill, useNow } from './shared';
 
 export default function NextMatchHero({
@@ -26,7 +26,7 @@ export default function NextMatchHero({
   dataAt: number;
   onOpen: () => void;
 }) {
-  const { fs } = useTheme();
+  const { colors, fs } = useTheme();
   // Geri sayım ve canlı dakika saniyede bir; son maç kartı durağan.
   const now = useNow(1000, mode === 'next' || (mode === 'live' && match.running));
   const [reminders, setReminders] = useState<boolean | null>(null);
@@ -68,13 +68,13 @@ export default function NextMatchHero({
           overflow: 'hidden',
           borderWidth: 1,
           borderColor: 'rgba(255,255,255,0.14)',
-          backgroundColor: CLUB_COLORS.blueDark,
+          backgroundColor: tint(colors, CLUB_COLORS.blueDark),
         },
         // Opak degrade: arkadaki stadyum sahnesi kartın içine sızıp rengi bulandırmasın.
         inner: { paddingHorizontal: 18, paddingTop: 16, paddingBottom: 16, gap: 16 },
         stripe: { flexDirection: 'row', height: 4 },
-        stripeGreen: { flex: 1, backgroundColor: CLUB_COLORS.green },
-        stripeBlue: { flex: 1, backgroundColor: '#2F7BEA' },
+        stripeGreen: { flex: 1, backgroundColor: tint(colors, CLUB_COLORS.green) },
+        stripeBlue: { flex: 1, backgroundColor: tint(colors, '#2F7BEA') },
         // Saha çizgisi motifi: orta çizgi + orta yuvarlak, yazıların arkasında çok silik.
         pitchLine: { position: 'absolute', top: 0, height: 236, left: '50%', width: 1, backgroundColor: 'rgba(255,255,255,0.07)' },
         pitchCircle: {
@@ -106,9 +106,9 @@ export default function NextMatchHero({
           borderWidth: 3,
           borderColor: 'rgba(255,255,255,0.25)',
         },
-        crestUs: { borderColor: CLUB_COLORS.green },
-        crestText: { color: CLUB_COLORS.blueDark, fontSize: fs(15), fontWeight: '900' },
-        crestTextUs: { color: CLUB_COLORS.greenDark },
+        crestUs: { borderColor: tint(colors, CLUB_COLORS.green) },
+        crestText: { color: tint(colors, CLUB_COLORS.blueDark), fontSize: fs(15), fontWeight: '900' },
+        crestTextUs: { color: tint(colors, CLUB_COLORS.greenDark) },
         teamName: { color: '#FFFFFF', fontSize: fs(14), fontWeight: '800', textAlign: 'center', lineHeight: fs(18) },
         side: { color: 'rgba(255,255,255,0.55)', fontSize: fs(11), fontWeight: '600', marginTop: -4 },
         center: { width: fs(112), alignItems: 'center', paddingTop: 6, gap: 2 },
@@ -165,9 +165,9 @@ export default function NextMatchHero({
         btnOn: { backgroundColor: '#FFFFFF', borderColor: '#FFFFFF' },
         btnText: { color: '#FFFFFF', fontSize: fs(13), fontWeight: '800' },
         btnInner: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-        btnTextOn: { color: CLUB_COLORS.greenDark },
+        btnTextOn: { color: tint(colors, CLUB_COLORS.greenDark) },
       }),
-    [fs],
+    [colors, fs],
   );
 
   const cd = countdownParts(match.date.getTime() - now);
@@ -185,7 +185,7 @@ export default function NextMatchHero({
         <View style={styles.stripeGreen} />
         <View style={styles.stripeBlue} />
       </View>
-      <LinearGradient colors={[CLUB_COLORS.greenDark, '#0A3550', CLUB_COLORS.blueDark]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.inner}>
+      <LinearGradient colors={[tint(colors, CLUB_COLORS.greenDark), tint(colors, '#0A3550'), tint(colors, CLUB_COLORS.blueDark)]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.inner}>
         <View style={styles.pitchLine} pointerEvents="none" />
         <View style={styles.pitchCircle} pointerEvents="none" />
         <View style={styles.top}>
@@ -281,7 +281,7 @@ export default function NextMatchHero({
               accessibilityState={{ checked: reminders }}
             >
               <View style={styles.btnInner}>
-                <Icon name={reminders ? 'notifications' : 'notifications-outline'} size={16} color={reminders ? CLUB_COLORS.greenDark : '#FFFFFF'} />
+                <Icon name={reminders ? 'notifications' : 'notifications-outline'} size={16} color={reminders ? tint(colors, CLUB_COLORS.greenDark) : '#FFFFFF'} />
                 <Text style={[styles.btnText, reminders && styles.btnTextOn]}>{reminders ? 'Hatırlatma açık' : 'Bana hatırlat'}</Text>
               </View>
             </PressableScale>

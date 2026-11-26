@@ -9,6 +9,7 @@ import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 import { ICON_FONT, Icon, type IconName } from './src/components/Icon';
 import { FadeInView } from './src/components/motion';
+import { HeaderTitle, TabBar } from './src/components/TabBar';
 import { tapFeedback } from './src/haptics';
 import { openUrl } from './src/components/ui';
 import { FavoritesProvider } from './src/favorites';
@@ -29,7 +30,7 @@ import TeaScreen from './src/screens/TeaScreen';
 import WeatherScreen from './src/screens/WeatherScreen';
 import type { SkyChrome } from './src/weatherScene';
 import { loadSettings } from './src/storage';
-import { DISCOVER_ENABLED, ThemeProvider, useTheme, type Settings, type TabId } from './src/theme';
+import { DISCOVER_ENABLED, ThemeProvider, useTheme, type Settings, type TabId, tint } from './src/theme';
 
 // Bildirim yanıtı yalnızca telefonda vardır; web önizlemesinde boş döner.
 const useNotificationResponse =
@@ -179,25 +180,37 @@ function Main() {
         body: { flex: 1, backgroundColor: colors.background },
         screen: { flex: 1 },
         tabBar: {
-          flexDirection: 'row',
           backgroundColor: colors.card,
           borderTopWidth: StyleSheet.hairlineWidth,
           borderTopColor: colors.border,
         },
-        tabButton: { flex: 1, alignItems: 'center', paddingTop: 8, paddingBottom: 6, paddingHorizontal: 2, gap: 2 },
-        tabIndicator: { position: 'absolute', top: 0, height: 3, width: 28, borderRadius: 2 },
         tabLabel: { fontSize: fs(11), fontWeight: '600', color: colors.textMuted },
       }),
     [colors, fs],
+  );
+
+  // Seçili sekmenin rengi: sahnesi olan sekmelerde sahnenin vurgusu (tek renk düzeninde seçilen renk).
+  const tabAccent = useCallback(
+    (id: Tab) =>
+      club
+        ? tint(colors, GLASS.accent)
+        : economyVisible
+          ? tint(colors, MARKET.gold)
+          : teaVisible
+            ? tint(colors, TEA_GLASS.accent)
+            : skyChrome
+              ? '#FFFFFF'
+              : id === 'rizespor'
+                ? tint(colors, CLUB_COLORS.green)
+                : colors.primary,
+    [club, economyVisible, teaVisible, skyChrome, colors],
   );
 
   const title = showSettings ? 'Ayarlar' : tab === 'news' && showSaved ? 'Kaydedilenler' : activeTab.title;
 
   const headerContent = (
     <View style={styles.header}>
-      <Text style={styles.headerTitle} numberOfLines={1}>
-        {title}
-      </Text>
+      <HeaderTitle title={title} style={styles.headerTitle} />
       <View style={styles.headerActions}>
         {tab === 'news' && !showSettings ? (
           <Pressable
@@ -284,39 +297,15 @@ function Main() {
           ) : null}
         </View>
 
-        <SafeAreaView
-          edges={['bottom']}
+        <TabBar
+          tabs={TABS}
+          active={showSettings ? null : tab}
+          onPress={goTo}
+          accent={tabAccent}
+          idle={skyChrome ? 'rgba(255,255,255,0.62)' : colors.textMuted}
+          labelStyle={styles.tabLabel}
           style={[styles.tabBar, skyChrome && { backgroundColor: skyChrome.footer, borderTopColor: 'rgba(255,255,255,0.12)' }]}
-          accessibilityRole="tablist"
-        >
-          {TABS.map((t) => {
-            const active = t.id === tab && !showSettings;
-            // Hava ekranında sekme çubuğu gökyüzüne karışır: seçili sekme beyaz, diğerleri yarı saydam beyaz.
-            const accent = club ? GLASS.accent : economyVisible ? MARKET.gold : teaVisible ? TEA_GLASS.accent : skyChrome ? '#FFFFFF' : t.id === 'rizespor' ? CLUB_COLORS.green : colors.primary;
-            const idle = skyChrome ? 'rgba(255,255,255,0.62)' : colors.textMuted;
-            return (
-              <Pressable
-                key={t.id}
-                onPress={() => goTo(t.id)}
-                style={styles.tabButton}
-                accessibilityRole="tab"
-                accessibilityState={{ selected: active }}
-                accessibilityLabel={t.label}
-              >
-                <View style={[styles.tabIndicator, active && { backgroundColor: accent }]} />
-                <Icon name={active ? t.iconActive : t.icon} size={23} color={active ? accent : idle} />
-                <Text
-                  style={[styles.tabLabel, { color: active ? accent : idle }]}
-                  numberOfLines={1}
-                  adjustsFontSizeToFit
-                  minimumFontScale={0.8}
-                >
-                  {t.label}
-                </Text>
-              </Pressable>
-            );
-          })}
-        </SafeAreaView>
+        />
       </SafeAreaView>
     </>
   );
