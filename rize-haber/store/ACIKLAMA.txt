@@ -34,7 +34,8 @@ Rize Haber, Rize’ye dair her gün baktığınız şeyleri tek uygulamada topla
 🎨 SİZE GÖRE
 • 6 tema: Klasik, Kâğıt, Yayla Sisi, Renk tonlu, Zifiri ve Yüksek kontrast; açık, koyu veya sistem
 • Her sekme için ayrı arka plan sahnesi: Yıldızlı Kaçkar, Karadeniz fırtınası, Yayla sisi, Tribün ışıkları, Demlik buharı, Altın tozu, Kaçkar sırtları ve daha fazlası
-• Beş vurgu rengi, büyük ve çok büyük yazı boyutu
+• Yedi vurgu rengi; büyük ve çok büyük yazı boyutu
+• Tek renk düzeni: uygulamanın tamamı seçtiğiniz rengin tonlarında; Grafit ile siyah-beyaz
 • Hareketli arka planları ve titreşimi isterseniz kapatın; açılış sekmesini siz seçin
 
 🔒 GİZLİLİK

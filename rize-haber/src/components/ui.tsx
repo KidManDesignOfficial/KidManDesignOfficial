@@ -5,7 +5,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import type { StyleProp, ViewStyle } from 'react-native';
 import * as WebBrowser from 'expo-web-browser';
 
-import { useTheme, type Colors } from '../theme';
+import { useTheme, type Colors, tint } from '../theme';
 import { Icon } from './Icon';
 
 export function openUrl(url: string, colors: Colors) {
@@ -85,7 +85,7 @@ export function LinkRow({ label, url, glass = false }: { label: string; url: str
   const { colors } = useTheme();
   const styles = useStyles();
   // Cam görünüm (koyu sahne üstü): açık yeşil yazı, ince beyaz ayraç.
-  const tint = glass ? '#9BE8B4' : colors.primary;
+  const linkTint = glass ? tint(colors, '#9BE8B4') : colors.primary;
   return (
     <Pressable
       onPress={() => openUrl(url, colors)}
@@ -93,8 +93,8 @@ export function LinkRow({ label, url, glass = false }: { label: string; url: str
       accessibilityRole="link"
       accessibilityLabel={label}
     >
-      <Text style={[styles.linkText, glass && { color: tint }]}>{label}</Text>
-      <Icon name="open-outline" size={18} color={tint} />
+      <Text style={[styles.linkText, glass && { color: linkTint }]}>{label}</Text>
+      <Icon name="open-outline" size={18} color={linkTint} />
     </Pressable>
   );
 }

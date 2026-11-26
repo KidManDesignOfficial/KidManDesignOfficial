@@ -8,11 +8,11 @@ import { LinearGradient } from 'expo-linear-gradient';
 
 import { BACKDROPS, BACKDROP_TABS, DEFAULT_BACKDROPS, backdropFor, type Backdrop, type BackdropTab, type WeatherStyle } from '../backdrops';
 import { tapFeedback } from '../haptics';
-import { useTheme } from '../theme';
+import { sceneTint, useTheme } from '../theme';
 import { sceneFor, skyChrome } from '../weatherScene';
 import { Icon, type IconName } from './Icon';
 import { useRizeSky } from './RizeScene';
-import { EconomyBackdrop, NewsBackdrop, RizesporBackdrop, TeaBackdrop, useTabChrome } from './TabBackdrop';
+import { EconomyBackdrop, NewsBackdrop, RizesporBackdrop, TeaBackdrop, useTabChrome, useToneChrome } from './TabBackdrop';
 import WeatherScene from './WeatherScene';
 
 const PREVIEW_W = 92;
@@ -132,7 +132,7 @@ function Option({ b, original, on, styles, onPress }: { b: Backdrop; original: b
       accessibilityLabel={`${b.name}${original ? ' (özgün)' : ''}. ${b.hint}`}
     >
       <View style={styles.swatch}>
-        <LinearGradient colors={b.swatch} style={StyleSheet.absoluteFill} />
+        <LinearGradient colors={[sceneTint(colors, b.swatch[0]), sceneTint(colors, b.swatch[1])]} style={StyleSheet.absoluteFill} />
         <Icon name={b.icon as IconName} size={12} color="#FFFFFF" />
       </View>
       <Text style={[styles.optionName, on && styles.optionNameOn]} numberOfLines={1}>
@@ -152,7 +152,8 @@ const Preview = memo(function Preview({ tab }: { tab: BackdropTab }) {
   const { colors, settings } = useTheme();
   const sky = useRizeSky();
   const chrome = useTabChrome(tab === 'weather' ? 'news' : tab, sky);
-  const frame = tab === 'weather' ? skyChrome(SAMPLE_WEATHER) : chrome;
+  const weatherFrame = useToneChrome(skyChrome(SAMPLE_WEATHER));
+  const frame = tab === 'weather' ? weatherFrame : chrome;
   const s = PREVIEW_W / width;
   const h = Math.round(height * s);
   const scene =

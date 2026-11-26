@@ -12,6 +12,8 @@ import {
   Text,
   View,
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+
 import appConfig from '../../app.json';
 
 import BackdropPicker from '../components/BackdropPicker';
@@ -28,6 +30,9 @@ import { disableNewsNotifications, enableNewsNotifications, setMatchFeature } fr
 import { REMINDER_MINUTES, getMatchSettings } from '../rizespor/reminders';
 import { loadNotificationsEnabled } from '../storage';
 import { buildColors } from '../colors';
+import { ECON_CHROME, MARKET } from '../economyScene';
+import { GLASS, STADIUM_CHROME } from '../rizespor/stadium';
+import { TEA_CHROME, TEA_GLASS } from '../teaScene';
 import { tapFeedback } from '../haptics';
 import {
   ACCENTS,
@@ -35,6 +40,8 @@ import {
   PALETTES,
   PALETTE_IDS,
   TEXT_SCALES,
+  sceneTint,
+  tint,
   useTheme,
   type AccentId,
   type PaletteId,
@@ -140,8 +147,8 @@ export default function SettingsScreen() {
         segmentItemActive: { backgroundColor: colors.primary },
         segmentText: { fontSize: fs(14), fontWeight: '600', color: colors.text },
         segmentTextActive: { color: colors.isDark ? '#0F1311' : colors.onPrimary },
-        swatches: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', rowGap: 10, marginTop: 12 },
-        swatch: { alignItems: 'center', width: 60, gap: 6 },
+        swatches: { flexDirection: 'row', flexWrap: 'wrap', rowGap: 12, marginTop: 12 },
+        swatch: { alignItems: 'center', width: '25%', gap: 6 },
         swatchCircle: {
           width: 44,
           height: 44,
@@ -266,6 +273,26 @@ export default function SettingsScreen() {
               </Pressable>
             );
           })}
+        </View>
+
+        <View style={styles.divider} />
+
+        <Text style={styles.rowLabel}>Renk düzeni</Text>
+        <Text style={styles.rowHint}>
+          “Tek renk” seçilince sahneler, başlıklar ve vurgular seçtiğiniz rengin tonlarına bürünür. Grafit ile
+          uygulama tamamen siyah-beyaz olur. Yükseliş/düşüş ve kırmızı kart gibi anlam taşıyan renkler korunur.
+        </Text>
+        <View style={styles.themeGrid} accessibilityRole="radiogroup">
+          {COLOR_MODES.map((m) => (
+            <ColorModeOption
+              key={m.id}
+              mono={m.id === 'tek'}
+              label={m.label}
+              hint={m.hint}
+              selected={settings.monochrome === (m.id === 'tek')}
+              onPress={() => updateSettings({ monochrome: m.id === 'tek' })}
+            />
+          ))}
         </View>
 
         <View style={styles.divider} />
@@ -453,6 +480,67 @@ export default function SettingsScreen() {
         hakları ilgili yayın kuruluşlarına aittir.
       </Text>
     </ScrollView>
+  );
+}
+
+const COLOR_MODES = [
+  { id: 'sekme', label: 'Sekmeye göre', hint: 'Her sekme kendi renginde' },
+  { id: 'tek', label: 'Tek renk', hint: 'Her yer seçtiğiniz renkte' },
+] as const;
+
+/** Önizlemede gösterilen sekme çerçeveleri ve vurguları (Haberler, Rizespor, Çay, Ekonomi, Hava). */
+const TAB_SWATCHES: readonly (readonly [string, string, string])[] = [
+  ['#1D6782', '#1F6040', '#FFFFFF'],
+  [STADIUM_CHROME.header, STADIUM_CHROME.footer, GLASS.accent],
+  [TEA_CHROME.header, TEA_CHROME.footer, TEA_GLASS.accent],
+  [ECON_CHROME.header, ECON_CHROME.footer, MARKET.gold],
+  ['#2F7FC1', '#7DB8E8', '#FFFFFF'],
+];
+
+/** Renk düzeni seçeneği: beş sekmenin çerçeve ve vurgu renkleriyle küçük önizleme. */
+function ColorModeOption({ mono, label, hint, selected, onPress }: { mono: boolean; label: string; hint: string; selected: boolean; onPress: () => void }) {
+  const { colors, fs, settings } = useTheme();
+  const c = useMemo(
+    () => buildColors(settings.accent, colors.isDark, settings.palette, mono),
+    [settings.accent, colors.isDark, settings.palette, mono],
+  );
+  return (
+    <PressableScale
+      onPress={() => {
+        tapFeedback();
+        onPress();
+      }}
+      scaleTo={0.97}
+      containerStyle={{ width: '48%' }}
+      accessibilityRole="radio"
+      accessibilityState={{ selected }}
+      accessibilityLabel={`${label}. ${hint}`}
+    >
+      <View
+        style={{
+          flexDirection: 'row',
+          gap: 4,
+          padding: 8,
+          borderRadius: 14,
+          borderWidth: selected ? 2.5 : 1,
+          borderColor: selected ? colors.primary : colors.border,
+          backgroundColor: colors.background,
+        }}
+      >
+        {TAB_SWATCHES.map(([top, bottom, accent], i) => (
+          <View key={i} style={{ flex: 1, height: 46, borderRadius: 7, overflow: 'hidden' }}>
+            <LinearGradient colors={[sceneTint(c, top), sceneTint(c, bottom)]} style={StyleSheet.absoluteFill} />
+            <View style={{ position: 'absolute', left: 4, right: 4, bottom: 5, height: 4, borderRadius: 2, backgroundColor: tint(c, accent) }} />
+          </View>
+        ))}
+      </View>
+      <Text style={{ marginTop: 6, fontSize: fs(13), fontWeight: selected ? '800' : '600', color: colors.text }} numberOfLines={1}>
+        {label}
+      </Text>
+      <Text style={{ fontSize: fs(11), color: colors.textMuted }} numberOfLines={1}>
+        {hint}
+      </Text>
+    </PressableScale>
   );
 }
 

@@ -1,6 +1,7 @@
 /** Renk paletleri ve yazı ölçekleri (React'ten bağımsız; Node ile test edilir). */
+import { cachedMonoTint, sceneTone, uiTone, type MonoTint } from './mono.ts';
 
-export type AccentId = 'cay' | 'deniz' | 'kackar' | 'bordo' | 'gurgen';
+export type AccentId = 'cay' | 'deniz' | 'kackar' | 'bordo' | 'gurgen' | 'firtina' | 'grafit';
 export type TextSize = 'normal' | 'large' | 'xlarge';
 
 /** Rize'den esinlenen vurgu renkleri. `light`/`dark`: açık ve koyu temadaki ana renk. */
@@ -10,6 +11,9 @@ export const ACCENTS: Record<AccentId, { name: string; short: string; light: str
   kackar: { name: 'Kaçkar Laciverti', short: 'Kaçkar', light: '#25336B', dark: '#8C9EEB' },
   bordo: { name: 'Rize Bezi Bordosu', short: 'Rize Bezi', light: '#8A1E2D', dark: '#E07A86' },
   gurgen: { name: 'Gürgen Kahvesi', short: 'Gürgen', light: '#6B4423', dark: '#C9976B' },
+  firtina: { name: 'Fırtına Deresi', short: 'Fırtına', light: '#0E6B66', dark: '#4DC2B8' },
+  /** Nötr gri: "Tek renk" düzeniyle birlikte uygulama tamamen siyah-beyaz olur. */
+  grafit: { name: 'Grafit', short: 'Grafit', light: '#36393C', dark: '#B9BDC1' },
 };
 
 export const TEXT_SCALES: Record<TextSize, { name: string; scale: number }> = {
@@ -30,7 +34,22 @@ export type Colors = {
   border: string;
   error: string;
   isDark: boolean;
+  /** "Tek renk" düzeni açıksa seçilen rengin tonlama ayarları; kapalıysa null. */
+  mono: MonoTint | null;
 };
+
+/**
+ * Arayüz vurgusunu (kulüp yeşili, altın sarısı, sahne bağlantı rengi…) etkin renk düzenine uyarlar:
+ * "Tek renk" kapalıyken rengi olduğu gibi, açıkken seçilen rengin tonunda döndürür.
+ */
+export function tint(colors: Pick<Colors, 'mono'>, color: string): string {
+  return colors.mono ? uiTone(colors.mono, color) : color;
+}
+
+/** Sahne rengini (üst başlık / alt sekme çubuğu) sahne filtresiyle aynı tona çevirir. */
+export function sceneTint(colors: Pick<Colors, 'mono'>, color: string): string {
+  return colors.mono ? sceneTone(colors.mono, color) : color;
+}
 
 function hexToRgb(hex: string): [number, number, number] {
   const n = parseInt(hex.slice(1), 16);
@@ -118,8 +137,9 @@ function tintedSurface(a: { light: string; dark: string }, isDark: boolean): Sur
   };
 }
 
-export function buildColors(accent: AccentId, isDark: boolean, palette: PaletteId = 'klasik'): Colors {
-  const a = ACCENTS[accent];
+export function buildColors(accent: AccentId, isDark: boolean, palette: PaletteId = 'klasik', monochrome = false): Colors {
+  const a = ACCENTS[accent] ?? ACCENTS.cay;
+  const mono = monochrome ? cachedMonoTint(a.light) : null;
   const p = PALETTES[palette] ?? PALETTES.klasik;
   const surface = palette === 'tonlu' ? tintedSurface(a, isDark) : isDark ? p.dark : p.light;
   const strong = palette === 'kontrast';
@@ -134,6 +154,7 @@ export function buildColors(accent: AccentId, isDark: boolean, palette: PaletteI
       // Klasik palet önceki sürümlerle birebir aynı kalsın.
       primarySoft: mix(primary, palette === 'klasik' ? '#121614' : surface.background, 0.82),
       isDark,
+      mono,
     };
   }
   const primary = strong ? mix(a.light, '#000000', 0.2) : a.light;
@@ -144,5 +165,6 @@ export function buildColors(accent: AccentId, isDark: boolean, palette: PaletteI
     header: primary,
     primarySoft: mix(primary, surface.card, 0.88),
     isDark,
+    mono,
   };
 }

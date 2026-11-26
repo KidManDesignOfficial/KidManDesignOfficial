@@ -13,7 +13,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { DAWN_SUN, TEA_CHROME, TEA_LAYERS, TEA_SKY, TEA_SKY_STOPS } from '../teaScene';
 import { seeded } from '../weatherScene';
 import { Icon } from './Icon';
-import { loopPhase, useLoopClock, useSceneStill } from './motion';
+import { loopPhase, useLoopClock, useSceneStill, useSceneFilter } from './motion';
 
 const FILL = { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 } as const;
 
@@ -28,13 +28,14 @@ const LAYOUT: { top: number; humps: Hump[] }[] = [
 ];
 
 export default function TeaScene({ active }: { active: boolean }) {
+  const tone = useSceneFilter();
   const reduced = useSceneStill();
   const running = active && !reduced;
   const { width, height } = useWindowDimensions();
   const footer = TEA_CHROME.footer;
 
   return (
-    <View style={[FILL, styles.clip]} pointerEvents="none" accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+    <View style={[FILL, styles.clip, tone]} pointerEvents="none" accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
       <LinearGradient colors={TEA_SKY} locations={TEA_SKY_STOPS} style={FILL} />
       <Sun width={width} height={height} running={running} />
       {LAYOUT.map((layer, i) => (

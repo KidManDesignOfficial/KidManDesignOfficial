@@ -8,6 +8,7 @@
  */
 import { XMLParser } from 'fast-xml-parser';
 
+import { requestText } from './net.ts';
 import { formatNumber } from './tea.ts';
 
 export const TCMB_URL = 'https://www.tcmb.gov.tr/kurlar/today.xml';
@@ -81,6 +82,8 @@ export function parseTcmb(xml: string): { date: string | null; rates: Rate[] } {
     const buying = num(c.ForexBuying) ?? num(c.BanknoteBuying);
     const selling = num(c.ForexSelling) ?? num(c.BanknoteSelling);
     if (buying === null || selling === null) continue;
+    // Alış satıştan büyükse ya da makas %20'yi aşıyorsa satır bozuktur; yanlış kur gösterilmez.
+    if (selling < buying || selling > buying * 1.2) continue;
     byCode.set(code, { code, name: '', buying: buying / unit, selling: selling / unit });
   }
 
@@ -112,17 +115,16 @@ export function convert(amount: number, rate: Rate, toTry: boolean): number {
   return toTry ? amount * rate.buying : amount / rate.selling;
 }
 
-async function fetchText(url: string, signal?: AbortSignal): Promise<string> {
-  const res = await fetch(url, { signal, headers: { Accept: '*/*' } });
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  return res.text();
+function fetchText(url: string, signal?: AbortSignal): Promise<string> {
+  return requestText(url, { signal, headers: { Accept: '*/*' } });
 }
 
 /** Kurlar zorunludur; altın gelmezse sayfa yine kurlarla açılır. */
 export async function fetchMarkets(signal?: AbortSignal): Promise<Markets> {
   const [tcmb, gold] = await Promise.all([
     fetchText(TCMB_URL, signal),
-    fetchText(GOLD_URL, signal)
+    // Altın isteğe bağlıdır: kısa süre sınırı, yeniden deneme yok; kurları bekletmesin.
+    requestText(GOLD_URL, { signal, timeoutMs: 8000, retries: 0 })
       .then((t) => parseGold(JSON.parse(t)))
       .catch(() => null),
   ]);

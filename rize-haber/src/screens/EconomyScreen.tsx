@@ -21,7 +21,7 @@ import { convert, fetchMarkets, formatRate, gramGoldTry, type Markets } from '..
 import { loadCachedMarkets, saveCachedMarkets, savedAtLabel } from '../offline';
 import { formatDateTr, formatLira, formatNumber, parseKg, type TeaData } from '../tea';
 import { BUNDLED_TEA_DATA, loadLocalTeaData } from '../teaData';
-import { useTheme } from '../theme';
+import { useTheme, tint } from '../theme';
 
 const REFRESH_MS = 10 * 60 * 1000;
 
@@ -37,7 +37,7 @@ type Props = {
 
 export default function EconomyScreen({ active = true, onOpenTea }: Props) {
   const scrollRef = useScrollTopOnShow();
-  const { fs } = useTheme();
+  const { colors, fs } = useTheme();
   const chrome = useTabChrome('economy');
   const appActive = useAppActive();
   const [markets, setMarkets] = useState<Markets | null>(null);
@@ -110,7 +110,7 @@ export default function EconomyScreen({ active = true, onOpenTea }: Props) {
         container: { flex: 1, backgroundColor: 'transparent' },
         content: { padding: 16, paddingBottom: 32 },
         card: { backgroundColor: G.surface, borderColor: G.border },
-        heroShell: { borderWidth: 1, borderColor: G.goldBorder },
+        heroShell: { borderWidth: 1, borderColor: tint(colors, G.goldBorder) },
         heroLabel: { color: G.soft, fontSize: fs(14), fontWeight: '600' },
         heroValue: { color: G.text, fontSize: fs(46), fontWeight: '800', letterSpacing: -1, marginTop: 2 },
         heroStats: { flexDirection: 'row', gap: 8, marginTop: 14 },
@@ -125,7 +125,7 @@ export default function EconomyScreen({ active = true, onOpenTea }: Props) {
         },
         heroStatLabel: { color: G.faint, fontSize: fs(11), fontWeight: '700', letterSpacing: 0.4 },
         heroStatValue: { color: G.text, fontSize: fs(17), fontWeight: '800', marginTop: 2 },
-        heroStatGold: { color: MARKET.goldSoft },
+        heroStatGold: { color: tint(colors, MARKET.goldSoft) },
         offline: {
           flexDirection: 'row',
           alignItems: 'center',
@@ -169,8 +169,8 @@ export default function EconomyScreen({ active = true, onOpenTea }: Props) {
         num: { width: fs(74), textAlign: 'right', fontSize: fs(15), color: G.soft, fontVariant: ['tabular-nums'] },
         numStrong: { fontWeight: '800', color: G.text },
         goldRow: { flexDirection: 'row', gap: 10 },
-        goldBox: { flex: 1, borderRadius: 14, padding: 12, overflow: 'hidden', borderWidth: 1, borderColor: G.goldBorder },
-        goldLabel: { fontSize: fs(12), color: MARKET.goldSoft, fontWeight: '700', letterSpacing: 0.3 },
+        goldBox: { flex: 1, borderRadius: 14, padding: 12, overflow: 'hidden', borderWidth: 1, borderColor: tint(colors, G.goldBorder) },
+        goldLabel: { fontSize: fs(12), color: tint(colors, MARKET.goldSoft), fontWeight: '700', letterSpacing: 0.3 },
         goldValue: { fontSize: fs(22), color: G.text, fontWeight: '800', marginTop: 4 },
         hint: { fontSize: fs(12), color: G.faint, marginTop: 10, lineHeight: fs(17) },
         input: {
@@ -192,11 +192,11 @@ export default function EconomyScreen({ active = true, onOpenTea }: Props) {
           paddingHorizontal: 12,
           paddingVertical: 7,
           borderRadius: 999,
-          backgroundColor: G.goldSurface,
+          backgroundColor: tint(colors, G.goldSurface),
           borderWidth: 1,
-          borderColor: G.goldBorder,
+          borderColor: tint(colors, G.goldBorder),
         },
-        swapText: { fontSize: fs(13), fontWeight: '700', color: MARKET.goldSoft },
+        swapText: { fontSize: fs(13), fontWeight: '700', color: tint(colors, MARKET.goldSoft) },
         resultRow: {
           flexDirection: 'row',
           justifyContent: 'space-between',
@@ -207,7 +207,7 @@ export default function EconomyScreen({ active = true, onOpenTea }: Props) {
           borderTopColor: G.divider,
         },
         resultLabel: { fontSize: fs(15), color: G.soft },
-        resultValue: { fontSize: fs(26), fontWeight: '800', color: MARKET.gold, flexShrink: 1 },
+        resultValue: { fontSize: fs(26), fontWeight: '800', color: tint(colors, MARKET.gold), flexShrink: 1 },
         teaRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
         teaIcon: {
           width: 44,
@@ -226,7 +226,7 @@ export default function EconomyScreen({ active = true, onOpenTea }: Props) {
         errorText: { color: G.text, fontSize: fs(15), textAlign: 'center' },
         footer: { fontSize: fs(12), color: G.faint, textAlign: 'center', marginTop: 16, lineHeight: fs(17) },
       }),
-    [fs, chrome],
+    [colors, fs, chrome],
   );
 
   const running = active && appActive;
@@ -275,8 +275,8 @@ export default function EconomyScreen({ active = true, onOpenTea }: Props) {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            colors={[MARKET.gold]}
-            tintColor={MARKET.gold}
+            colors={[tint(colors, MARKET.gold)]}
+            tintColor={tint(colors, MARKET.gold)}
             progressBackgroundColor={chrome.header}
           />
         }
@@ -289,7 +289,7 @@ export default function EconomyScreen({ active = true, onOpenTea }: Props) {
         ) : null}
 
         <HeroCard
-          gradient={HERO_GRADIENT}
+          gradient={[tint(colors, HERO_GRADIENT[0]), tint(colors, HERO_GRADIENT[1])]}
           style={styles.heroShell}
           watermark="trending-up-outline"
           eyebrow={bulletin ? `TCMB · ${bulletin.toLocaleUpperCase('tr-TR')}` : 'TCMB GÖSTERGE KURU'}
@@ -354,7 +354,7 @@ export default function EconomyScreen({ active = true, onOpenTea }: Props) {
             ].map((g) => (
               <View key={g.label} style={styles.goldBox}>
                 <LinearGradient
-                  colors={['rgba(242,199,92,0.24)', 'rgba(242,199,92,0.05)']}
+                  colors={[tint(colors, 'rgba(242,199,92,0.24)'), tint(colors, 'rgba(242,199,92,0.05)')]}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 1 }}
                   style={StyleSheet.absoluteFill}
@@ -388,7 +388,7 @@ export default function EconomyScreen({ active = true, onOpenTea }: Props) {
               accessibilityRole="button"
               accessibilityLabel="Çeviri yönünü değiştir"
             >
-              <Icon name="swap-horizontal" size={16} color={MARKET.goldSoft} />
+              <Icon name="swap-horizontal" size={16} color={tint(colors, MARKET.goldSoft)} />
               <Text style={styles.swapText}>Yönü değiştir</Text>
             </Pressable>
           </View>
@@ -462,7 +462,7 @@ type TickerItem = { label: string; value: string; gold?: boolean };
 const TICKER_SPEED = 36;
 
 function Ticker({ items, running }: { items: TickerItem[]; running: boolean }) {
-  const { fs } = useTheme();
+  const { colors, fs } = useTheme();
   const reduced = useSceneStill();
   const [rowWidth, setRowWidth] = useState(0);
   const x = useAnimatedValue(0);
@@ -486,7 +486,7 @@ function Ticker({ items, running }: { items: TickerItem[]; running: boolean }) {
       {items.map((it) => (
         <View key={`${copy}-${it.label}`} style={tickerStyles.item}>
           <Text style={[tickerStyles.label, { fontSize: fs(11) }]}>{it.label}</Text>
-          <Text style={[tickerStyles.value, { fontSize: fs(13) }, it.gold && { color: MARKET.goldSoft }]}>{it.value}</Text>
+          <Text style={[tickerStyles.value, { fontSize: fs(13) }, it.gold && { color: tint(colors, MARKET.goldSoft) }]}>{it.value}</Text>
           <Text style={[tickerStyles.sep, { fontSize: fs(8) }]}>◆</Text>
         </View>
       ))}

@@ -7,6 +7,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
 
+import { requestJson } from '../net';
 import { applyLive, scoreboardDate } from './live';
 import { RIZESPOR_ID } from './names';
 import { parseRoster, parseSchedule, parseStandings, parseSummary, type Match, type MatchDetail, type Player, type StandingRow } from './parse';
@@ -28,19 +29,8 @@ export const RIZESPOR_URLS = {
 // Canlı skorun ara bellekten eski gelmemesi için (web'de bu başlık CORS ön isteği doğurur, eklenmez).
 const NO_CACHE: Record<string, string> = Platform.OS === 'web' ? {} : { 'Cache-Control': 'no-cache' };
 
-async function fetchJson(url: string, signal?: AbortSignal): Promise<unknown> {
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
-  const onAbort = () => controller.abort();
-  signal?.addEventListener('abort', onAbort);
-  try {
-    const res = await fetch(url, { signal: controller.signal, headers: { Accept: 'application/json', ...NO_CACHE } });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    return await res.json();
-  } finally {
-    clearTimeout(timer);
-    signal?.removeEventListener('abort', onAbort);
-  }
+function fetchJson(url: string, signal?: AbortSignal): Promise<unknown> {
+  return requestJson(url, { signal, timeoutMs: TIMEOUT_MS, headers: { Accept: 'application/json', ...NO_CACHE } });
 }
 
 const CACHE_PREFIX = 'rizehaber:rizespor:v1:';

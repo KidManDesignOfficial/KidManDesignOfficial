@@ -6,6 +6,7 @@
  * birleştirilir; kullanıcıların yeni APK kurmasına gerek kalmaz.
  */
 import bundledJson from '../data/cay.json';
+import { requestJson } from './net';
 import { loadCachedTeaData, saveCachedTeaData } from './storage';
 import { newerTeaData, parseTeaData, type TeaData } from './tea';
 
@@ -23,9 +24,7 @@ export async function loadLocalTeaData(): Promise<TeaData> {
 /** Depodaki güncel veriyi indirir; geçersizse veya ulaşılamazsa `null`. */
 export async function fetchRemoteTeaData(signal?: AbortSignal): Promise<TeaData | null> {
   try {
-    const response = await fetch(TEA_DATA_URL, { signal, headers: { 'Cache-Control': 'no-cache' } });
-    if (!response.ok) return null;
-    const data = parseTeaData(await response.json());
+    const data = parseTeaData(await requestJson(TEA_DATA_URL, { signal, headers: { 'Cache-Control': 'no-cache' } }));
     if (data) await saveCachedTeaData(data);
     return data;
   } catch {

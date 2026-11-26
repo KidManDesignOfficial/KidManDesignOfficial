@@ -12,7 +12,7 @@ import { CLUB_COLORS } from '../rizespor/names';
 import { GLASS } from '../rizespor/stadium';
 import type { Match } from '../rizespor/parse';
 import { syncMatchReminders } from '../rizespor/reminders';
-import { useTheme } from '../theme';
+import { useTheme, tint } from '../theme';
 import Celebration, { celebrationFor, type CelebrationData } from './rizespor/Celebration';
 import MatchCenter from './rizespor/MatchCenter';
 import { MatchesView, SquadView, StandingsView } from './rizespor/views';
@@ -43,7 +43,7 @@ function pickMoment(moments: LiveMoment[]): LiveMoment | null {
 }
 
 export default function RizesporScreen({ openMatchId, active = true }: { openMatchId?: string | null; active?: boolean }) {
-  const { fs } = useTheme();
+  const { colors, fs } = useTheme();
   const chrome = useTabChrome('rizespor');
   const [section, setSection] = useState<Section>('matches');
   const [visited, setVisited] = useState<Set<Section>>(() => new Set(['matches']));
@@ -195,7 +195,7 @@ export default function RizesporScreen({ openMatchId, active = true }: { openMat
   return (
     <View style={styles.container}>
       <RizesporBackdrop active={active} live={live} cheer={cheer} />
-      <SegmentedTabs segments={SECTIONS} value={section} onChange={select} activeColor={CLUB_COLORS.green} glass />
+      <SegmentedTabs segments={SECTIONS} value={section} onChange={select} activeColor={tint(colors, CLUB_COLORS.green)} glass />
 
       {state === 'loading' ? (
         <HeroSkeleton rows={5} />

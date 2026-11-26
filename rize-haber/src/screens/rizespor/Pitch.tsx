@@ -12,7 +12,7 @@ import { shortName } from '../../rizespor/format';
 import { lineupRows } from '../../rizespor/formation';
 import { CLUB_COLORS, RIZESPOR_ID } from '../../rizespor/names';
 import type { Lineup, LineupPlayer } from '../../rizespor/parse';
-import { useTheme } from '../../theme';
+import { useTheme, tint } from '../../theme';
 
 const GRASS_A = '#2F8F46';
 const GRASS_B = '#2A8340';
@@ -48,7 +48,7 @@ function place(lineup: Lineup, home: boolean): Placed[] {
 }
 
 export default function Pitch({ home, away, live }: { home: Lineup | null; away: Lineup | null; live: boolean }) {
-  const { fs } = useTheme();
+  const { colors, fs } = useTheme();
   const reduced = useReducedMotion();
   const [width, setWidth] = useState(0);
   const height = width * 1.42;
@@ -60,7 +60,7 @@ export default function Pitch({ home, away, live }: { home: Lineup | null; away:
   const styles = useMemo(
     () =>
       StyleSheet.create({
-        pitch: { width: '100%', borderRadius: 16, overflow: 'hidden', backgroundColor: GRASS_A },
+        pitch: { width: '100%', borderRadius: 16, overflow: 'hidden', backgroundColor: tint(colors, GRASS_A) },
         stripe: { position: 'absolute', left: 0, right: 0 },
         line: { position: 'absolute', borderColor: LINE },
         label: {
@@ -72,7 +72,7 @@ export default function Pitch({ home, away, live }: { home: Lineup | null; away:
           letterSpacing: 0.5,
         },
       }),
-    [fs],
+    [colors, fs],
   );
 
   const inset = 0.04;
@@ -100,7 +100,7 @@ export default function Pitch({ home, away, live }: { home: Lineup | null; away:
           {Array.from({ length: 10 }, (_, i) => (
             <View
               key={i}
-              style={[styles.stripe, { top: (height / 10) * i, height: height / 10, backgroundColor: i % 2 ? GRASS_B : GRASS_A }]}
+              style={[styles.stripe, { top: (height / 10) * i, height: height / 10, backgroundColor: tint(colors, i % 2 ? GRASS_B : GRASS_A) }]}
             />
           ))}
           <View style={[styles.line, { left: L, top: T, width: W, height: H, borderWidth: 2 }]} />
@@ -152,15 +152,15 @@ function CenterSpot({ x, y, live }: { x: number; y: number; live: boolean }) {
 }
 
 function PlayerDot({ p, pitchW, pitchH, reduced }: { p: Placed; pitchW: number; pitchH: number; reduced: boolean }) {
-  const { fs } = useTheme();
+  const { colors, fs } = useTheme();
   const v = useAnimatedValue(reduced ? 1 : 0);
   useEffect(() => {
     if (reduced) return;
     Animated.spring(v, { toValue: 1, delay: p.delay, useNativeDriver: true, speed: 12, bounciness: 8 }).start();
   }, [p.delay, reduced, v]);
 
-  const fill = p.us ? CLUB_COLORS.blue : '#F4F4F4';
-  const ring = p.us ? CLUB_COLORS.green : '#9AA3AD';
+  const fill = p.us ? tint(colors, CLUB_COLORS.blue) : '#F4F4F4';
+  const ring = p.us ? tint(colors, CLUB_COLORS.green) : '#9AA3AD';
   const text = p.us ? '#FFFFFF' : '#1E2228';
   const boxW = 70;
   const left = (p.x / 100) * pitchW - boxW / 2;

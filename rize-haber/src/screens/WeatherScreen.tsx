@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 
+import { useAppActive } from '../appState';
 import { Icon, type IconName } from '../components/Icon';
 import LocationPicker from '../components/LocationPicker';
 import { PressableScale, useScrollTopOnShow } from '../components/motion';
@@ -9,17 +10,21 @@ import { HeroSkeleton } from '../components/Skeleton';
 import { Chip, ChipRow, PrimaryButton } from '../components/ui';
 import { useBackdrop } from '../components/Backdrop';
 import WeatherScene from '../components/WeatherScene';
+import { useToneChrome } from '../components/TabBackdrop';
 import type { WeatherStyle } from '../backdrops';
 import { WEATHER_LOCATIONS } from '../config';
 import { DISTRICT_PLACES, districtName, placeById, pushRecent, type Place } from '../places';
 import { pressFeedback } from '../haptics';
+import { friendlyError } from '../net';
 import { loadCachedWeather, saveCachedWeather, savedAtLabel } from '../offline';
 import { useRainSound, useRainSoundPreference } from '../rainSound';
-import { useTheme } from '../theme';
+import { sceneTint, tint, useTheme } from '../theme';
 import { clockTime, dayLabel } from '../time';
 import { describeWeatherCode, fetchWeather, type Weather } from '../weather';
 import { sceneFor, skyChrome, type SkyChrome } from '../weatherScene';
 
+/** Hava verisi bu süreden eskiyse yenilenir (Open-Meteo modelleri 15 dakikada bir güncellenir). */
+const WEATHER_REFRESH_MS = 15 * 60 * 1000;
 const WHITE = '#FFFFFF';
 const SOFT = 'rgba(255,255,255,0.78)';
 const GLASS = 'rgba(255,255,255,0.13)';
@@ -52,6 +57,8 @@ export default function WeatherScreen({
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const controller = useRef<AbortController | null>(null);
+  const lastLoad = useRef(0);
+  const appActive = useAppActive();
 
   const location: Place = placeById(locationId) ?? placeById(WEATHER_LOCATIONS[0].id)!;
   // Şeritte: önce son seçilen köy/yaylalar, sonra 12 ilçe ve Ayder.
@@ -79,6 +86,7 @@ export default function WeatherScreen({
     controller.current?.abort();
     const c = new AbortController();
     controller.current = c;
+    lastLoad.current = Date.now();
     setLoading(true);
     setError(null);
     // Son kayıtlı veriyi hemen göster; ağdan gelince yerini alır.
@@ -90,8 +98,8 @@ export default function WeatherScreen({
       const fresh = await fetchWeather(location, c.signal);
       setEntry({ id: location.id, weather: fresh, cachedAt: null });
       saveCachedWeather(location.id, fresh);
-    } catch {
-      if (!c.signal.aborted) setError('Hava durumu alınamadı. İnternet bağlantınızı kontrol edin.');
+    } catch (e) {
+      if (!c.signal.aborted) setError(friendlyError(e, 'Hava durumu'));
     } finally {
       if (!c.signal.aborted) setLoading(false);
     }
@@ -104,6 +112,14 @@ export default function WeatherScreen({
     return () => controller.current?.abort();
   }, [load]);
 
+  // Ekran açık kaldıkça ve sekmeye / uygulamaya dönüldüğünde veri bayatsa yenilenir.
+  useEffect(() => {
+    if (!active || !appActive) return;
+    if (Date.now() - lastLoad.current >= WEATHER_REFRESH_MS) load();
+    const timer = setInterval(load, WEATHER_REFRESH_MS);
+    return () => clearInterval(timer);
+  }, [active, appActive, load]);
+
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
     await load();
@@ -115,7 +131,7 @@ export default function WeatherScreen({
   const isDay = current?.isDay ?? true;
   const scene = useMemo(() => (code == null ? null : sceneFor(code, isDay)), [code, isDay]);
   const variant = useBackdrop('weather').id as WeatherStyle;
-  const chrome = scene ? skyChrome(scene) : null;
+  const chrome = useToneChrome(scene ? skyChrome(scene) : null);
   const chromeHeader = chrome?.header ?? null;
   const chromeFooter = chrome?.footer ?? null;
 
@@ -130,7 +146,7 @@ export default function WeatherScreen({
   const styles = useMemo(
     () =>
       StyleSheet.create({
-        root: { flex: 1, backgroundColor: scene ? scene.sky[1] : colors.background },
+        root: { flex: 1, backgroundColor: scene ? sceneTint(colors, scene.sky[1]) : colors.background },
         scroll: { flex: 1 },
         content: { paddingBottom: 28 },
         center: { alignItems: 'center', justifyContent: 'center', padding: 48, gap: 12 },
@@ -204,11 +220,11 @@ export default function WeatherScreen({
         hourTimeNow: { color: WHITE, fontWeight: '800' },
         hourIcon: { fontSize: fs(24) },
         hourTemp: { fontSize: fs(17), fontWeight: '700', color: WHITE },
-        hourRain: { fontSize: fs(11), color: '#BFE3FF', fontWeight: '700' },
+        hourRain: { fontSize: fs(11), color: tint(colors, '#BFE3FF'), fontWeight: '700' },
         dayRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 11, gap: 8 },
         dayName: { width: fs(84), fontSize: fs(15), fontWeight: '700', color: WHITE },
         dayIcon: { fontSize: fs(22), width: fs(30), textAlign: 'center' },
-        dayRain: { width: fs(40), fontSize: fs(12), color: '#BFE3FF', fontWeight: '700' },
+        dayRain: { width: fs(40), fontSize: fs(12), color: tint(colors, '#BFE3FF'), fontWeight: '700' },
         dayMin: { width: fs(34), fontSize: fs(15), color: SOFT, textAlign: 'right', fontWeight: '600' },
         dayMax: { width: fs(34), fontSize: fs(15), color: WHITE, fontWeight: '800' },
         track: { flex: 1, height: 5, borderRadius: 3, backgroundColor: 'rgba(255,255,255,0.18)', overflow: 'hidden' },
@@ -329,7 +345,7 @@ export default function WeatherScreen({
             <View style={styles.glass}>
               <View style={styles.grid}>
                 <Stat styles={styles} icon="water-outline" label="Nem" value={`%${Math.round(current.humidity)}`} />
-                <Stat styles={styles} icon="flag-outline" label="Rüzgâr" value={`${Math.round(current.windSpeed)} km/s`} />
+                <Stat styles={styles} icon="flag-outline" label="Rüzgâr" value={`${Math.round(current.windSpeed)} km/sa`} />
                 <Stat styles={styles} icon="rainy-outline" label="Yağış" value={`${current.precipitation} mm`} />
                 <Stat styles={styles} icon="sunny-outline" label="Gün doğumu" value={clockTime(weather.sunrise)} />
                 <Stat styles={styles} icon="moon-outline" label="Gün batımı" value={clockTime(weather.sunset)} />
@@ -398,7 +414,7 @@ export default function WeatherScreen({
                       <Text style={styles.dayMin}>{Math.round(day.min)}°</Text>
                       <View style={styles.track}>
                         <LinearGradient
-                          colors={['#8FD3FF', '#FFD36B']}
+                          colors={[tint(colors, '#8FD3FF'), tint(colors, '#FFD36B')]}
                           start={{ x: 0, y: 0 }}
                           end={{ x: 1, y: 0 }}
                           style={{ position: 'absolute', top: 0, bottom: 0, left: `${Math.min(left, 94)}%`, width: `${width}%`, borderRadius: 3 }}

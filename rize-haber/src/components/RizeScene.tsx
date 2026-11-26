@@ -13,7 +13,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 
 import { rizeSkyFor, type RizeSky } from '../rizeScene';
 import { seeded } from '../weatherScene';
-import { useAnimatedValue, useSceneStill } from './motion';
+import { useAnimatedValue, useSceneStill, useSceneFilter } from './motion';
 
 const FILL = { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 } as const;
 
@@ -47,6 +47,7 @@ function cycle(clock: Animated.Value, speed: number, phase: number) {
 type Peak = { x: number; peakY: number; size: number; snow?: boolean };
 
 export default function RizeScene({ sky, active }: { sky: RizeSky; active: boolean }) {
+  const tone = useSceneFilter();
   const reduced = useSceneStill();
   const running = active && !reduced;
   const { width, height } = useWindowDimensions();
@@ -77,7 +78,7 @@ export default function RizeScene({ sky, active }: { sky: RizeSky; active: boole
   );
 
   return (
-    <View style={[FILL, styles.clip]} pointerEvents="none" accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+    <View style={[FILL, styles.clip, tone]} pointerEvents="none" accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
       <LinearGradient colors={sky.sky} locations={[0, 0.55, 1]} end={{ x: 0, y: 0.5 }} style={FILL} />
       {sky.phase === 'night' ? <Stars width={width} height={horizon} running={running} /> : null}
       <Glow sky={sky} width={width} horizon={horizon} />

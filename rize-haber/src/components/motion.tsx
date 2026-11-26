@@ -5,11 +5,12 @@
  * "Hareketi azalt" (erişilebilirlik) açıksa ya da kullanıcı Ayarlar → Özelleştirme'den
  * animasyonları kapattıysa animasyonlar anında tamamlanır.
  */
-import { createContext, useContext, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { createContext, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import type { ComponentRef, ReactNode } from 'react';
-import { AccessibilityInfo, Animated, Easing, Pressable, ScrollView, View } from 'react-native';
+import { AccessibilityInfo, Animated, Easing, Platform, Pressable, ScrollView, View } from 'react-native';
 import type { PressableProps, StyleProp, ViewStyle } from 'react-native';
 
+import { sceneFilter } from '../mono';
 import { useTheme } from '../theme';
 import { Icon } from './Icon';
 
@@ -76,6 +77,16 @@ export function useSceneStill(): boolean {
   const system = useSystemReducedMotion();
   const { settings } = useTheme();
   return system || !settings.sceneMotion;
+}
+
+/**
+ * "Tek renk" düzeninde sahne katmanının kök görünümüne verilen renk filtresi; kapalıyken null.
+ * Renk matrisi filtresi Android'in tüm sürümlerinde donanım katmanıyla çizilir.
+ */
+export function useSceneFilter(): ViewStyle | null {
+  const { colors } = useTheme();
+  const mono = colors.mono;
+  return useMemo(() => (mono ? ({ filter: sceneFilter(mono, Platform.OS) } as ViewStyle) : null), [mono]);
 }
 
 /**

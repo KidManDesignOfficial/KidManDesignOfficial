@@ -15,7 +15,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 
 import { FLOODLIGHT, GRASS, STADIUM_CHROME, STADIUM_SKY, STADIUM_SKY_STOPS } from '../rizespor/stadium';
 import { seeded } from '../weatherScene';
-import { useAnimatedValue, useSceneStill } from './motion';
+import { useAnimatedValue, useSceneStill, useSceneFilter } from './motion';
 
 const FILL = { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 } as const;
 const LINE = 'rgba(255,255,255,0.30)';
@@ -37,13 +37,14 @@ function cycle(clock: Animated.Value, speed: number, phase: number) {
 }
 
 export default function StadiumScene({ active, live = false, cheer = 0 }: { active: boolean; live?: boolean; cheer?: number }) {
+  const tone = useSceneFilter();
   const reduced = useSceneStill();
   const running = active && !reduced;
   const { width, height } = useWindowDimensions();
   const footer = STADIUM_CHROME.footer;
 
   return (
-    <View style={[FILL, styles.clip]} pointerEvents="none" accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+    <View style={[FILL, styles.clip, tone]} pointerEvents="none" accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
       <LinearGradient colors={STADIUM_SKY} locations={STADIUM_SKY_STOPS} style={FILL} />
       <Stars width={width} height={height} />
       {running && cheer > 0 ? <Fireworks key={cheer} width={width} height={height} /> : null}

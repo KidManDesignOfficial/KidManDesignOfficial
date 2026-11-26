@@ -7,7 +7,7 @@ import { clock, dayLabel } from '../../rizespor/format';
 import { RIZESPOR_ID } from '../../rizespor/names';
 import { GLASS } from '../../rizespor/stadium';
 import type { Match } from '../../rizespor/parse';
-import { useTheme } from '../../theme';
+import { useTheme, tint } from '../../theme';
 
 /** Belirli aralıkla güncellenen "şimdi" (canlı dakika, geri sayım). `enabled` yanlışsa durur. */
 export function useNow(intervalMs: number, enabled = true): number {
@@ -78,7 +78,7 @@ export function LivePulse({ size = 10, color = '#FF3B30' }: { size?: number; col
 
 /** Maç satırı: stadyum sahnesinin üstünde cam kart. */
 export function MatchRow({ match, onPress }: { match: Match; onPress: () => void }) {
-  const { fs } = useTheme();
+  const { colors, fs } = useTheme();
   const styles = useMemo(
     () =>
       StyleSheet.create({
@@ -99,7 +99,7 @@ export function MatchRow({ match, onPress }: { match: Match; onPress: () => void
         teams: { flex: 1, gap: 6 },
         teamLine: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
         team: { flex: 1, fontSize: fs(15), color: GLASS.text, fontWeight: '500' },
-        us: { fontWeight: '800', color: GLASS.accent },
+        us: { fontWeight: '800', color: tint(colors, GLASS.accent) },
         score: { fontSize: fs(16), fontWeight: '800', color: GLASS.text, minWidth: 18, textAlign: 'right' },
         winner: { color: GLASS.text },
         loser: { color: GLASS.faint, fontWeight: '600' },
@@ -107,7 +107,7 @@ export function MatchRow({ match, onPress }: { match: Match; onPress: () => void
         live: { fontSize: fs(11), fontWeight: '800', color: '#FF6B61' },
         venue: { fontSize: fs(12), color: GLASS.soft },
       }),
-    [fs],
+    [colors, fs],
   );
 
   const isLive = match.state === 'in';

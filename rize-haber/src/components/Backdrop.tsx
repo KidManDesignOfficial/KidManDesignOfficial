@@ -18,7 +18,7 @@ import { backdropFor, type Backdrop, type BackdropScene, type BackdropTab, type 
 import { useTheme } from '../theme';
 import { seeded } from '../weatherScene';
 import { Icon } from './Icon';
-import { loopPhase, useLoopClock, useSceneStill } from './motion';
+import { loopPhase, useLoopClock, useSceneFilter, useSceneStill } from './motion';
 
 const FILL = { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 } as const;
 
@@ -41,11 +41,12 @@ export default function BackdropView({
   children?: ReactNode;
 }) {
   const still = useSceneStill();
+  const tone = useSceneFilter();
   const { width, height } = useWindowDimensions();
   const box: Box = { width, height, running: active && !still };
   const footer = scene.chrome.footer;
   return (
-    <View style={[FILL, styles.clip]} pointerEvents="none" accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+    <View style={[FILL, styles.clip, tone]} pointerEvents="none" accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
       <LinearGradient colors={scene.sky as [string, string, ...string[]]} locations={scene.stops as [number, number, ...number[]]} style={FILL} />
       {scene.effects.map((e, i) => (
         <Layer key={`${e.type}-${i}`} effect={e} box={box} salt={i * 17} />

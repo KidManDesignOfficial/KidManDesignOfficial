@@ -22,7 +22,7 @@ import { clock, dayLabel, longKickoff, shortName } from '../../rizespor/format';
 import { awaitingKickoff, detectMoments, liveMinute, matchProgress, momentText, pollDelay } from '../../rizespor/live';
 import { CLUB_COLORS, RIZESPOR_ID, STAT_GROUPS, shortTeamName } from '../../rizespor/names';
 import type { FormGame, Lineup, LineupPlayer, Match, MatchDetail, MatchEvent, StandingRow, TeamStat } from '../../rizespor/parse';
-import { useTheme } from '../../theme';
+import { useTheme, tint } from '../../theme';
 import Celebration, { celebrationFor, type CelebrationData } from './Celebration';
 import Pitch from './Pitch';
 import { LivePulse, ProgressBar, RESULT_COLORS, ResultPill, useNow } from './shared';
@@ -177,7 +177,7 @@ function MatchCenterBody({ initial, standings, onClose }: { initial: Match; stan
         },
         crestUs: { backgroundColor: '#FFFFFF' },
         crestText: { color: '#FFFFFF', fontSize: fs(13), fontWeight: '900' },
-        crestTextUs: { color: CLUB_COLORS.greenDark },
+        crestTextUs: { color: tint(colors, CLUB_COLORS.greenDark) },
         teamName: { color: '#FFFFFF', fontSize: fs(14), fontWeight: '800', textAlign: 'center' },
         center: { width: fs(124), alignItems: 'center', gap: 4, paddingTop: 4 },
         score: { color: '#FFFFFF', fontSize: fs(44), fontWeight: '900', fontVariant: ['tabular-nums'] },
@@ -210,7 +210,7 @@ function MatchCenterBody({ initial, standings, onClose }: { initial: Match; stan
 
   return (
     <View style={styles.root}>
-      <LinearGradient colors={[CLUB_COLORS.greenDark, CLUB_COLORS.blueDark]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
+      <LinearGradient colors={[tint(colors, CLUB_COLORS.greenDark), tint(colors, CLUB_COLORS.blueDark)]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
         {live ? <LiveGlow /> : null}
         <SafeAreaView edges={['top']} style={styles.header}>
           <View style={styles.topBar}>
@@ -264,12 +264,12 @@ function MatchCenterBody({ initial, standings, onClose }: { initial: Match; stan
       </LinearGradient>
 
       <View style={styles.tabs}>
-        <SegmentedTabs segments={TABS} value={tab} onChange={setTab} activeColor={CLUB_COLORS.green} />
+        <SegmentedTabs segments={TABS} value={tab} onChange={setTab} activeColor={tint(colors, CLUB_COLORS.green)} />
       </View>
 
       <ScrollView
         contentContainerStyle={styles.content}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={[CLUB_COLORS.green]} tintColor={CLUB_COLORS.green} />}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={[tint(colors, CLUB_COLORS.green)]} tintColor={tint(colors, CLUB_COLORS.green)} />}
       >
         {error ? (
           <>
@@ -278,7 +278,7 @@ function MatchCenterBody({ initial, standings, onClose }: { initial: Match; stan
           </>
         ) : null}
 
-        {!detail && !error ? <ActivityIndicator color={CLUB_COLORS.green} style={{ marginTop: 32 }} /> : null}
+        {!detail && !error ? <ActivityIndicator color={tint(colors, CLUB_COLORS.green)} style={{ marginTop: 32 }} /> : null}
 
         {detail ? (
           <>
@@ -403,8 +403,8 @@ function MatchFlow({ events, match, progress }: { events: MatchEvent[]; match: M
   useEffect(() => {
     if (!reduced) Animated.timing(pop, { toValue: 1, duration: 700, easing: Easing.out(Easing.back(1.6)), useNativeDriver: true }).start();
   }, [pop, reduced]);
-  const homeColor = match.home.id === RIZESPOR_ID ? CLUB_COLORS.green : CLUB_COLORS.blue;
-  const awayColor = match.away.id === RIZESPOR_ID ? CLUB_COLORS.green : '#8A94A6';
+  const homeColor = match.home.id === RIZESPOR_ID ? tint(colors, CLUB_COLORS.green) : tint(colors, CLUB_COLORS.blue);
+  const awayColor = match.away.id === RIZESPOR_ID ? tint(colors, CLUB_COLORS.green) : '#8A94A6';
   return (
     <View onLayout={(e) => setWidth(e.nativeEvent.layout.width)}>
       <Text style={{ color: colors.textMuted, fontSize: fs(11), fontWeight: '700' }} numberOfLines={1}>
@@ -412,7 +412,7 @@ function MatchFlow({ events, match, progress }: { events: MatchEvent[]; match: M
       </Text>
       <View style={{ height: 82, justifyContent: 'center' }}>
         <View style={{ height: 8, borderRadius: 4, backgroundColor: colors.border, overflow: 'hidden' }}>
-          <View style={{ width: `${Math.round((match.state === 'post' ? 1 : (progress * 5400) / span) * 100)}%`, height: '100%', backgroundColor: CLUB_COLORS.green, opacity: 0.5 }} />
+          <View style={{ width: `${Math.round((match.state === 'post' ? 1 : (progress * 5400) / span) * 100)}%`, height: '100%', backgroundColor: tint(colors, CLUB_COLORS.green), opacity: 0.5 }} />
         </View>
         <View style={{ position: 'absolute', left: (width * 2700) / span - 1, top: 26, height: 30, width: 2, backgroundColor: colors.textMuted, opacity: 0.5 }} />
         {width > 0
@@ -500,7 +500,7 @@ function Timeline({ events, match, live }: { events: MatchEvent[]; match: Match;
           fontSize: fs(12),
           fontWeight: '800',
         },
-        minuteGoal: { backgroundColor: CLUB_COLORS.green, color: '#FFFFFF' },
+        minuteGoal: { backgroundColor: tint(colors, CLUB_COLORS.green), color: '#FFFFFF' },
         rail: { position: 'absolute', top: 0, bottom: 0, left: '50%', width: 2, marginLeft: -1, backgroundColor: colors.border },
         main: { fontSize: fs(14), color: colors.text, fontWeight: '700' },
         goalText: { fontWeight: '900' },
@@ -626,9 +626,9 @@ function LineupsTab({ detail, match, live }: { detail: MatchDetail; match: Match
                     borderRadius: 17,
                     alignItems: 'center',
                     justifyContent: 'center',
-                    backgroundColor: s.us ? CLUB_COLORS.blue : colors.border,
+                    backgroundColor: s.us ? tint(colors, CLUB_COLORS.blue) : colors.border,
                     borderWidth: 2,
-                    borderColor: s.us ? CLUB_COLORS.green : colors.border,
+                    borderColor: s.us ? tint(colors, CLUB_COLORS.green) : colors.border,
                   }}
                 >
                   <Text style={{ color: s.us ? '#FFFFFF' : colors.text, fontWeight: '900', fontSize: fs(12) }}>{s.player.jersey ?? ''}</Text>
@@ -659,7 +659,7 @@ function BenchList({ lineup, name }: { lineup: Lineup; name: string }) {
   const us = lineup.teamId === RIZESPOR_ID;
   return (
     <Card style={{ flex: 1, gap: 6, padding: 12 }}>
-      <Text style={{ color: us ? CLUB_COLORS.green : colors.text, fontWeight: '900', fontSize: fs(13) }} numberOfLines={1}>
+      <Text style={{ color: us ? tint(colors, CLUB_COLORS.green) : colors.text, fontWeight: '900', fontSize: fs(13) }} numberOfLines={1}>
         {shortTeamName(name)}
       </Text>
       {lineup.bench.length === 0 ? <Text style={{ color: colors.textMuted, fontSize: fs(12) }}>Bilgi yok</Text> : null}
@@ -691,8 +691,8 @@ function StatsTab({ detail, match, live }: { detail: MatchDetail; match: Match; 
   return (
     <>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 16, paddingHorizontal: 4 }}>
-        <Text style={{ color: homeIsUs ? CLUB_COLORS.green : colors.text, fontWeight: '900', fontSize: fs(14) }}>{shortTeamName(match.home.name)}</Text>
-        <Text style={{ color: awayIsUs ? CLUB_COLORS.green : colors.text, fontWeight: '900', fontSize: fs(14) }}>{shortTeamName(match.away.name)}</Text>
+        <Text style={{ color: homeIsUs ? tint(colors, CLUB_COLORS.green) : colors.text, fontWeight: '900', fontSize: fs(14) }}>{shortTeamName(match.home.name)}</Text>
+        <Text style={{ color: awayIsUs ? tint(colors, CLUB_COLORS.green) : colors.text, fontWeight: '900', fontSize: fs(14) }}>{shortTeamName(match.away.name)}</Text>
       </View>
       {STAT_GROUPS.map((g) => {
         const stats = detail.stats.filter((s) => s.group === g.id);
@@ -718,8 +718,8 @@ function StatBars({ stats, homeIsUs, awayIsUs }: { stats: TeamStat[]; homeIsUs: 
     if (!reduced) Animated.timing(grow, { toValue: 1, duration: 700, easing: Easing.out(Easing.cubic), useNativeDriver: false }).start();
   }, [grow, reduced]);
 
-  const homeColor = homeIsUs ? CLUB_COLORS.green : CLUB_COLORS.blue;
-  const awayColor = awayIsUs ? CLUB_COLORS.green : '#8A94A6';
+  const homeColor = homeIsUs ? tint(colors, CLUB_COLORS.green) : tint(colors, CLUB_COLORS.blue);
+  const awayColor = awayIsUs ? tint(colors, CLUB_COLORS.green) : '#8A94A6';
 
   return (
     <View style={{ gap: 14 }}>
@@ -780,7 +780,7 @@ function RivalryTab({ detail, match, standings }: { detail: MatchDetail; match: 
               r ? (
                 <View key={r.team.id} style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
                   <Text style={[text, { width: 30, fontWeight: '900', textAlign: 'center' }]}>{r.rank}.</Text>
-                  <Text style={[text, { flex: 1, fontWeight: r.team.id === RIZESPOR_ID ? '900' : '700', color: r.team.id === RIZESPOR_ID ? CLUB_COLORS.green : colors.text }]} numberOfLines={1}>
+                  <Text style={[text, { flex: 1, fontWeight: r.team.id === RIZESPOR_ID ? '900' : '700', color: r.team.id === RIZESPOR_ID ? tint(colors, CLUB_COLORS.green) : colors.text }]} numberOfLines={1}>
                     {r.team.name}
                   </Text>
                   <Text style={muted}>
@@ -846,7 +846,7 @@ function FormBlock({ name, us, games }: { name: string; us: boolean; games: Form
   return (
     <View style={{ gap: 8 }}>
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Text style={{ color: us ? CLUB_COLORS.green : colors.text, fontWeight: '900', fontSize: fs(14) }} numberOfLines={1}>
+        <Text style={{ color: us ? tint(colors, CLUB_COLORS.green) : colors.text, fontWeight: '900', fontSize: fs(14) }} numberOfLines={1}>
           {name}
         </Text>
         {games.length ? <Text style={{ color: colors.textMuted, fontSize: fs(12) }}>{points} puan / {games.length * 3}</Text> : null}

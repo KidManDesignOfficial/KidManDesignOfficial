@@ -13,18 +13,19 @@ import { LinearGradient } from 'expo-linear-gradient';
 
 import { candleSeries, ECON_CHROME, ECON_SKY, ECON_SKY_STOPS, MARKET, segments, trendLine } from '../economyScene';
 import { seeded } from '../weatherScene';
-import { loopPhase, useLoopClock, useSceneStill } from './motion';
+import { loopPhase, useLoopClock, useSceneStill, useSceneFilter } from './motion';
 
 const FILL = { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 } as const;
 
 export default function EconomyScene({ active }: { active: boolean }) {
+  const tone = useSceneFilter();
   const reduced = useSceneStill();
   const running = active && !reduced;
   const { width, height } = useWindowDimensions();
   const footer = ECON_CHROME.footer;
 
   return (
-    <View style={[FILL, styles.clip]} pointerEvents="none" accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+    <View style={[FILL, styles.clip, tone]} pointerEvents="none" accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
       <LinearGradient colors={ECON_SKY} locations={ECON_SKY_STOPS} style={FILL} />
       <Glows width={width} height={height} />
       <Grid width={width} height={height} />
