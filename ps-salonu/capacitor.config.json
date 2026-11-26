@@ -1,0 +1,7 @@
+{
+  "appId": "com.kidmandesign.pssalonu",
+  "appName": "PlayStation Salonu",
+  "webDir": "www",
+  "backgroundColor": "#0a1330",
+  "android": { "allowMixedContent": false }
+}

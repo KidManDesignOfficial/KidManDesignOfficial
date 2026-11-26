@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#0a1330">
+<title>PlayStation Salonu</title>
+<style>
+:root{--bg:#0a1330;--card:#14224d;--card2:#1b2d63;--ac:#2f7bff;--ac2:#00d4ff;--ok:#2ee59d;--warn:#ffb020;--bad:#ff4d6d;--tx:#eef3ff;--mut:#8fa3d6}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,Roboto,sans-serif;overflow:hidden;touch-action:manipulation}
+#app{height:100%;display:flex;flex-direction:column;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+#top{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:8px 10px;background:#0d1a40;border-bottom:1px solid #223468}
+.chip{background:var(--card);border-radius:10px;padding:6px 4px;text-align:center;font-weight:700;font-size:14px;white-space:nowrap}
+.chip small{display:block;font-size:10px;color:var(--mut);font-weight:600}
+#day{height:5px;background:#18275a}#dayb{height:100%;width:0;background:linear-gradient(90deg,var(--ac),var(--ac2))}
+#main{flex:1;overflow-y:auto;padding:10px}
+h3{margin:12px 0 6px;font-size:13px;color:var(--mut);text-transform:uppercase;letter-spacing:.06em}
+#queue{display:flex;gap:8px;min-height:74px;overflow-x:auto}
+.cust{flex:0 0 62px;background:var(--card);border-radius:12px;padding:6px 2px;text-align:center;font-size:26px;position:relative}
+.cust.first{outline:2px solid var(--ac2)}
+.cust small{display:block;font-size:11px;color:var(--mut)}
+.bar{height:5px;background:#0a1330;border-radius:3px;overflow:hidden;margin-top:4px}.bar>i{display:block;height:100%;background:var(--ok)}
+.empty{color:var(--mut);font-size:13px;padding:22px 4px}
+#st{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.s{background:var(--card);border-radius:14px;padding:10px;min-height:112px;position:relative;border:2px solid transparent}
+.s.free{border-color:#2a3f80;border-style:dashed}.s.done{border-color:var(--warn);background:#33300f}.s.order{border-color:var(--ac2)}
+.s .t{font-size:11px;font-weight:800;color:var(--ac2)}.s .e{font-size:30px;margin:2px 0}
+.s .m{font-size:13px;color:var(--mut)}.s .b{font-weight:800;font-size:14px}
+.tag{position:absolute;right:8px;top:8px;font-size:20px}
+#nav{display:flex;background:#0d1a40;border-top:1px solid #223468}
+#nav button{flex:1;padding:12px 0;background:none;border:0;color:var(--mut);font-weight:700;font-size:13px}
+#nav button.on{color:var(--ac2)}
+.row{display:flex;align-items:center;gap:10px;background:var(--card);border-radius:12px;padding:10px;margin-bottom:8px}
+.row .i{font-size:28px}.row .d{flex:1;font-size:13px}.row .d b{display:block;font-size:14px}.row .d span{color:var(--mut)}
+.btn{background:var(--ac);color:#fff;border:0;border-radius:10px;padding:10px 12px;font-weight:800;font-size:13px;min-width:84px}
+.btn:disabled{background:#2a3566;color:#7685b8}.btn.g{background:#243a7d}
+.seg{display:flex;gap:6px}.seg button{flex:1;padding:10px 0;border:0;border-radius:10px;background:var(--card);color:var(--tx);font-weight:700}.seg button.on{background:var(--ac)}
+#toast{position:fixed;left:50%;top:70px;transform:translateX(-50%);background:#000c;padding:8px 14px;border-radius:20px;font-size:14px;font-weight:700;opacity:0;transition:opacity .25s;pointer-events:none;z-index:9}
+#toast.on{opacity:1}
+#modal{position:fixed;inset:0;background:#000b;display:none;align-items:center;justify-content:center;z-index:10;padding:20px}
+#modal.on{display:flex}
+#mb{background:var(--card2);border-radius:18px;padding:20px;width:100%;max-width:360px}
+#mb h2{margin:0 0 12px}#mb table{width:100%;font-size:15px;border-collapse:collapse}#mb td{padding:4px 0}#mb td:last-child{text-align:right;font-weight:700}
+.pos{color:var(--ok)}.neg{color:var(--bad)}
+@media(min-width:700px){#app{max-width:520px;margin:0 auto}}
+</style>
+</head>
+<body>
+<div id="app">
+ <div id="top"></div><div id="day"><div id="dayb"></div></div>
+ <div id="main"></div>
+ <div id="nav"><button data-v="salon" class="on">🎮 Salon</button><button data-v="shop">🛒 Mağaza</button><button data-v="set">⚙️ Ayarlar</button></div>
+</div>
+<div id="toast"></div>
+<div id="modal"><div id="mb"></div></div>
+<script>
+'use strict';
+const TIERS=[{n:'PS3',e:'🎮',p:40,el:3},{n:'PS4',e:'🕹️',p:70,el:5},{n:'PS5',e:'🖥️',p:120,el:9}];
+const UPG_TIER=[0,600,2000];
+const STATION_COST=[0,0,900,1500,2400,3800,6000,9000];
+const MAX_ST=8,DAY_SEC=156,OPEN=10,CLOSE=23;
+const FACES=['😀','😎','🤓','😜','🧑‍🎤','👦','👧','🧔','👩‍🦰','🥳'];
+const UPG={
+ snack:{i:'🥤',n:'Büfe',d:'Oyuncular içecek/atıştırmalık ister',c:[500,1500,4000],f:l=>`Sipariş geliri %${l*40+40}`},
+ ac:{i:'❄️',n:'Klima',d:'Müşteri daha sabırlı olur',c:[400,1200,3000],f:l=>`Sabır +%${l*25}`},
+ cashier:{i:'🧾',n:'Kasiyer',d:'Ücretler otomatik toplanır',c:[2500],f:l=>l?'Aktif':'Yok'},
+ ads:{i:'📢',n:'Reklam',d:'Daha çok müşteri gelir',c:[600,1800,4500],f:l=>`Müşteri +%${l*25}`},
+ chair:{i:'🛋️',n:'Koltuklar',d:'Bahşiş artar',c:[700,2000,5000],f:l=>`Bahşiş %${l*10}`},
+ games:{i:'💿',n:'Oyun Kütüphanesi',d:'Saat ücreti artar',c:[800,2500,6000],f:l=>`Ücret +%${l*10}`}
+};
+const KEY='psSalonuV1';
+let S, view='salon', last=performance.now(), spawnT=3, snd=true, modalOn=false, saveT=0, drawT=0;
+function fresh(){return{money:500,day:1,min:OPEN*60,rep:2,price:1,
+ st:[0,0].map(()=>({tier:0,s:'free'})),q:[],cid:1,u:{snack:0,ac:0,cashier:0,ads:0,chair:0,games:0},
+ dIn:0,dSn:0,dEl:0,dServed:0,dLost:0,total:0,snd:true}}
+function load(){try{const j=JSON.parse(localStorage.getItem(KEY));if(j&&j.st)return j}catch(e){}return fresh()}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+S=load();snd=S.snd!==false;
+const $=s=>document.querySelector(s),fm=n=>Math.round(n).toLocaleString('tr-TR')+' ₺';
+let actx;
+function beep(f,d=.08,t='sine'){if(!snd)return;try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();const o=actx.createOscillator(),g=actx.createGain();o.type=t;o.frequency.value=f;g.gain.value=.06;o.connect(g);g.connect(actx.destination);o.start();g.gain.exponentialRampToValueAtTime(.0001,actx.currentTime+d);o.stop(actx.currentTime+d)}catch(e){}}
+let tt;function toast(m){const e=$('#toast');e.textContent=m;e.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>e.classList.remove('on'),1400)}
+const rate=t=>Math.round(TIERS[t].p*(1+S.u.games*.1)*S.price);
+const patMax=()=>(32+Math.random()*12)*(1+S.u.ac*.25);
+function spawn(){
+ if(S.q.length>=6)return;
+ S.q.push({id:S.cid++,f:FACES[Math.random()*FACES.length|0],h:1+(Math.random()*3|0),pat:0,pm:0});
+ const c=S.q[S.q.length-1];c.pm=c.pat=patMax();
+}
+function spawnGap(){
+ const h=S.min/60,peak=h>=17&&h<22?1.6:1,rep=.6+S.rep*.22,ads=1+S.u.ads*.25;
+ return 8/(peak*rep*ads/Math.pow(S.price,1.5))*(.7+Math.random()*.6);
+}
+function seat(i){
+ const s=S.st[i],c=S.q.shift();if(!c){toast('Bekleyen müşteri yok');return}
+ s.s='play';s.h=c.h;s.f=c.f;s.left=c.h*60;s.total=c.h*60;s.order=0;s.ot=0;s.served=false;
+ beep(660);
+}
+function collect(i){
+ const s=S.st[i];let inc=rate(s.tier)*s.h;const tip=inc*(S.u.chair*.1)*(S.rep/5);
+ inc+=tip;S.money+=inc;S.dIn+=inc;S.total+=inc;S.dServed++;S.rep=Math.min(5,S.rep+.05);
+ s.s='free';beep(880,.12);if(view==='salon')toast('+'+fm(inc));
+}
+function serveSnack(i){
+ const s=S.st[i],v=(25+Math.random()*20|0)*(1+S.u.snack*.4);
+ S.money+=v;S.dSn+=v;S.total+=v;s.order=0;S.rep=Math.min(5,S.rep+.02);beep(990);toast('🥤 +'+fm(v));
+}
+function tick(dt){
+ if(modalOn)return;
+ const mPerSec=(CLOSE-OPEN)*60/DAY_SEC,dm=dt*mPerSec;
+ S.min+=dm;
+ spawnT-=dt;if(spawnT<=0){spawn();spawnT=spawnGap()}
+ for(let i=S.q.length-1;i>=0;i--){const c=S.q[i];c.pat-=dt;if(c.pat<=0){S.q.splice(i,1);S.rep=Math.max(0,S.rep-.15);S.dLost++;beep(180,.15,'square')}}
+ S.st.forEach((s,i)=>{
+  if(s.s==='play'){
+   s.left-=dm;S.dEl+=TIERS[s.tier].el*dm/60;
+   if(S.u.snack&&!s.order&&!s.served&&Math.random()<dt*.04*(1+S.u.snack*.2)){s.order=1;s.ot=20;s.served=true}
+   if(s.order){s.ot-=dt;if(s.ot<=0){s.order=0;S.rep=Math.max(0,S.rep-.03)}}
+   if(s.left<=0){s.s='done';s.order=0;if(S.u.cashier)collect(i)}
+  }
+ });
+ if(S.min>=CLOSE*60)endDay();
+}
+function endDay(){
+ S.st.forEach((s,i)=>{if(s.s==='play'){s.left=0;s.s='done'}if(s.s==='done')collect(i)});
+ S.q=[];
+ const rent=150+S.day*25,el=S.dEl,net=S.dIn+S.dSn-rent-el;S.money-=rent+el;
+ modalOn=true;
+ $('#mb').innerHTML=`<h2>🌙 Gün ${S.day} bitti</h2><table>
+ <tr><td>Oyun geliri</td><td class=pos>+${fm(S.dIn)}</td></tr>
+ <tr><td>Büfe geliri</td><td class=pos>+${fm(S.dSn)}</td></tr>
+ <tr><td>Kira</td><td class=neg>-${fm(rent)}</td></tr>
+ <tr><td>Elektrik</td><td class=neg>-${fm(el)}</td></tr>
+ <tr><td><b>Net</b></td><td class="${net>=0?'pos':'neg'}">${net>=0?'+':''}${fm(net)}</td></tr>
+ <tr><td>Hizmet / Kaçan</td><td>${S.dServed} / ${S.dLost}</td></tr>
+ <tr><td>Kasa</td><td>${fm(S.money)}</td></tr></table>
+ <button class=btn style="width:100%;margin-top:14px" id=nd>☀️ Yeni Gün</button>`;
+ $('#modal').classList.add('on');
+ $('#nd').onclick=()=>{S.day++;S.min=OPEN*60;S.dIn=S.dSn=S.dEl=S.dServed=S.dLost=0;spawnT=2;modalOn=false;$('#modal').classList.remove('on');save();draw(true)};
+ save();
+}
+function drawTop(){
+ const h=S.min/60|0,m=S.min%60|0;
+ $('#top').innerHTML=`<div class=chip>${fm(S.money)}<small>Kasa</small></div><div class=chip>Gün ${S.day}<small>${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}</small></div>
+ <div class=chip>${'⭐'.repeat(Math.round(S.rep))||'☆'}<small>İtibar ${S.rep.toFixed(1)}</small></div><div class=chip>${S.q.length}/6<small>Sırada</small></div>`;
+ $('#dayb').style.width=((S.min-OPEN*60)/((CLOSE-OPEN)*60)*100)+'%';
+}
+function salon(){
+ const q=S.q.map((c,i)=>`<div class="cust${i?'':' first'}">${c.f}<small>${c.h} saat</small><div class=bar><i style="width:${c.pat/c.pm*100}%;background:${c.pat/c.pm<.3?'var(--bad)':'var(--ok)'}"></i></div></div>`).join('')||'<div class=empty>Müşteri bekleniyor…</div>';
+ const st=S.st.map((s,i)=>{
+  const T=TIERS[s.tier];let b='',cls=s.s,tag='';
+  if(s.s==='free')b=`<div class=e>${T.e}</div><div class=m>Boş · ${rate(s.tier)}₺/saat</div><div class=b>Dokun: oturt</div>`;
+  else if(s.s==='play'){const p=100-s.left/s.total*100;if(s.order){cls+=' order';tag='<span class=tag>🥤</span>'}
+   b=`<div class=e>${s.f}</div><div class=m>${Math.floor(s.left/60)}sa ${Math.ceil(s.left%60)%60}dk</div><div class=bar><i style="width:${p}%;background:var(--ac2)"></i></div>${s.order?'<div class=b>Dokun: servis</div>':''}`}
+  else b=`<div class=e>💰</div><div class=b>Ücret Al<br>${fm(rate(s.tier)*s.h)}</div>`;
+  return `<div class="s ${cls}" data-i="${i}"><div class=t>${T.n} #${i+1}</div>${tag}${b}</div>`}).join('');
+ return `<h3>Bekleyenler</h3><div id=queue>${q}</div><h3>İstasyonlar</h3><div id=st>${st}</div>`;
+}
+function shop(){
+ let h='<h3>İstasyonlar</h3>';
+ S.st.forEach((s,i)=>{const nx=s.tier+1,T=TIERS[s.tier];
+  h+=`<div class=row><div class=i>${T.e}</div><div class=d><b>${T.n} #${i+1}</b><span>${rate(s.tier)}₺/saat</span></div>${nx<3?`<button class=btn data-up=${i} ${S.money<UPG_TIER[nx]?'disabled':''}>${TIERS[nx].n}<br>${fm(UPG_TIER[nx])}</button>`:'<span>MAX</span>'}</div>`});
+ if(S.st.length<MAX_ST){const c=STATION_COST[S.st.length];h+=`<div class=row><div class=i>➕</div><div class=d><b>Yeni İstasyon</b><span>Daha çok oyuncu</span></div><button class=btn data-new ${S.money<c?'disabled':''}>${fm(c)}</button></div>`}
+ h+='<h3>Geliştirmeler</h3>';
+ for(const k in UPG){const u=UPG[k],l=S.u[k],max=l>=u.c.length;
+  h+=`<div class=row><div class=i>${u.i}</div><div class=d><b>${u.n} (${l}/${u.c.length})</b><span>${u.d}<br>${u.f(l)}</span></div>${max?'<span>MAX</span>':`<button class=btn data-u=${k} ${S.money<u.c[l]?'disabled':''}>${fm(u.c[l])}</button>`}</div>`}
+ return h;
+}
+function sett(){
+ return `<h3>Saat ücreti çarpanı</h3><div class=seg>${[.8,1,1.2,1.5].map(p=>`<button data-p=${p} class="${S.price===p?'on':''}">x${p}</button>`).join('')}</div>
+ <p style="color:var(--mut);font-size:13px">Yüksek fiyat gelir artırır ama müşteri sayısını düşürür.</p>
+ <h3>Ses</h3><div class=seg><button data-snd=1 class="${snd?'on':''}">Açık</button><button data-snd=0 class="${snd?'':'on'}">Kapalı</button></div>
+ <h3>Oyun</h3><button class="btn g" data-reset style="width:100%">🗑️ İlerlemeyi Sıfırla</button>
+ <p style="color:var(--mut);font-size:12px;margin-top:16px">Toplam kazanç: ${fm(S.total)}<br>Bu oyun internet gerektirmez ve kişisel veri toplamaz.</p>`;
+}
+let lastShop='';
+function draw(force){
+ drawTop();const m=$('#main');
+ if(view==='salon'){const sc=m.scrollTop;m.innerHTML=salon();m.scrollTop=sc}
+ else if(force){const sc=m.scrollTop;m.innerHTML=view==='shop'?shop():sett();m.scrollTop=sc}
+}
+$('#main').addEventListener('pointerdown',e=>{
+ if(view!=='salon'||modalOn)return;
+ const el=e.target.closest('.s');if(!el)return;
+ const i=+el.dataset.i,s=S.st[i];
+ if(s.s==='free')seat(i);else if(s.s==='done')collect(i);else if(s.order)serveSnack(i);
+ draw();
+});
+$('#main').addEventListener('click',e=>{
+ if(view==='salon')return;const b=e.target.closest('button');if(!b)return;const d=b.dataset;
+ if(d.up!==undefined){const i=+d.up,c=UPG_TIER[S.st[i].tier+1];if(S.money>=c){S.money-=c;S.st[i].tier++;beep(760);toast('Yükseltildi!')}}
+ else if(d.new!==undefined){const c=STATION_COST[S.st.length];if(S.money>=c&&S.st.length<MAX_ST){S.money-=c;S.st.push({tier:0,s:'free'});beep(760);toast('Yeni istasyon!')}}
+ else if(d.u){const u=UPG[d.u],c=u.c[S.u[d.u]];if(c!==undefined&&S.money>=c){S.money-=c;S.u[d.u]++;beep(760);toast(u.n+' geliştirildi')}}
+ else if(d.p){S.price=+d.p}
+ else if(d.snd!==undefined){snd=d.snd==='1';S.snd=snd}
+ else if(d.reset!==undefined){if(confirm('Tüm ilerleme silinsin mi?')){S=fresh();save();view='salon';nav()}return}
+ save();draw(true);
+});
+function nav(){document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===view));draw(true)}
+$('#nav').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;view=b.dataset.v;nav()});
+function loop(now){
+ const dt=Math.min(.5,(now-last)/1000);last=now;
+ if(!document.hidden){tick(dt);saveT+=dt;drawT+=dt;if(saveT>5){saveT=0;save()}if(drawT>.2){drawT=0;draw()}}
+ requestAnimationFrame(loop);
+}
+document.addEventListener('visibilitychange',()=>{if(document.hidden)save();last=performance.now()});
+window.addEventListener('pagehide',save);
+draw(true);requestAnimationFrame(loop);
+</script>
+</body>
+</html>
