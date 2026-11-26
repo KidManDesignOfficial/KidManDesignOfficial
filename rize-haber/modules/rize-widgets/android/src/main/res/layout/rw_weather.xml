@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Hava Durumu widget'ı. Dar (2×2): yer, sıcaklık, durum, en yüksek/düşük.
+  Geniş (4×2): sağda önümüzdeki 4 zaman dilimi. Renkler ve yazı boyutları WeatherWidgetProvider'da verilir;
+  buradaki değerler yalnızca widget seçicideki önizleme içindir.
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@android:id/background"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+  <ImageView
+      android:id="@+id/rw_bg"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:importantForAccessibility="no"
+      android:scaleType="fitXY"
+      android:src="@drawable/rw_bg"
+      android:tint="#1B6B3A" />
+
+  <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:gravity="center_vertical"
+      android:orientation="horizontal"
+      android:padding="@dimen/rw_padding">
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+      <LinearLayout
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:gravity="center_vertical"
+          android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/rw_place_icon"
+            android:layout_width="13dp"
+            android:layout_height="13dp"
+            android:layout_marginEnd="4dp"
+            android:importantForAccessibility="no"
+            android:src="@drawable/rw_ic_location"
+            android:tint="#FFFFFF" />
+
+        <TextView
+            android:id="@+id/rw_place"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:fontFamily="sans-serif-medium"
+            android:maxLines="1"
+            android:text="Rize Merkez"
+            android:textColor="#FFFFFF"
+            android:textSize="13sp" />
+      </LinearLayout>
+
+      <LinearLayout
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:gravity="center_vertical"
+          android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/rw_temp"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:fontFamily="sans-serif-light"
+            android:includeFontPadding="false"
+            android:maxLines="1"
+            android:text="12°"
+            android:textColor="#FFFFFF"
+            android:textSize="42sp" />
+
+        <ImageView
+            android:id="@+id/rw_icon"
+            android:layout_width="34dp"
+            android:layout_height="34dp"
+            android:importantForAccessibility="no"
+            android:src="@drawable/rw_ic_rain"
+            android:tint="#FFFFFF" />
+      </LinearLayout>
+
+      <TextView
+          android:id="@+id/rw_label"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:ellipsize="end"
+          android:fontFamily="sans-serif-medium"
+          android:maxLines="1"
+          android:text="Hafif yağmur"
+          android:textColor="#FFFFFF"
+          android:textSize="14sp" />
+
+      <TextView
+          android:id="@+id/rw_detail"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_marginTop="2dp"
+          android:ellipsize="end"
+          android:maxLines="2"
+          android:text="14° / 8° · Yağış %70"
+          android:textColor="#D9FFFFFF"
+          android:textSize="12sp" />
+    </LinearLayout>
+
+    <!-- Geniş boyutta görünür: önümüzdeki saatler. -->
+    <LinearLayout
+        android:id="@+id/rw_hours"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_weight="1.2"
+        android:orientation="horizontal"
+        android:visibility="gone">
+
+      <LinearLayout style="@style/RwHourCell">
+        <TextView android:id="@+id/rw_h0_time" style="@style/RwHourTime" android:text="17:00" />
+        <ImageView android:id="@+id/rw_h0_icon" style="@style/RwHourIcon" android:src="@drawable/rw_ic_cloudy" />
+        <TextView android:id="@+id/rw_h0_temp" style="@style/RwHourTemp" android:text="11°" />
+      </LinearLayout>
+
+      <LinearLayout style="@style/RwHourCell">
+        <TextView android:id="@+id/rw_h1_time" style="@style/RwHourTime" android:text="20:00" />
+        <ImageView android:id="@+id/rw_h1_icon" style="@style/RwHourIcon" android:src="@drawable/rw_ic_rain" />
+        <TextView android:id="@+id/rw_h1_temp" style="@style/RwHourTemp" android:text="10°" />
+      </LinearLayout>
+
+      <LinearLayout style="@style/RwHourCell">
+        <TextView android:id="@+id/rw_h2_time" style="@style/RwHourTime" android:text="23:00" />
+        <ImageView android:id="@+id/rw_h2_icon" style="@style/RwHourIcon" android:src="@drawable/rw_ic_moon" />
+        <TextView android:id="@+id/rw_h2_temp" style="@style/RwHourTemp" android:text="9°" />
+      </LinearLayout>
+
+      <LinearLayout style="@style/RwHourCell">
+        <TextView android:id="@+id/rw_h3_time" style="@style/RwHourTime" android:text="02:00" />
+        <ImageView android:id="@+id/rw_h3_icon" style="@style/RwHourIcon" android:src="@drawable/rw_ic_moon" />
+        <TextView android:id="@+id/rw_h3_temp" style="@style/RwHourTemp" android:text="8°" />
+      </LinearLayout>
+    </LinearLayout>
+  </LinearLayout>
+</FrameLayout>

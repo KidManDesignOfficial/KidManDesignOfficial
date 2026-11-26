@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Hızlı Erişim widget'ı: beş sekmeye tek dokunuşla geçiş (her düğme en az 48dp dokunma alanı). -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@android:id/background"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+  <ImageView
+      android:id="@+id/rw_bg"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:importantForAccessibility="no"
+      android:scaleType="fitXY"
+      android:src="@drawable/rw_bg" />
+
+  <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:gravity="center_vertical"
+      android:orientation="horizontal"
+      android:paddingStart="6dp"
+      android:paddingTop="8dp"
+      android:paddingEnd="6dp"
+      android:paddingBottom="8dp">
+
+    <LinearLayout android:id="@+id/rw_s0" style="@style/RwShortcut">
+      <FrameLayout style="@style/RwShortcutCircle">
+        <ImageView
+            android:id="@+id/rw_s0_bg"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:importantForAccessibility="no"
+            android:src="@drawable/rw_circle"
+            android:tint="#1B6B3A" />
+        <ImageView
+            android:id="@+id/rw_s0_icon"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_gravity="center"
+            android:importantForAccessibility="no"
+            android:src="@drawable/rw_ic_news"
+            android:tint="#FFFFFF" />
+      </FrameLayout>
+      <TextView android:id="@+id/rw_s0_label" style="@style/RwShortcutLabel" android:text="@string/rw_tab_news" />
+    </LinearLayout>
+    <LinearLayout android:id="@+id/rw_s1" style="@style/RwShortcut">
+      <FrameLayout style="@style/RwShortcutCircle">
+        <ImageView
+            android:id="@+id/rw_s1_bg"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:importantForAccessibility="no"
+            android:src="@drawable/rw_circle"
+            android:tint="#1B6B3A" />
+        <ImageView
+            android:id="@+id/rw_s1_icon"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_gravity="center"
+            android:importantForAccessibility="no"
+            android:src="@drawable/rw_ic_football"
+            android:tint="#FFFFFF" />
+      </FrameLayout>
+      <TextView android:id="@+id/rw_s1_label" style="@style/RwShortcutLabel" android:text="@string/rw_tab_rizespor" />
+    </LinearLayout>
+    <LinearLayout android:id="@+id/rw_s2" style="@style/RwShortcut">
+      <FrameLayout style="@style/RwShortcutCircle">
+        <ImageView
+            android:id="@+id/rw_s2_bg"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:importantForAccessibility="no"
+            android:src="@drawable/rw_circle"
+            android:tint="#1B6B3A" />
+        <ImageView
+            android:id="@+id/rw_s2_icon"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_gravity="center"
+            android:importantForAccessibility="no"
+            android:src="@drawable/rw_ic_tea"
+            android:tint="#FFFFFF" />
+      </FrameLayout>
+      <TextView android:id="@+id/rw_s2_label" style="@style/RwShortcutLabel" android:text="@string/rw_tab_tea" />
+    </LinearLayout>
+    <LinearLayout android:id="@+id/rw_s3" style="@style/RwShortcut">
+      <FrameLayout style="@style/RwShortcutCircle">
+        <ImageView
+            android:id="@+id/rw_s3_bg"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:importantForAccessibility="no"
+            android:src="@drawable/rw_circle"
+            android:tint="#1B6B3A" />
+        <ImageView
+            android:id="@+id/rw_s3_icon"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_gravity="center"
+            android:importantForAccessibility="no"
+            android:src="@drawable/rw_ic_economy"
+            android:tint="#FFFFFF" />
+      </FrameLayout>
+      <TextView android:id="@+id/rw_s3_label" style="@style/RwShortcutLabel" android:text="@string/rw_tab_economy" />
+    </LinearLayout>
+    <LinearLayout android:id="@+id/rw_s4" style="@style/RwShortcut">
+      <FrameLayout style="@style/RwShortcutCircle">
+        <ImageView
+            android:id="@+id/rw_s4_bg"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:importantForAccessibility="no"
+            android:src="@drawable/rw_circle"
+            android:tint="#1B6B3A" />
+        <ImageView
+            android:id="@+id/rw_s4_icon"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_gravity="center"
+            android:importantForAccessibility="no"
+            android:src="@drawable/rw_ic_weather"
+            android:tint="#FFFFFF" />
+      </FrameLayout>
+      <TextView android:id="@+id/rw_s4_label" style="@style/RwShortcutLabel" android:text="@string/rw_tab_weather" />
+    </LinearLayout>
+  </LinearLayout>
+</FrameLayout>

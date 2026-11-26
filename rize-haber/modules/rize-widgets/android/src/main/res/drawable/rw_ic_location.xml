@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- scripts/widget-icons.py ile üretildi; elle düzenlemeyin. Ionicons (MIT). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp" android:height="24dp"
+    android:viewportWidth="512" android:viewportHeight="512">
+  <path android:fillColor="#FFFFFFFF" android:pathData="M232 34Q241 33 255.5 33Q270 33 279 34Q352 44 392 105Q424 153 413 212Q399 294 315 419Q285 465 277 472Q268 480 256 480Q244 480 236 472Q224 462 186 402Q102 272 96 195Q92 136 131.5 89.5Q171 43 232 34ZM272 130Q259 126 245 129Q213 135 198 165Q192 178 192 192Q192 206 198 219Q209 243 233 252Q257 261 281 251Q298 244 309 227.5Q320 211 320 192Q320 162 296 142Q285 134 272 130ZM245 162Q245 162 245 162Q258 157 270 163Q285 170 287.5 186.5Q290 203 278 214Q265 228 246.5 222Q228 216 224 197Q223 186 229 176Q235 166 245 162Z" />
+</vector>

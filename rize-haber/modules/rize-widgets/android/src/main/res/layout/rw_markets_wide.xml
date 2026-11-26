@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Döviz, Altın ve Çay widget'ı (geniş ve alçak): üç değer yan yana. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@android:id/background"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+  <ImageView
+      android:id="@+id/rw_bg"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:importantForAccessibility="no"
+      android:scaleType="fitXY"
+      android:src="@drawable/rw_bg" />
+
+  <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:orientation="vertical"
+      android:paddingStart="@dimen/rw_padding"
+      android:paddingTop="12dp"
+      android:paddingEnd="@dimen/rw_padding"
+      android:paddingBottom="10dp">
+
+    <LinearLayout
+        android:id="@+id/rw_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:minHeight="24dp"
+        android:orientation="horizontal">
+
+      <ImageView android:id="@+id/rw_header_icon" style="@style/RwHeaderIcon" android:src="@drawable/rw_ic_economy" />
+      <TextView android:id="@+id/rw_title" style="@style/RwHeaderTitle" android:text="Piyasalar" />
+      <TextView android:id="@+id/rw_updated" style="@style/RwHeaderMeta" android:text="21 Kas · TCMB" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/rw_rows"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+      <LinearLayout android:id="@+id/rw_m0" style="@style/RwMarketColumn">
+        <TextView android:id="@+id/rw_m0_label" style="@style/RwMarketLabel" android:layout_width="wrap_content" android:layout_weight="0" android:text="Dolar" />
+        <TextView android:id="@+id/rw_m0_value" style="@style/RwMarketValue" android:text="42,35 ₺" />
+      </LinearLayout>
+      <LinearLayout android:id="@+id/rw_m1" style="@style/RwMarketColumn">
+        <TextView android:id="@+id/rw_m1_label" style="@style/RwMarketLabel" android:layout_width="wrap_content" android:layout_weight="0" android:text="Euro" />
+        <TextView android:id="@+id/rw_m1_value" style="@style/RwMarketValue" android:text="48,90 ₺" />
+      </LinearLayout>
+      <LinearLayout android:id="@+id/rw_m2" style="@style/RwMarketColumn">
+        <TextView android:id="@+id/rw_m2_label" style="@style/RwMarketLabel" android:layout_width="wrap_content" android:layout_weight="0" android:text="Gram altın" />
+        <TextView android:id="@+id/rw_m2_value" style="@style/RwMarketValue" android:text="5.920 ₺" />
+      </LinearLayout>
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/rw_tea"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:gravity="center_vertical"
+        android:minHeight="28dp"
+        android:orientation="horizontal">
+
+      <ImageView
+          android:id="@+id/rw_tea_icon"
+          android:layout_width="14dp"
+          android:layout_height="14dp"
+          android:layout_marginEnd="6dp"
+          android:importantForAccessibility="no"
+          android:src="@drawable/rw_ic_tea"
+          android:tint="#1B6B3A" />
+
+      <TextView
+          android:id="@+id/rw_tea_text"
+          android:layout_width="0dp"
+          android:layout_height="wrap_content"
+          android:layout_weight="1"
+          android:ellipsize="end"
+          android:maxLines="1"
+          android:text="2026 yaş çay: 26,50 ₺/kg"
+          android:textColor="#5E6B63"
+          android:textSize="12sp" />
+    </LinearLayout>
+    <TextView
+        android:id="@+id/rw_empty"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:text="@string/rw_open_app"
+        android:textColor="#5E6B63"
+        android:textSize="13sp"
+        android:visibility="gone" />
+  </LinearLayout>
+</FrameLayout>

@@ -1,9 +1,8 @@
 <tr-TR>
-Rize Haber 1.18 🍃
-• Yeni: Tek renk düzeni; uygulamanın tamamı seçtiğiniz renkte, Grafit ile siyah-beyaz
-• Yeni renkler: Fırtına Deresi ve Grafit
-• Haberlerde tekrar eden ve Rize dışı haberler ayıklanır
-• Zayıf bağlantıda daha dayanıklı veri yükleme, daha anlaşılır hata mesajları
-• Hava durumu açık kaldıkça kendini yeniler
-• Akıcı sekme geçişleri ve daha hızlı haber listesi
+Rize Haber 1.19 🍃
+• Yeni: Ana ekran widget’ları; Hava Durumu, Son Haberler, Döviz-Altın-Çay, Çaykur Rizespor ve Hızlı Erişim
+• Widget’lar uygulamanın renk, tema ve yazı boyutunu kullanır, ~30 dakikada bir kendiliğinden güncellenir
+• Widget’taki habere dokununca haber doğrudan açılır
+• Uygulama simgesine basılı tutunca Haberler, Rizespor, Çay ve Hava kısayolları
+• Ayarlar → Ana ekran widget’ları: tek dokunuşla ekleme
 </tr-TR>

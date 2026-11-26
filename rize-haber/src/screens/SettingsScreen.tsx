@@ -20,6 +20,7 @@ import BackdropPicker from '../components/BackdropPicker';
 import { Icon } from '../components/Icon';
 
 import LocationPicker from '../components/LocationPicker';
+import WidgetSettings from '../components/WidgetSettings';
 import { Card, Chip, LinkRow, SectionTitle, openUrl } from '../components/ui';
 import { PressableScale, useSystemReducedMotion, useScrollTopOnShow } from '../components/motion';
 import type { IconName } from '../components/Icon';
@@ -410,6 +411,15 @@ export default function SettingsScreen() {
           hint="Maç başladı, gol ve maç sonu. Arka planda en sık ~15–30 dakikada bir kontrol edildiği için gecikmeli gelebilir; anlık takip için Maç Merkezi’ni açın."
         />
       </Card>
+
+      {Platform.OS !== 'ios' ? (
+        <>
+          <SectionTitle hint="Uygulamayı açmadan bakın, tek dokunuşla girin">Ana ekran widget’ları</SectionTitle>
+          <Card>
+            <WidgetSettings />
+          </Card>
+        </>
+      ) : null}
 
       <SectionTitle>Veriler</SectionTitle>
       <Card>

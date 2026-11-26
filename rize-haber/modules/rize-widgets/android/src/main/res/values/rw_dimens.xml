@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <!-- Android 12 öncesi: başlatıcıların çoğuyla uyumlu köşe. -->
+  <dimen name="rw_radius">20dp</dimen>
+  <dimen name="rw_padding">14dp</dimen>
+</resources>

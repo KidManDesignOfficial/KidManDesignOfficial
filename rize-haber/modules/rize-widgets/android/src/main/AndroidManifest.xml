@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Ana ekran widget'ları. Sağlayıcılar başlatıcının (launcher) yayınlarını alabilmek için dışa açıktır;
+  yalnızca sistemin APPWIDGET_UPDATE yayınını dinler. Hiçbir yeni izin istenmez.
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+  <application>
+    <receiver
+        android:name="expo.modules.rizewidgets.WeatherWidgetProvider"
+        android:exported="true"
+        android:label="@string/rw_weather_label">
+      <intent-filter>
+        <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+      </intent-filter>
+      <meta-data
+          android:name="android.appwidget.provider"
+          android:resource="@xml/rw_info_weather" />
+    </receiver>
+    <receiver
+        android:name="expo.modules.rizewidgets.NewsWidgetProvider"
+        android:exported="true"
+        android:label="@string/rw_news_label">
+      <intent-filter>
+        <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+      </intent-filter>
+      <meta-data
+          android:name="android.appwidget.provider"
+          android:resource="@xml/rw_info_news" />
+    </receiver>
+    <receiver
+        android:name="expo.modules.rizewidgets.MarketsWidgetProvider"
+        android:exported="true"
+        android:label="@string/rw_markets_label">
+      <intent-filter>
+        <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+      </intent-filter>
+      <meta-data
+          android:name="android.appwidget.provider"
+          android:resource="@xml/rw_info_markets" />
+    </receiver>
+    <receiver
+        android:name="expo.modules.rizewidgets.RizesporWidgetProvider"
+        android:exported="true"
+        android:label="@string/rw_rizespor_label">
+      <intent-filter>
+        <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+      </intent-filter>
+      <meta-data
+          android:name="android.appwidget.provider"
+          android:resource="@xml/rw_info_rizespor" />
+    </receiver>
+    <receiver
+        android:name="expo.modules.rizewidgets.ShortcutsWidgetProvider"
+        android:exported="true"
+        android:label="@string/rw_shortcuts_label">
+      <intent-filter>
+        <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+      </intent-filter>
+      <meta-data
+          android:name="android.appwidget.provider"
+          android:resource="@xml/rw_info_shortcuts" />
+    </receiver>
+  </application>
+</manifest>

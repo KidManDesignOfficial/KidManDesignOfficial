@@ -256,6 +256,11 @@ export function useScrollTopOnShow<T extends Scrollable = ComponentRef<typeof Sc
   return ref;
 }
 
+/** Ekran her gösterildiğinde değişen anahtar (gösterildiğinde veriyi yenilemek için). */
+export function useShowKey(): string {
+  return useContext(ShowContext);
+}
+
 /** Dönen ok (▾): `progress` 0 → 1 iken 0° → 180°. */
 export function Chevron({ progress, color, size }: { progress: Animated.Value; color: string; size: number }) {
   const rotate = progress.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '180deg'] });

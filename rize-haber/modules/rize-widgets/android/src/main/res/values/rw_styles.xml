@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <!-- Hava widget'ındaki saat hücreleri. -->
+  <style name="RwHourCell">
+    <item name="android:layout_width">0dp</item>
+    <item name="android:layout_height">wrap_content</item>
+    <item name="android:layout_weight">1</item>
+    <item name="android:gravity">center_horizontal</item>
+    <item name="android:orientation">vertical</item>
+  </style>
+
+  <style name="RwHourTime">
+    <item name="android:layout_width">wrap_content</item>
+    <item name="android:layout_height">wrap_content</item>
+    <item name="android:maxLines">1</item>
+    <item name="android:textColor">#D9FFFFFF</item>
+    <item name="android:textSize">11sp</item>
+  </style>
+
+  <style name="RwHourIcon">
+    <item name="android:layout_width">22dp</item>
+    <item name="android:layout_height">22dp</item>
+    <item name="android:layout_marginTop">4dp</item>
+    <item name="android:layout_marginBottom">4dp</item>
+    <item name="android:importantForAccessibility">no</item>
+    <item name="android:tint">#FFFFFF</item>
+  </style>
+
+  <style name="RwHourTemp">
+    <item name="android:layout_width">wrap_content</item>
+    <item name="android:layout_height">wrap_content</item>
+    <item name="android:fontFamily">sans-serif-medium</item>
+    <item name="android:maxLines">1</item>
+    <item name="android:textColor">#FFFFFF</item>
+    <item name="android:textSize">13sp</item>
+  </style>
+
+  <!-- Kart başlığı: simge + başlık + sağda güncelleme saati. -->
+  <style name="RwHeaderIcon">
+    <item name="android:layout_width">16dp</item>
+    <item name="android:layout_height">16dp</item>
+    <item name="android:layout_marginEnd">6dp</item>
+    <item name="android:importantForAccessibility">no</item>
+    <item name="android:tint">#1B6B3A</item>
+  </style>
+
+  <style name="RwHeaderTitle">
+    <item name="android:layout_width">0dp</item>
+    <item name="android:layout_height">wrap_content</item>
+    <item name="android:layout_weight">1</item>
+    <item name="android:ellipsize">end</item>
+    <item name="android:fontFamily">sans-serif-medium</item>
+    <item name="android:maxLines">1</item>
+    <item name="android:textColor">#1B6B3A</item>
+    <item name="android:textSize">13sp</item>
+  </style>
+
+  <style name="RwHeaderMeta">
+    <item name="android:layout_width">wrap_content</item>
+    <item name="android:layout_height">wrap_content</item>
+    <item name="android:layout_marginStart">8dp</item>
+    <item name="android:maxLines">1</item>
+    <item name="android:textColor">#5E6B63</item>
+    <item name="android:textSize">11sp</item>
+  </style>
+
+  <!-- Haber satırları. -->
+  <style name="RwNewsRow">
+    <item name="android:layout_width">match_parent</item>
+    <item name="android:layout_height">wrap_content</item>
+    <item name="android:minHeight">44dp</item>
+    <item name="android:gravity">center_vertical</item>
+    <item name="android:orientation">vertical</item>
+    <item name="android:paddingTop">6dp</item>
+    <item name="android:paddingBottom">6dp</item>
+  </style>
+
+  <style name="RwNewsTitle">
+    <item name="android:layout_width">match_parent</item>
+    <item name="android:layout_height">wrap_content</item>
+    <item name="android:ellipsize">end</item>
+    <item name="android:fontFamily">sans-serif-medium</item>
+    <item name="android:maxLines">2</item>
+    <item name="android:textColor">#16201A</item>
+    <item name="android:textSize">14sp</item>
+  </style>
+
+  <style name="RwNewsMeta">
+    <item name="android:layout_width">match_parent</item>
+    <item name="android:layout_height">wrap_content</item>
+    <item name="android:layout_marginTop">2dp</item>
+    <item name="android:ellipsize">end</item>
+    <item name="android:maxLines">1</item>
+    <item name="android:textColor">#5E6B63</item>
+    <item name="android:textSize">11sp</item>
+  </style>
+
+  <style name="RwDivider">
+    <item name="android:layout_width">match_parent</item>
+    <item name="android:layout_height">1dp</item>
+    <item name="android:background">#DCE3DE</item>
+    <item name="android:importantForAccessibility">no</item>
+  </style>
+
+  <!-- Piyasa satırları. -->
+  <style name="RwMarketRow">
+    <item name="android:layout_width">match_parent</item>
+    <item name="android:layout_height">wrap_content</item>
+    <item name="android:gravity">center_vertical</item>
+    <item name="android:orientation">horizontal</item>
+    <item name="android:paddingTop">3dp</item>
+    <item name="android:paddingBottom">3dp</item>
+  </style>
+
+  <style name="RwMarketLabel">
+    <item name="android:layout_width">0dp</item>
+    <item name="android:layout_height">wrap_content</item>
+    <item name="android:layout_weight">1</item>
+    <item name="android:ellipsize">end</item>
+    <item name="android:maxLines">1</item>
+    <item name="android:textColor">#5E6B63</item>
+    <item name="android:textSize">13sp</item>
+  </style>
+
+  <style name="RwMarketValue">
+    <item name="android:layout_width">wrap_content</item>
+    <item name="android:layout_height">wrap_content</item>
+    <item name="android:fontFamily">sans-serif-medium</item>
+    <item name="android:maxLines">1</item>
+    <item name="android:textColor">#16201A</item>
+    <item name="android:textSize">15sp</item>
+  </style>
+
+  <!-- Geniş piyasa düzeninde sütunlar. -->
+  <style name="RwMarketColumn">
+    <item name="android:layout_width">0dp</item>
+    <item name="android:layout_height">wrap_content</item>
+    <item name="android:layout_weight">1</item>
+    <item name="android:orientation">vertical</item>
+  </style>
+
+  <!-- Hızlı erişim düğmeleri. -->
+  <style name="RwShortcut">
+    <item name="android:layout_width">0dp</item>
+    <item name="android:layout_height">match_parent</item>
+    <item name="android:layout_weight">1</item>
+    <item name="android:gravity">center</item>
+    <item name="android:minHeight">48dp</item>
+    <item name="android:orientation">vertical</item>
+  </style>
+
+  <style name="RwShortcutCircle">
+    <item name="android:layout_width">40dp</item>
+    <item name="android:layout_height">40dp</item>
+  </style>
+
+  <style name="RwShortcutLabel">
+    <item name="android:layout_width">wrap_content</item>
+    <item name="android:layout_height">wrap_content</item>
+    <item name="android:layout_marginTop">4dp</item>
+    <item name="android:ellipsize">end</item>
+    <item name="android:fontFamily">sans-serif-medium</item>
+    <item name="android:maxLines">1</item>
+    <item name="android:textColor">#16201A</item>
+    <item name="android:textSize">11sp</item>
+  </style>
+</resources>

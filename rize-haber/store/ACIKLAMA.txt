@@ -31,6 +31,13 @@ Rize Haber, Rize’ye dair her gün baktığınız şeyleri tek uygulamada topla
 • Havaya göre canlanan ekran: güneş, ay ve yıldızlar, bulut, yağmur, kar, sis ve şimşek
 • İsteğe bağlı yağmur sesi
 
+📱 ANA EKRAN WIDGET’LARI
+• Uygulamayı açmadan bakın: Hava Durumu, Son Haberler, Döviz-Altın-Çay ve Çaykur Rizespor widget’ları
+• Hızlı Erişim widget’ı ile Haberler, Rizespor, Çay, Ekonomi ve Hava’ya tek dokunuş
+• Widget’a dokunduğunuz haber ya da sekme doğrudan açılır; boyutlarını ana ekranda büyütüp küçültebilirsiniz
+• Uygulamadaki renk, tema ve yazı boyutunu kullanır; ekran okuyucu (TalkBack) ile tam cümleler halinde okunur
+• Uygulama simgesine basılı tutunca açılan kısayollar
+
 🎨 SİZE GÖRE
 • 6 tema: Klasik, Kâğıt, Yayla Sisi, Renk tonlu, Zifiri ve Yüksek kontrast; açık, koyu veya sistem
 • Her sekme için ayrı arka plan sahnesi: Yıldızlı Kaçkar, Karadeniz fırtınası, Yayla sisi, Tribün ışıkları, Demlik buharı, Altın tozu, Kaçkar sırtları ve daha fazlası

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="rw_weather_label">Hava Durumu</string>
+  <string name="rw_weather_desc">Seçtiğiniz ilçe ya da yaylada anlık hava, en yüksek / en düşük sıcaklık ve önümüzdeki saatler.</string>
+  <string name="rw_news_label">Son Haberler</string>
+  <string name="rw_news_desc">Rize’den son haber başlıkları; dokunduğunuz haber uygulamada açılır.</string>
+  <string name="rw_markets_label">Döviz, Altın ve Çay</string>
+  <string name="rw_markets_desc">Dolar, euro, gram altın ve yaş çay alım fiyatı.</string>
+  <string name="rw_rizespor_label">Çaykur Rizespor</string>
+  <string name="rw_rizespor_desc">Sıradaki maç, canlı skor ya da son sonuç.</string>
+  <string name="rw_shortcuts_label">Hızlı Erişim</string>
+  <string name="rw_shortcuts_desc">Haberler, Rizespor, Çay, Ekonomi ve Hava sekmelerine tek dokunuşla gidin.</string>
+
+  <string name="rw_open_app">Verileri görmek için uygulamayı bir kez açın</string>
+  <string name="rw_tab_news">Haberler</string>
+  <string name="rw_tab_rizespor">Rizespor</string>
+  <string name="rw_tab_tea">Çay</string>
+  <string name="rw_tab_economy">Ekonomi</string>
+  <string name="rw_tab_weather">Hava</string>
+</resources>

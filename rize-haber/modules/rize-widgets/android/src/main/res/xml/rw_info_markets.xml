@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  minWidth/minHeight: Android 11 ve öncesi için hücre boyutu; targetCell*: Android 12+.
+  updatePeriodMillis: veri değişmese de zamana bağlı yazıların ("12 dk önce", "Bugün") tazelenmesi için
+  sistemin widget'ı yeniden çizme aralığı (en az 30 dk; 0 = yalnızca uygulama tetikler).
+-->
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:description="@string/rw_markets_desc"
+    android:initialLayout="@layout/rw_markets"
+    android:minWidth="110dp"
+    android:minHeight="110dp"
+    android:minResizeWidth="110dp"
+    android:minResizeHeight="50dp"
+    android:previewLayout="@layout/rw_markets"
+    android:resizeMode="horizontal|vertical"
+    android:targetCellWidth="2"
+    android:targetCellHeight="2"
+    android:updatePeriodMillis="1800000"
+    android:widgetCategory="home_screen" />

@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Çaykur Rizespor widget'ı: başlıkta durum (CANLI / Maç sonu / kalan süre), ortada skor ya da saat. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@android:id/background"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+  <ImageView
+      android:id="@+id/rw_bg"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:importantForAccessibility="no"
+      android:scaleType="fitXY"
+      android:src="@drawable/rw_bg" />
+
+  <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:gravity="center_vertical"
+      android:orientation="vertical"
+      android:paddingStart="@dimen/rw_padding"
+      android:paddingTop="12dp"
+      android:paddingEnd="@dimen/rw_padding"
+      android:paddingBottom="12dp">
+
+    <LinearLayout
+        android:id="@+id/rw_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:minHeight="24dp"
+        android:orientation="horizontal">
+
+      <ImageView android:id="@+id/rw_header_icon" style="@style/RwHeaderIcon" android:src="@drawable/rw_ic_football" />
+      <TextView android:id="@+id/rw_title" style="@style/RwHeaderTitle" android:text="Çaykur Rizespor" />
+      <TextView
+          android:id="@+id/rw_status"
+          style="@style/RwHeaderMeta"
+          android:fontFamily="sans-serif-medium"
+          android:text="2 gün sonra" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/rw_score_row"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+      <TextView
+          android:id="@+id/rw_home"
+          android:layout_width="0dp"
+          android:layout_height="wrap_content"
+          android:layout_weight="1"
+          android:ellipsize="end"
+          android:fontFamily="sans-serif-medium"
+          android:gravity="end"
+          android:maxLines="2"
+          android:text="Rizespor"
+          android:textColor="#16201A"
+          android:textSize="15sp" />
+
+      <TextView
+          android:id="@+id/rw_center"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginStart="12dp"
+          android:layout_marginEnd="12dp"
+          android:fontFamily="sans-serif-medium"
+          android:maxLines="1"
+          android:text="19:00"
+          android:textColor="#1B6B3A"
+          android:textSize="24sp" />
+
+      <TextView
+          android:id="@+id/rw_away"
+          android:layout_width="0dp"
+          android:layout_height="wrap_content"
+          android:layout_weight="1"
+          android:ellipsize="end"
+          android:fontFamily="sans-serif-medium"
+          android:gravity="start"
+          android:maxLines="2"
+          android:text="Trabzonspor"
+          android:textColor="#16201A"
+          android:textSize="15sp" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/rw_sub"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:gravity="center"
+        android:maxLines="1"
+        android:text="Cmt 28 Kas · Çaykur Didi Stadyumu"
+        android:textColor="#5E6B63"
+        android:textSize="12sp" />
+
+    <TextView
+        android:id="@+id/rw_empty"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:text="@string/rw_open_app"
+        android:textColor="#5E6B63"
+        android:textSize="13sp"
+        android:visibility="gone" />
+  </LinearLayout>
+</FrameLayout>

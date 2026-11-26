@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <!-- Android 12+: sistemin widget köşe yarıçapı (başlatıcı kendi değerini verir). -->
+  <dimen name="rw_radius">@android:dimen/system_app_widget_background_radius</dimen>
+  <dimen name="rw_padding">16dp</dimen>
+</resources>

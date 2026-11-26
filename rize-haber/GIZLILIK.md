@@ -1,6 +1,6 @@
 # Rize Haber – Gizlilik Politikası
 
-**Yürürlük tarihi:** 22 Kasım 2026
+**Yürürlük tarihi:** 26 Kasım 2026
 
 Rize Haber, Rize’nin haberlerini, hava durumunu, yaş çay alım fiyatını, döviz ve altın fiyatlarını ve
 Çaykur Rizespor maç bilgilerini sunan bağımsız bir mobil uygulamadır. Bu metin, uygulamanın hangi verileri
@@ -23,6 +23,9 @@ Aşağıdakiler yalnızca telefonunuzun uygulama depolamasında tutulur, hiçbir
 - Kaydettiğiniz haberler
 - Bildirim tercihleriniz
 - Çevrimdışı kullanım için son indirilen haber, hava durumu, çay fiyatı, döviz/altın ve Rizespor verileri
+- Ana ekran widget’larında gösterilen son veriler (haber başlıkları, hava, kurlar, maç bilgisi ve görünüm
+  renkleri). Bunlar yalnızca sizin eklediğiniz widget’larda, telefonunuzun ana ekranında görünür; ana
+  ekranınızı gören herkesin de görebileceğini unutmayın. Widget’ı kaldırmak için ana ekranda üzerine basılı tutun.
 
 Uygulamayı kaldırdığınızda bu bilgilerin tamamı silinir. Kaydedilen haberleri Ayarlar’dan da silebilirsiniz.
 
@@ -57,7 +60,9 @@ ayarlarından istediğiniz zaman kapatabilirsiniz.
 | Bildirim | Yalnızca siz açarsanız; haber ve maç bildirimleri için |
 | Titreşim | Dokunsal geri bildirim ve gol anı için (Ayarlar’dan kapatılabilir) |
 | Ses ayarları | Yalnızca isteğe bağlı yağmur sesini çalmak için; mikrofon kullanılmaz |
-| Arka planda çalışma / açılışta başlama | Açtığınız bildirimlerin uygulama kapalıyken de çalışabilmesi için |
+| Arka planda çalışma / açılışta başlama | Açtığınız bildirimlerin ve ana ekrana eklediğiniz widget’ların uygulama kapalıyken de güncellenebilmesi için |
+
+Ana ekran widget’ları ve uygulama kısayolları için ek bir izin istenmez.
 
 ## Çocukların gizliliği
 

@@ -1,0 +1,17 @@
+// Rize Haber ana ekran widget'ları ve uygulama kısayolları (yerel Expo modülü).
+// android/ klasörü CNG ile üretilir; bu modül autolinking ile otomatik eklenir (modules/ klasörü).
+plugins {
+  id 'com.android.library'
+  id 'expo-module-gradle-plugin'
+}
+
+group = 'com.kidmandesign.rizehaber'
+version = '1.0.0'
+
+android {
+  namespace "expo.modules.rizewidgets"
+  defaultConfig {
+    versionCode 1
+    versionName "1.0.0"
+  }
+}

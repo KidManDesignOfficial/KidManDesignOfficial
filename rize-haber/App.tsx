@@ -31,6 +31,8 @@ import WeatherScreen from './src/screens/WeatherScreen';
 import type { SkyChrome } from './src/weatherScene';
 import { loadSettings } from './src/storage';
 import { DISCOVER_ENABLED, ThemeProvider, useTheme, type Settings, type TabId, tint } from './src/theme';
+import type { WidgetLink } from './src/widgets/links';
+import { useWidgetLinks, useWidgetSync } from './src/widgets/useWidgets';
 
 // Bildirim yanıtı yalnızca telefonda vardır; web önizlemesinde boş döner.
 const useNotificationResponse =
@@ -102,6 +104,19 @@ function Main() {
   }, [mount]);
 
   useOpenNotifications(goTo, () => setShowSaved(false), setOpenMatchId);
+
+  // Ana ekran widget'ları ve uygulama kısayolları: dokunulan sekmeyi (ve haberi) açar.
+  useWidgetSync();
+  useWidgetLinks(
+    useCallback(
+      (link: WidgetLink) => {
+        goTo(link.tab);
+        if (link.tab === 'news') setShowSaved(false);
+        if (link.url) openUrl(link.url, colors);
+      },
+      [goTo, colors],
+    ),
+  );
 
   // Android geri tuşu: önce Ayarlar'ı / Kaydedilenler'i kapat, sonra açılış sekmesine dön.
   useEffect(() => {
